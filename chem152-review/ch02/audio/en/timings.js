@@ -21,11 +21,11 @@ window.TIMINGS = {
   ]
  },
  "molar-mass": {
-  "dur": 26.064,
+  "dur": 26.088,
   "marks": {
-   "fe": 2.044,
-   "o": 12.695,
-   "sum": 20.326
+   "fe": 1.953,
+   "o": 12.956,
+   "sum": 20.807
   },
   "cues": [
    [
@@ -33,15 +33,15 @@ window.TIMINGS = {
     "Start with the molar mass."
    ],
    [
-    2.044,
-    "Iron oxide, F e two O three, has two iron atoms: two times fifty-five point eight five is one hundred eleven point seven zero grams."
+    1.953,
+    "Iron oxide, F, E two O three, has two iron atoms: two times fifty-five point eight five is one hundred eleven point seven zero grams."
    ],
    [
-    12.695,
+    12.956,
     "It has three oxygen atoms: three times sixteen point zero zero is forty-eight point zero zero grams."
    ],
    [
-    20.326,
+    20.807,
     "Together, one mole weighs one hundred fifty-nine point seven zero grams."
    ]
   ]
@@ -113,12 +113,12 @@ window.TIMINGS = {
   ]
  },
  "round-trip": {
-  "dur": 25.08,
+  "dur": 25.488,
   "marks": {
-   "back": 3.62,
-   "mm": 5.938,
-   "pct": 14.154,
-   "match": 21.914
+   "back": 3.438,
+   "mm": 5.755,
+   "pct": 14.492,
+   "match": 22.526
   },
   "cues": [
    [
@@ -126,19 +126,19 @@ window.TIMINGS = {
     "Chapter one went from percentages to a formula."
    ],
    [
-    3.62,
+    3.438,
     "This method goes the other way."
    ],
    [
-    5.938,
-    "For S n C l two I two, the molar mass is four hundred forty-three point four one grams."
+    5.755,
+    "For S, N, C, L two I two, the molar mass is four hundred forty-three point four one grams."
    ],
    [
-    14.154,
+    14.492,
     "The shares come out to about twenty-six point seven seven, fifteen point nine nine, and fifty-seven point two four percent."
    ],
    [
-    21.914,
+    22.526,
     "That's the same compound we started with in chapter one."
    ]
   ]

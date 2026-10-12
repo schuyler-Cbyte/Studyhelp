@@ -21,13 +21,13 @@ window.TIMINGS = {
   ]
  },
  "parts": {
-  "dur": 21.84,
+  "dur": 24.888,
   "marks": {
-   "sides": 1.367,
-   "coef": 8.138,
-   "na": 14.141,
-   "cl2": 16.654,
-   "nacl": 18.88
+   "sides": 1.419,
+   "coef": 8.008,
+   "na": 14.062,
+   "cl2": 16.966,
+   "nacl": 19.714
   },
   "cues": [
    [
@@ -35,52 +35,52 @@ window.TIMINGS = {
     "Here's an equation."
    ],
    [
-    1.367,
+    1.419,
     "Reactants are on the left of the arrow, products on the right, and plus signs separate the substances."
    ],
    [
-    8.138,
+    8.008,
     "The big numbers in front are coefficients."
    ],
    [
-    11.107,
+    10.911,
     "They count units, and they are not part of the name."
    ],
    [
-    14.141,
-    "N a is the element sodium."
+    14.062,
+    "N, A is the element sodium."
    ],
    [
-    16.654,
-    "C l two is still just chlorine."
+    16.966,
+    "C, L two is still just chlorine."
    ],
    [
-    18.88,
-    "And N a C l is sodium chloride."
+    19.714,
+    "And N, A, C, L is sodium chloride."
    ]
   ]
  },
  "q1": {
-  "dur": 3.024,
+  "dur": 3.528,
   "marks": {},
   "cues": [
    [
-    0.091,
+    0.104,
     "Quick check."
    ],
    [
     1.146,
-    "Two N a C l."
+    "Two N, A, C, L."
    ]
   ]
  },
  "ionic-eq": {
-  "dur": 21.168,
+  "dur": 25.752,
   "marks": {
-   "fecl3": 1.237,
-   "naoh": 5.156,
-   "feoh3": 11.654,
-   "nacl": 17.682
+   "fecl3": 1.25,
+   "naoh": 6.667,
+   "feoh3": 13.698,
+   "nacl": 20.443
   },
   "cues": [
    [
@@ -88,20 +88,20 @@ window.TIMINGS = {
     "A longer one."
    ],
    [
-    1.237,
-    "F e C l three is iron three chloride."
+    1.25,
+    "F, E, C, L three is iron three chloride."
    ],
    [
-    5.156,
-    "N a O H is sodium hydroxide: hydroxide is a polyatomic ion."
+    6.667,
+    "N, A, O, H is sodium hydroxide: hydroxide is a polyatomic ion."
    ],
    [
-    11.654,
-    "F e O H three, in brackets, is iron three hydroxide."
+    13.698,
+    "F, E, O, H three, in brackets, is iron three hydroxide."
    ],
    [
-    17.682,
-    "And N a C l is sodium chloride again."
+    20.443,
+    "And N, A, C, L is sodium chloride again."
    ]
   ]
  },
@@ -120,12 +120,12 @@ window.TIMINGS = {
   ]
  },
  "mixed-eq": {
-  "dur": 19.368,
+  "dur": 22.008,
   "marks": {
-   "caco3": 3.568,
-   "cao": 6.81,
-   "co2": 8.672,
-   "water": 14.688
+   "caco3": 3.698,
+   "cao": 8.516,
+   "co2": 10.586,
+   "water": 17.305
   },
   "cues": [
    [
@@ -133,19 +133,19 @@ window.TIMINGS = {
     "Equations can mix ionic and molecular compounds."
    ],
    [
-    3.568,
-    "C a C O three is calcium carbonate."
+    3.698,
+    "C, A, C, O three is calcium carbonate."
    ],
    [
-    6.81,
-    "C a O is calcium oxide."
+    8.516,
+    "C, A, O is calcium oxide."
    ],
    [
-    8.672,
-    "And C O two has only nonmetals, so it takes prefixes: carbon dioxide."
+    10.586,
+    "And C, O two has only nonmetals, so it takes prefixes: carbon dioxide."
    ],
    [
-    14.688,
+    17.305,
     "One more you'll see often: H two O is simply called water."
    ]
   ]
@@ -165,12 +165,12 @@ window.TIMINGS = {
   ]
  },
  "wrap": {
-  "dur": 14.016,
+  "dur": 14.784,
   "marks": {
-   "w1": 0.951,
+   "w1": 1.003,
    "w2": 4.18,
-   "w3": 8.568,
-   "end": 11.849
+   "w3": 9.258,
+   "end": 12.5
   },
   "cues": [
    [
@@ -178,19 +178,19 @@ window.TIMINGS = {
     "To sum up."
    ],
    [
-    0.951,
+    1.003,
     "Coefficients count units; they're not part of the name."
    ],
    [
     4.18,
-    "Elements take the element's name, even when written like C l two."
+    "Elements take the element's name, even when written like C, L two."
    ],
    [
-    8.568,
+    9.258,
     "Name each compound with the chapter five rules."
    ],
    [
-    11.849,
+    12.5,
     "Now try the chapter practice."
    ]
   ]

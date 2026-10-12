@@ -194,33 +194,33 @@ window.TIMINGS = {
   ]
  },
  "write-formula": {
-  "dur": 18.48,
+  "dur": 19.128,
   "marks": {
-   "order": 2.656,
-   "subs": 7.969,
-   "one": 10.794,
-   "ans": 13.425
+   "order": 2.604,
+   "subs": 7.93,
+   "one": 10.82,
+   "ans": 13.438
   },
   "cues": [
    [
-    0.104,
+    0.091,
     "Step five: write the formula."
    ],
    [
-    2.656,
+    2.604,
     "Keep the elements in the order the problem gave them: tin, chlorine, iodine."
    ],
    [
-    7.969,
+    7.93,
     "The whole-number ratios become the subscripts."
    ],
    [
-    10.794,
+    10.82,
     "A subscript of one is not written."
    ],
    [
-    13.425,
-    "So the empirical formula is S n, C l two, I two."
+    13.438,
+    "So the empirical formula is S, N, C, L two, I two."
    ]
   ]
  },

@@ -21,27 +21,27 @@ window.TIMINGS = {
   ]
  },
  "type": {
-  "dur": 17.616,
+  "dur": 20.496,
   "marks": {
-   "ionic": 2.708,
-   "mol": 9.336,
-   "why": 15.56
+   "ionic": 2.539,
+   "mol": 11.797,
+   "why": 18.464
   },
   "cues": [
    [
-    0.143,
+    0.169,
     "First, decide what kind of compound it is."
    ],
    [
-    2.708,
-    "A metal with a nonmetal makes an ionic compound, like N a C l, or M g O."
+    2.539,
+    "A metal with a nonmetal makes an ionic compound, like N, A, C, L, or M, G, O."
    ],
    [
-    9.336,
-    "Nonmetals only make a molecular compound, like C O two, or N two O five."
+    11.797,
+    "Nonmetals only make a molecular compound, like C, O two, or N two O five."
    ],
    [
-    15.56,
+    18.464,
     "The two kinds are named differently."
    ]
   ]
@@ -61,12 +61,12 @@ window.TIMINGS = {
   ]
  },
  "ionic": {
-  "dur": 13.464,
+  "dur": 16.752,
   "marks": {
-   "metal": 2.109,
-   "nonmetal": 4.05,
-   "nacl": 7.839,
-   "mgo": 11.042
+   "metal": 2.214,
+   "nonmetal": 4.128,
+   "nacl": 7.982,
+   "mgo": 13.255
   },
   "cues": [
    [
@@ -74,51 +74,51 @@ window.TIMINGS = {
     "To name an ionic compound, say the metal's name first."
    ],
    [
-    4.05,
+    4.128,
     "Then take the nonmetal's root and add i d e."
    ],
    [
-    7.839,
-    "N a C l is sodium chloride."
+    7.982,
+    "N, A, C, L is sodium chloride."
    ],
    [
-    11.042,
-    "M g O is magnesium oxide."
+    13.255,
+    "M, G, O is magnesium oxide."
    ]
   ]
  },
  "roman": {
-  "dur": 28.176,
+  "dur": 29.976,
   "marks": {
-   "more": 5.3,
-   "fe": 10.781,
-   "total": 18.854,
-   "iii": 21.615,
-   "name": 23.646
+   "more": 5.117,
+   "fe": 10.833,
+   "total": 20.69,
+   "iii": 23.203,
+   "name": 25.339
   },
   "cues": [
    [
-    0.104,
+    0.091,
     "Group one and two metals, and aluminum, have only one charge."
    ],
    [
-    5.3,
+    5.117,
     "But many transition metals, like iron, copper and lead, can have more than one."
    ],
    [
-    10.781,
+    10.833,
     "For these, find the metal's charge from the nonmetal."
    ],
    [
-    14.089,
-    "In F e C l three, each chloride is one minus, so three of them make three minus."
+    14.154,
+    "In F, E, C, L three, each chloride is one minus, so three of them make three minus."
    ],
    [
-    21.615,
+    23.203,
     "Iron must be three plus."
    ],
    [
-    23.646,
+    25.339,
     "The name shows it with a Roman numeral: iron three chloride."
    ]
   ]
@@ -138,57 +138,57 @@ window.TIMINGS = {
   ]
  },
  "poly": {
-  "dur": 16.752,
+  "dur": 16.968,
   "marks": {
-   "list": 4.766,
-   "na2so4": 12.331
+   "list": 4.596,
+   "na2so4": 12.083
   },
   "cues": [
    [
-    0.104,
+    0.091,
     "Some ions are groups of atoms that stay together: polyatomic ions."
    ],
    [
-    4.766,
+    4.596,
     "They keep their own names, like sulfate, nitrate, hydroxide, carbonate, phosphate and ammonium."
    ],
    [
-    12.331,
-    "So N a two S O four is simply sodium sulfate."
+    12.083,
+    "So N, A two S, O four is simply sodium sulfate."
    ]
   ]
  },
  "molecular": {
-  "dur": 18.648,
+  "dur": 19.704,
   "marks": {
-   "prefixes": 3.854,
-   "co2": 8.32,
-   "co": 10.508,
-   "n2o5": 15.065
+   "prefixes": 4.232,
+   "co2": 8.568,
+   "co": 11.094,
+   "n2o5": 16.172
   },
   "cues": [
    [
-    0.104,
+    0.091,
     "Molecular compounds use prefixes to count atoms."
    ],
    [
-    3.854,
+    4.232,
     "Mono, di, tri, tetra, penta, hexa."
    ],
    [
-    8.32,
-    "C O two is carbon dioxide."
+    8.568,
+    "C, O two is carbon dioxide."
    ],
    [
-    10.508,
-    "C O is carbon monoxide."
+    11.094,
+    "C, O is carbon monoxide."
    ],
    [
-    12.513,
+    13.542,
     "The first element never takes mono."
    ],
    [
-    15.065,
+    16.172,
     "N two O five is dinitrogen pentoxide."
    ]
   ]

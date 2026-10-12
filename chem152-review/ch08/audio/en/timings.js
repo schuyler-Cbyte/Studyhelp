@@ -114,42 +114,42 @@ window.TIMINGS = {
   ]
  },
  "methane": {
-  "dur": 24.552,
+  "dur": 25.776,
   "marks": {
-   "big": 6.51,
-   "c": 10.078,
-   "h": 13.008,
-   "o": 16.875,
-   "o2": 19.036,
-   "done": 23.568
+   "big": 6.979,
+   "c": 11.224,
+   "h": 14.245,
+   "o": 18.008,
+   "o2": 20.104,
+   "done": 24.831
   },
   "cues": [
    [
     0.104,
-    "Methane burning: C H four plus O two makes C O two and H two O."
+    "Methane burning: C, H four plus O two makes C, O two and H two O."
    ],
    [
-    6.51,
-    "Start with the substance with the most atoms, C H four."
+    6.979,
+    "Start with the substance with the most atoms, C, H four."
    ],
    [
-    10.078,
+    11.224,
     "Carbon: one and one, already fine."
    ],
    [
-    13.008,
+    14.245,
     "Hydrogen: four on the left, so two waters."
    ],
    [
-    16.875,
+    18.008,
     "Now oxygen: four on the right."
    ],
    [
-    19.036,
+    20.104,
     "O two is a single element, so it goes last: two O two."
    ],
    [
-    23.568,
+    24.831,
     "Balanced."
    ]
   ]
@@ -169,13 +169,13 @@ window.TIMINGS = {
   ]
  },
  "fraction": {
-  "dur": 20.952,
+  "dur": 21.888,
   "marks": {
-   "start": 1.979,
-   "h": 7.122,
-   "o": 10.013,
-   "x2": 15.039,
-   "done": 17.943
+   "start": 1.901,
+   "h": 7.5,
+   "o": 10.846,
+   "x2": 16.393,
+   "done": 19.193
   },
   "cues": [
    [
@@ -183,19 +183,19 @@ window.TIMINGS = {
     "Sometimes you hit a fraction."
    ],
    [
-    1.979,
-    "C two H six: two carbons, so two C O two."
+    1.901,
+    "C two H six: two carbons, so two C, O two."
    ],
    [
-    7.122,
+    7.5,
     "Six hydrogens, so three waters."
    ],
    [
-    10.013,
+    10.846,
     "That's seven oxygen atoms on the right, so O two would need seven halves."
    ],
    [
-    15.039,
+    16.393,
     "Multiply every coefficient by two: two, seven, four, six."
    ]
   ]
