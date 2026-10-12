@@ -48,9 +48,10 @@ footer { margin-top: 48px; font-size: 14px; color: var(--faint); }
 </main>
 <script>
 'use strict';
-// The shelf is built from bookshelf.json. Each entry:
+// The shelf is built from bookshelf.json. Links are relative ("<slug>/") so the site works from any folder,
+// e.g. a GitHub Pages project URL; an older "/<slug>/" entry is accepted and made relative. Each entry:
 //   { "slug": "lowercase-slug", "title": "...", "subtitle": "...", "status": "Draft" | "Pilot / in review" | "Ready",
-//     "href": "/<slug>/", "chapters": { "available": 1, "planned": 8 }, "note": "...", "updated": "YYYY-MM-DD", "hue": "#rrggbb" }
+//     "href": "<slug>/", "chapters": { "available": 1, "planned": 8 }, "note": "...", "updated": "YYYY-MM-DD", "hue": "#rrggbb" }
 const STATUS = { 'Draft': 'var(--draft)', 'Pilot / in review': 'var(--pilot)', 'Ready': 'var(--ready)' };
 const $ = id => document.getElementById(id);
 const el = (tag, cls, text) => { const e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
@@ -58,11 +59,11 @@ const valid = b => b && typeof b === 'object'
   && typeof b.slug === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(b.slug)
   && typeof b.title === 'string' && b.title.trim()
   && Object.hasOwn(STATUS, b.status)
-  && typeof b.href === 'string' && /^\/[a-z0-9-]+\/$/.test(b.href);
+  && typeof b.href === 'string' && /^\/?[a-z0-9]+(?:-[a-z0-9]+)*\/$/.test(b.href);
 
 function card(b) {
   const a = el('a', 'card');
-  a.href = b.href;
+  a.href = b.href.replace(/^\//, '');
   a.setAttribute('aria-label', `${b.title} (${b.status})`);
   const spine = el('div', 'spine');
   if (typeof b.hue === 'string' && /^#[0-9a-f]{6}$/i.test(b.hue)) spine.style.setProperty('--c', b.hue);
