@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dot Product, Length, Angle and Distance · Math 254 Exam 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m254.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 254 Exam 2 Review, Chapter 2. Study guide problem 3. Storyboard: books/math254-exam2/chapters/ch02.md.
+const CHAPTER = { number: 2, title: 'Dot Product, Length, Angle and Distance', minutes: 7, language: 'en', next: '../ch03/' };
+
+/* ---------- chapter data: u = (1, 2, 2, 4), v = (2, 0, 1, 2): u·v = 12, ‖u‖ = 5, ‖v‖ = 3, cos θ = 4/5, ‖u − v‖ = √10 (checked in ch02.md) ---------- */
+const CU = COL.whole, CV = COL.nat;
+const UC = ['1', '2', '2', '4'], VC = ['2', '0', '1', '2'], PR = ['2', '0', '2', '8'], XS = [560, 720, 880, 1040];
+// The sketch: two arrows of length 5 and 3 (92 px per unit) whose angle is arccos(4/5) ≈ 36.9°, so the picture is to scale.
+const O = { x: 200, y: 640 }, K = 92, AU = 15, AV = 15 + Math.acos(.8) * 180 / Math.PI;
+const tip = (len, deg) => [O.x + len * K * Math.cos(deg * Math.PI / 180), O.y - len * K * Math.sin(deg * Math.PI / 180)];
+const [UX, UY] = tip(5, AU), [VX, VY] = tip(3, AV);
+const arrD = (ax, ay, bx, by, hd = 14) => {
+  const L = Math.hypot(bx - ax, by - ay), ux = (bx - ax) / L, uy = (by - ay) / L;
+  return `M${ax} ${ay}L${bx} ${by}M${bx - hd * ux - hd * .6 * uy} ${by - hd * uy + hd * .6 * ux}L${bx} ${by}L${bx - hd * ux + hd * .6 * uy} ${by - hd * uy - hd * .6 * ux}`;
+};
+function sketch(p, t0, { v = true } = {}) {
+  mk('circle', { cx: O.x, cy: O.y, r: 6, fill: COL.dim }, p);
+  arrowPx(p, O.x, O.y, UX, UY, CU, t0);
+  ml(p, ['u'], UX + 26, UY + 10, t0 + .3, { size: 36, fill: CU });
+  if (v) { arrowPx(p, O.x, O.y, VX, VY, CV, t0 + .2); ml(p, ['v'], VX - 6, VY - 22, t0 + .5, { size: 36, fill: CV }); }
+  tx(p, 'sketch in the plane, to scale', 220, 760, t0 + .4, { size: 22, fill: COL.dim });
+}
+const RX = 1100;
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Dot product and length', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Vectors in ℝⁿ · Chapter 2', ['Dot Product, Length,', 'Angle and Distance'], 'four measurements from one product', 'Study guide problem 3');
+  }],
+  ['dot', 'The dot product', (m) => {
+    const p = panel(0);
+    ml(p, ['u ='], 400, 260, .3, { size: 46, fill: CU });
+    UC.forEach((c, k) => ml(p, [c], XS[k], 260, .3, { size: 50, fill: CU }));
+    ml(p, ['v ='], 400, 380, m('v'), { size: 46, fill: CV });
+    VC.forEach((c, k) => ml(p, [c], XS[k], 380, m('v', .2), { size: 50, fill: CV }));
+    XS.forEach((x, k) => {
+      draw(path(p, `M${x} 290V340M${x} 410V455`, { stroke: COL.faint, 'stroke-width': 2.5 }, { d: 0 }), m('mult', k * 1.1), .4);
+      ml(p, ['×'], x, 330, m('mult', k * 1.1), { size: 30, fill: COL.dim });
+      ml(p, [PR[k]], x, 510, m('mult', k * 1.1 + .4), { size: 50, fill: COL.task });
+      if (k) ml(p, ['+'], x - 80, 510, m('add', (k - 1) * .3), { size: 44 });
+    });
+    const a = ml(p, ['= 12'], 1230, 510, m('ans'), { size: 54, fill: COL.good });
+    boxMath(p, a, 1230, 510, 54, m('ans', .5));
+    ml(p, ['u · v = 12'], 800, 660, m('num'), { size: 46 });
+    tx(p, 'a scalar, not a vector', 800, 720, m('num', .6), { size: 30, fill: COL.task, anchor: 'middle', weight: 600 });
+  }],
+  ['len', 'Length (norm)', (m) => {
+    const p = panel(0), A = [180, 640], B = [420, 640], C = [420, 320];
+    draw(path(p, `M${A}L${B[0]} ${B[1]}`, { stroke: COL.chalk, 'stroke-width': 4 }, { d: 0 }), m('tri'), .5);
+    draw(path(p, `M${B[0]} ${B[1]}L${C[0]} ${C[1]}`, { stroke: COL.chalk, 'stroke-width': 4 }, { d: 0 }), m('tri', .4), .5);
+    show(path(p, `M${B[0] - 24} ${B[1]}V${B[1] - 24}H${B[0]}`, { stroke: COL.dim, 'stroke-width': 2 }, { o: 0 }), m('tri', .8));
+    tx(p, '3', 300, 685, m('tri', .3), { size: 34, anchor: 'middle' });
+    tx(p, '4', 450, 490, m('tri', .7), { size: 34 });
+    arrowPx(p, A[0], A[1], C[0], C[1], CU, m('hyp'));
+    tx(p, '5', 270, 460, m('hyp', 1.2), { size: 34, fill: CU, anchor: 'middle' });
+    ml(p, ['‖(3, 4)‖ = ', R('9 + 16'), ' = 5'], RX, 200, m('hyp', .4), { size: 46 });
+    ml(p, ['‖u‖ = ', R('u · u')], RX, 330, m('rule'), { size: 44, fill: COL.task });
+    ml(p, ['‖u‖ = ', R('1 + 4 + 4 + 16'), ' = ', R('25'), ' = 5'], RX, 460, m('u'), { size: 46, fill: CU });
+    ml(p, ['‖v‖ = ', R('4 + 0 + 1 + 4'), ' = ', R('9'), ' = 3'], RX, 580, m('v'), { size: 46, fill: CV });
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['u · v = u₁v₁ + u₂v₂ + …'], 800, 300, .2, { size: 50, fill: COL.task });
+    ml(p, ['‖u‖ = ', R('u · u')], 800, 440, .4, { size: 50, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-dot', prompt: ['Find ', $m('(1, −2, 3) · (4, 0, −1)'), '.'],
+    build: blanks([{ parts: [{ box: '1' }], why: '1 · 4 + (−2) · 0 + 3 · (−1) = 4 + 0 − 3 = 1.', hint: 'Multiply matching components: 4, 0 and −3. Then add.' }]),
+  }, {
+    id: 'c-norm', prompt: ['Find ', $m('‖(2, −1, 2)‖'), '.'],
+    build: blanks([{ parts: [{ box: '3' }], why: '√(4 + 1 + 4) = √9 = 3.', hint: 'Square each component (negatives become positive), add, then take the square root.' }]),
+  }], done) }],
+  ['angle', 'The angle', (m) => {
+    const p = panel(0);
+    sketch(p, m('sketch'));
+    const a0 = AU * Math.PI / 180, a1 = AV * Math.PI / 180, r = 95;
+    draw(path(p, `M${O.x + r * Math.cos(a0)} ${O.y - r * Math.sin(a0)}A${r} ${r} 0 0 0 ${O.x + r * Math.cos(a1)} ${O.y - r * Math.sin(a1)}`, { stroke: COL.task, 'stroke-width': 3 }, { d: 0 }), m('theta'), .5);
+    const am = (a0 + a1) / 2;
+    ml(p, ['θ'], O.x + 128 * Math.cos(am), O.y - 128 * Math.sin(am) + 12, m('theta', .3), { size: 36, fill: COL.task });
+    ml(p, ['cos θ = ', F('u · v', '‖u‖ ‖v‖')], RX, 190, m('rule'), { size: 50, fill: COL.task });
+    ml(p, ['cos θ = ', F('12', '5 · 3')], RX, 320, m('plug'), { size: 50 });
+    const a = ml(p, ['cos θ = ', F('4', '5')], RX, 450, m('ans'), { size: 50, fill: COL.good });
+    boxMath(p, a, RX, 440, 50, m('ans', .5), COL.good, 30);
+    ml(p, ['θ ≈ 36.9°'], RX, 545, m('deg'), { size: 40, fill: COL.dim });
+    tx(p, 'Cauchy–Schwarz inequality', RX, 625, m('cs'), { size: 26, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['|u · v| ≤ ‖u‖ ‖v‖'], RX, 690, m('cs', .3), { size: 44, fill: COL.task });
+    ml(p, ['12 ≤ 15  ✓'], RX, 765, m('cs', 4), { size: 42, fill: COL.good });
+  }],
+  ['dist', 'Distance', (m) => {
+    const p = panel(0);
+    sketch(p, .2);
+    const s = path(p, `M${VX} ${VY}L${UX} ${UY}`, { stroke: COL.task, 'stroke-width': 4, 'stroke-dasharray': '10 8' }, { o: 0 });
+    show(s, m('seg'));
+    ml(p, ['d'], (UX + VX) / 2 + 26, (UY + VY) / 2 - 14, m('seg', .3), { size: 36, fill: COL.task });
+    ml(p, ['d(u, v) = ‖u − v‖'], RX, 190, m('seg', .2), { size: 50, fill: COL.task });
+    ml(p, ['u − v = (1 − 2, 2 − 0, 2 − 1, 4 − 2)'], RX, 310, m('sub'), { size: 42 });
+    ml(p, ['= (−1, 2, 1, 2)'], RX, 390, m('sub', 2), { size: 42 });
+    ml(p, ['‖u − v‖ = ', R('1 + 4 + 1 + 4')], RX, 510, m('len'), { size: 46 });
+    const a = ml(p, ['d = ', R('10'), ' ≈ 3.16'], RX, 640, m('ans'), { size: 50, fill: COL.good });
+    boxMath(p, a, RX, 640, 50, m('ans', .5));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['d(u, v) = ‖u − v‖'], 800, 380, .2, { size: 60, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-dist', prompt: ['Find the distance between ', $m('(1, 1, 0)'), ' and ', $m('(3, 2, 2)'), '.'],
+    build: blanks([{ parts: ['d = ', { box: '3' }], why: 'The difference is (−2, −1, −2), and √(4 + 1 + 4) = √9 = 3.', hint: 'Subtract component by component first, then take the length.' }]),
+  }], done) }],
+  ['unit', 'Unit vectors', (m) => {
+    const p = panel(0);
+    sketch(p, .2, { v: false });
+    const c = path(p, `M${O.x + K} ${O.y}A${K} ${K} 0 1 0 ${O.x - K} ${O.y}A${K} ${K} 0 1 0 ${O.x + K} ${O.y}`, { stroke: COL.dim, 'stroke-width': 2.5, 'stroke-dasharray': '7 7' }, { o: 0 });
+    show(c, m('circ'));
+    tx(p, 'radius 1', O.x, O.y - K - 16, m('circ', .3), { size: 22, fill: COL.dim, anchor: 'middle' });
+    const e = path(p, arrD(O.x, O.y, UX, UY), { stroke: COL.good, 'stroke-width': 5 }, { o: 0 });
+    show(e, m('shrink'), .2);
+    const [EX, EY] = tip(1, AU);
+    prog(q => e.setAttribute('d', arrD(O.x, O.y, UX + (EX - UX) * q, UY + (EY - UY) * q)), m('shrink', .3), 1.4, io);
+    ml(p, [F('u', '‖u‖')], EX + 34, EY + 60, m('shrink', 1.8), { size: 34, fill: COL.good });
+    ml(p, ['unit vector = ', F('u', '‖u‖')], RX, 200, m('shrink', .2), { size: 50, fill: COL.task });
+    ml(p, [F('1', '5'), '(1, 2, 2, 4) = (', F('1', '5'), ', ', F('2', '5'), ', ', F('2', '5'), ', ', F('4', '5'), ')'], RX, 350, m('calc'), { size: 46, fill: COL.good });
+    ml(p, ['length: ', R(F('1 + 4 + 4 + 16', '25')), ' = 1  ✓'], RX, 500, m('check'), { size: 44 });
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['unit vector = ', F('u', '‖u‖')], 800, 380, .2, { size: 60, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-unit', prompt: ['Which is the unit vector in the direction of ', $m('(0, 3, −4)'), '?'],
+    build: choice([[$m('(0, ', F('3', '5'), ', −', F('4', '5'), ')')], [$m('(0, ', F('3', '25'), ', −', F('4', '25'), ')')], [$m('(0, ', F('3', '7'), ', −', F('4', '7'), ')')]], 0,
+      'The length is √(0 + 9 + 16) = 5; divide every component by 5.',
+      [null, 'Divide by the length, 5, not by its square, 25.', 'The length is √(9 + 16) = 5, not 3 + 4 = 7.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Dot product: multiply matching components, add. A scalar.', 'w1'], ['Norm: ‖u‖ = √(u · u).', 'w2'],
+      ['cos θ = u · v / (‖u‖ ‖v‖); Cauchy–Schwarz: |u · v| ≤ ‖u‖ ‖v‖.', 'w3'], ['Distance ‖u − v‖; unit vector u / ‖u‖.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-hw3a', prompt: [fromHW(3), $m('u = (3, −2, 0, 5)'), ', ', $m('v = (7, −1, −2, 4)'), '. (a) Compute ', $m('u · v'), '.'],
+    build: blanks([{ parts: ['u · v = ', { box: '43' }], why: '21 + 2 + 0 + 20 = 43.', hint: 'Four products: 3 · 7, (−2)(−1), 0 · (−2), 5 · 4. Then add.' }]),
+  }, {
+    id: 'p-hw3e1', prompt: ['Problem 3, the lengths you need for (b), (d) and (e):'],
+    build: blanks([{ parts: ['‖u‖', E(2), ' = ', { box: '38' }, ',    ‖v‖', E(2), ' = ', { box: '70' }], why: '9 + 4 + 0 + 25 = 38 and 49 + 1 + 4 + 16 = 70, so ‖u‖ = √38 and ‖v‖ = √70.',
+      hint: '‖u‖² = u · u: add the squares of the components.' }]),
+  }, {
+    id: 'p-hw3b', prompt: ['(b) The cosine of the angle between u and v:'],
+    build: choice([[$m('cos θ = ', F('43', '√38 √70'))], [$m('cos θ = ', F('43', '38 · 70'))], [$m('cos θ = ', F('43', '√(38 + 70)'))]], 0,
+      'cos θ = u · v / (‖u‖ ‖v‖) = 43 / (√38 √70) ≈ 0.834.',
+      [null, 'Use the norms √38 and √70, not their squares.', 'The denominator is the product ‖u‖ ‖v‖, not the length of a sum.']),
+  }, {
+    id: 'p-hw3c', prompt: ['(c) The Euclidean distance between u and v:'],
+    build: blanks([{ parts: ['d = √', { box: '22' }], why: 'u − v = (−4, −1, 2, 1) and 16 + 1 + 4 + 1 = 22.', hint: 'Subtract first: u − v = (3 − 7, −2 + 1, 0 + 2, 5 − 4). Then square and add.' }]),
+  }, {
+    id: 'p-hw3d', prompt: ['(d) A unit vector with the same direction as u:'],
+    build: choice([[$m(F('1', '√38'), '(3, −2, 0, 5)')], [$m(F('1', '38'), '(3, −2, 0, 5)')], [$m(F('1', '10'), '(3, −2, 0, 5)')]], 0,
+      'Divide u by its length √38.',
+      [null, 'Divide by the length √38, not by its square.', 'The length is √38, not the sum 3 + 2 + 0 + 5.']),
+  }, {
+    id: 'p-hw3e', prompt: ['(e) Cauchy–Schwarz says ', $m('|u · v| ≤ ‖u‖ ‖v‖'), '. Here that reads'],
+    build: choice([[$m('43 ≤ √38 √70 ≈ 51.6  ✓')], [$m('43 ≤ 38 + 70  ✓')], [$m('43 ≤ 38 · 70  ✓')]], 0,
+      '|u · v| = 43 and ‖u‖ ‖v‖ = √2660 ≈ 51.6, so the inequality holds.',
+      [null, 'The right side is the product of the norms, √38 · √70.', 'Use the norms √38 and √70, not their squares.']),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

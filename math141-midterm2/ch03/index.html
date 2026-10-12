@@ -1,0 +1,174 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Complex Zeros and Linear Factors · Math 141 Midterm 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 2 Review, Chapter 3. Practice midterm questions 3, 8, 9, 11. Storyboard: books/math141-midterm2/chapters/ch03.md.
+const CHAPTER = { number: 3, title: 'Complex Zeros and Linear Factors', minutes: 7, language: 'en', next: '../ch04/' };
+
+/* ---------- chapter data: x³ − 5x² + 11x − 15 = (x − 3)(x² − 2x + 5), zeros 3, 1 ± 2i (checked in ch03.md) ---------- */
+const SX = [600, 800, 1000, 1200], SY = { top: 300, mid: 380, line: 415, bot: 470 };
+const COEF = ['1', '−5', '11', '−15'], MID = ['3', '−6', '15'], BOT = ['1', '−2', '5', '0'];
+const IC = { x: 520, y: 420, r: 180 };                       // the circle for powers of i
+const IPT = [['1', 0], ['i', 90], ['−1', 180], ['−i', 270]];
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Complex zeros', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Polynomial Functions · Chapter 3', 'Complex Zeros and Linear Factors', 'from one known zero to all of them', 'Practice midterm questions 3, 8, 9 and 11');
+  }],
+  ['synth', 'Synthetic division', (m) => {
+    const p = panel(0);
+    ml(p, ['f(x) = x', E(3), ' − 5x', E(2), ' + 11x − 15'], 800, 160, .3, { size: 52 });
+    ml(p, ['3'], 460, SY.top, m('coef'), { size: 50, fill: COL.task });
+    draw(path(p, `M510 250V${SY.line}H1270`, { stroke: COL.chalk, 'stroke-width': 3 }, { d: 0 }), m('coef', .2), .7);
+    COEF.forEach((c, i) => ml(p, [c], SX[i], SY.top, m('coef', 1.4 + i * .45), { size: 50 }));
+    draw(path(p, `M${SX[0]} 320V440M${SX[0] - 9} 430L${SX[0]} 442L${SX[0] + 9} 430`, { stroke: COL.dim, 'stroke-width': 2.5 }, { d: 0 }), m('down'), .4);
+    ml(p, [BOT[0]], SX[0], SY.bot, m('down', .3), { size: 50 });
+    [1, 2, 3].forEach(k => {
+      const ax = SX[k - 1] + 34, bx = SX[k] - 40;
+      draw(path(p, `M${ax} 455L${bx} 395M${bx - 15} 393L${bx} 395L${bx - 6} 409`, { stroke: COL.task, 'stroke-width': 2.5 }, { d: 0 }), m('mult' + k), .45);
+      ml(p, [MID[k - 1]], SX[k], SY.mid, m('mult' + k, .35), { size: 50, fill: COL.task });
+      ml(p, [BOT[k]], SX[k], SY.bot, m('add' + k, .15), { size: 50, fill: k === 3 ? COL.good : COL.chalk });
+    });
+    ansBox(p, SX[3] - 50, SY.bot - 52, 100, 74, m('zero'));
+    tx(p, 'remainder 0', SX[3], 545, m('zero', .3), { size: 28, fill: COL.good, anchor: 'middle', weight: 600 });
+    draw(path(p, `M${SX[0] - 30} 500V512H${SX[2] + 30}V500`, { stroke: COL.whole, 'stroke-width': 3 }, { d: 0 }), m('quot'), .5);
+    ml(p, ['x', E(2), ' − 2x + 5'], SX[1], 590, m('quot', .4), { size: 48, fill: COL.whole });
+    tx(p, 'quotient: one degree lower', SX[1], 645, m('quot', .9), { size: 26, fill: COL.dim, anchor: 'middle' });
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-synth', prompt: ['Divide ', $m('x', E(3), ' − 4x', E(2), ' + 9x − 10'), ' by ', $m('x − 2'), ' with synthetic division. Fill in the bottom row.'],
+    build: blanks([{ parts: ['1,  ', { box: '-2' }, ',  ', { box: '5' }, ',  ', { box: '0' }], why: '1; 2 · 1 = 2, −4 + 2 = −2; 2 · (−2) = −4, 9 − 4 = 5; 2 · 5 = 10, −10 + 10 = 0.',
+      hint: 'Multiply by 2, write it under the next coefficient, add. Start: 2 · 1 = 2 and −4 + 2 = −2.' }]),
+  }], done) }],
+  ['quad', 'The other zeros', (m) => {
+    const p = panel(0);
+    ml(p, ['x', E(2), ' − 2x + 5 = 0'], 800, 150, .3, { size: 52 });
+    fracEq(p, 'x =', ['2 ± ', R('4 − 20')], ['2'], 520, 280, m('qf'), { size: 48 });
+    fracEq(p, 'x =', ['2 ± ', R('−16')], ['2'], 520, 415, m('neg'), { size: 48 });
+    ml(p, [R('−16'), ' = ', R('16'), ' · ', R('−1'), ' = 4i'], 900, 432, m('neg', .5), { size: 38, fill: COL.task, anchor: 'start' });
+    fracEq(p, 'x =', ['2 ± 4i'], ['2'], 520, 550, m('split'), { size: 48 });
+    const a = ml(p, ['x = 1 + 2i ,    x = 1 − 2i'], 800, 700, m('ans'), { size: 54, fill: COL.good });
+    boxMath(p, a, 800, 700, 54, m('ans', .6));
+  }],
+  ['lft', 'Linear factors', (m) => {
+    const p = panel(0);
+    ml(p, ['zero  c   →   factor  (x − c)'], 800, 130, m('rule'), { size: 42, fill: COL.task });
+    ml(p, ['f(x) = (x − 3)(x − (1 + 2i))(x − (1 − 2i))'], 800, 225, m('fact'), { size: 48 });
+    const P = plane(p, { cx: 700, cy: 540, u: 58, x0: -2, x1: 5, y0: -3, y1: 3, t0: m('plane') });
+    [...P.g.querySelectorAll('text')].filter(t => t.textContent === 'x' || t.textContent === 'y').forEach(t => t.remove());
+    T(P.g, 'real', { x: P.PX(5.5) + 14, y: P.cy + 8, size: 24, fill: COL.dim });
+    T(P.g, 'imaginary', { x: P.cx + 14, y: P.PY(3.5), size: 24, fill: COL.dim });
+    P.layer = p;
+    P.dot(3, 0, COL.irr, m('plane', .6), { label: '3' });
+    P.dot(1, 2, COL.task, m('pair'), { label: '1 + 2i' });
+    dashed(p, `M${P.PX(1)} ${P.PY(2) + 12}V${P.PY(-2) - 12}`, m('conj'), COL.task);
+    P.dot(1, -2, COL.task, m('conj', .4), { label: '1 − 2i' });
+    tx(p, 'conjugate pair', 1250, 500, m('conj', .8), { size: 34, fill: COL.task, anchor: 'middle', weight: 600 });
+    ml(p, ['a + bi   and   a − bi'], 1250, 570, m('conj', 1.2), { size: 36, fill: COL.task });
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['a + bi   and   a − bi'], 800, 380, .2, { size: 64, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-conj', prompt: ['A polynomial with real coefficients has the zero ', $m('2 − 7i'), '. Which other number must be a zero?'],
+    build: choice([[$m('2 + 7i')], [$m('−2 + 7i')], [$m('−2 − 7i')]], 0, 'Complex zeros of a real polynomial come in conjugate pairs: change only the sign of the imaginary part.',
+      [null, 'Keep the real part, 2. Only the sign of the imaginary part changes.', 'The conjugate keeps the real part 2 and flips the imaginary part: 2 + 7i.']),
+  }], done) }],
+  ['mult', 'Multiplicity', (m) => {
+    const p = panel(0), sz = 64, y = 280;
+    const parts = [['f(x) = '], ['(x + 1)', E(2)], ['(x − 5)', E(4)]], ws = parts.map(q => mathW(q, sz));
+    let x = 800 - ws.reduce((a, b) => a + b, 0) / 2;
+    const cx = parts.map((q, i) => { const c = x + ws[i] / 2; x += ws[i]; return c; });
+    ml(p, parts[0], cx[0], y, .3, { size: sz });
+    ml(p, parts[1], cx[1], y, .3, { size: sz, fill: COL.whole });
+    ml(p, parts[2], cx[2], y, .3, { size: sz, fill: COL.nat });
+    draw(path(p, `M${cx[1]} 315V390`, { stroke: COL.whole, 'stroke-width': 2.5 }, { d: 0 }), m('m1'), .4);
+    tx(p, 'zero −1, multiplicity 2', cx[1], 430, m('m1', .3), { size: 32, fill: COL.whole, anchor: 'middle', weight: 600 });
+    draw(path(p, `M${cx[2]} 315V480`, { stroke: COL.nat, 'stroke-width': 2.5 }, { d: 0 }), m('m2'), .4);
+    tx(p, 'zero 5, multiplicity 4', cx[2], 520, m('m2', .3), { size: 32, fill: COL.nat, anchor: 'middle', weight: 600 });
+    tx(p, 'the exponent on the factor is the multiplicity', 800, 640, m('m2', 2), { size: 30, fill: COL.dim, anchor: 'middle' });
+  }],
+  ['ipow', 'Powers of i', (m) => {
+    const p = panel(0), at = deg => [IC.x + IC.r * Math.cos(deg * Math.PI / 180), IC.y - IC.r * Math.sin(deg * Math.PI / 180)];
+    draw(path(p, `M${IC.x + IC.r} ${IC.y}A${IC.r} ${IC.r} 0 1 0 ${IC.x - IC.r} ${IC.y}A${IC.r} ${IC.r} 0 1 0 ${IC.x + IC.r} ${IC.y}`, { stroke: COL.faint, 'stroke-width': 3 }, { d: 0 }), .2, .9);
+    path(p, `M${IC.x - IC.r - 40} ${IC.y}H${IC.x + IC.r + 40}M${IC.x} ${IC.y - IC.r - 40}V${IC.y + IC.r + 40}`, { stroke: COL.faint, 'stroke-width': 1.5 });
+    const labs = IPT.map(([s, deg]) => {
+      const [x, y] = at(deg), off = { 0: [44, 12], 90: [0, -24], 180: [-44, 12], 270: [0, 50] }[deg];
+      mk('circle', { cx: x, cy: y, r: 7, fill: COL.dim }, p);
+      return ml(p, [s], x + off[0], y + off[1], .5, { size: 40, fill: COL.dim });
+    });
+    const dotI = G(p, { x: at(0)[0], y: at(0)[1], o: 0 });
+    mk('circle', { r: 16, fill: COL.task, stroke: COL.board, 'stroke-width': 3 }, dotI);
+    show(dotI, m('cycle'), .3);
+    const lines = [['i', E(1), ' = i'], ['i', E(2), ' = −1'], ['i', E(3), ' = −i'], ['i', E(4), ' = 1']];
+    lines.forEach((q, k) => {
+      const t0 = m('cycle', .2 + k * 1.35);
+      prog(u => { const [x, y] = at(k * 90 + 90 * u); put(dotI, { x, y }); }, t0, .8);
+      ml(p, q, k % 2 ? 1330 : 1030, k < 2 ? 220 : 300, t0 + .6, { size: 44, anchor: 'start', fill: COL.task });
+      pulse(labs[(k + 1) % 4], t0 + .7, 1.3);
+    });
+    tx(p, 'then the pattern repeats every 4', 1030, 380, m('repeat'), { size: 30, fill: COL.dim });
+    ml(p, ['i', E(62), ':   62 = 4 · 15 + 2'], 1030, 500, m('ex'), { size: 44, anchor: 'start' });
+    prog(u => { const [x, y] = at(90 * 2 * u); put(dotI, { x, y }); }, m('ans'), 1);
+    pulse(labs[2], m('ans', 1), 1.4);
+    const a = ml(p, ['i', E(62), ' = i', E(2), ' = −1'], 1230, 610, m('ans', .4), { size: 50, fill: COL.good });
+    boxMath(p, a, 1230, 610, 50, m('ans', 1));
+  }],
+  ['q3', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-ipow', prompt: ['Simplify ', $m('i', E(103)), '.'],
+    build: choice([[$m('i')], [$m('−1')], [$m('−i')], [$m('1')]], 2, '103 = 4 · 25 + 3, so i¹⁰³ = i³ = −i.',
+      ['The remainder is 3, not 1: 103 = 4 · 25 + 3.', 'Remainder 2 would give −1, but 103 = 4 · 25 + 3 leaves 3.', null, 'Remainder 0 would give 1; here 103 = 4 · 25 + 3.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Synthetic division by a zero: remainder 0, quotient one degree lower.', 'w1'], ['Solve the quadratic quotient; √(negative) gives i.', 'w2'],
+      ['Zero c → factor (x − c); complex zeros come in conjugate pairs.', 'w3'], ['Powers of i: use the remainder after dividing by 4.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q3-synth', prompt: [fromExam(3), $m('f(t) = t', E(3), ' − 7t', E(2), ' + 17t − 14'), ', and 2 is a zero. Divide by ', $m('t − 2'), ': fill in the bottom row.'],
+    build: blanks([{ parts: ['1,  ', { box: '-5' }, ',  ', { box: '7' }, ',  ', { box: '0' }], why: '2 · 1 = 2, −7 + 2 = −5; 2 · (−5) = −10, 17 − 10 = 7; 2 · 7 = 14, −14 + 14 = 0. Quotient: t² − 5t + 7.',
+      hint: 'Coefficients 1, −7, 17, −14. Multiply by 2 and add, column by column.' }]),
+  }, {
+    id: 'p-q3a', prompt: ['Question 3a. Solve ', $m('t', E(2), ' − 5t + 7 = 0'), ': the two other complex zeros are'],
+    build: choice([[$m(F('5', '2'), ' ± ', F('√3', '2'), 'i')], [$m(F('5', '2'), ' ± ', F('√3', '2'))], [$m('−', F('5', '2'), ' ± ', F('√3', '2'), 'i')]], 0,
+      't = (5 ± √(25 − 28))/2 = (5 ± √−3)/2 = 5/2 ± (√3/2)i.',
+      [null, '√−3 = i√3: the zeros are not real, so i must appear.', '−b = −(−5) = +5, so the real part is +5/2.']),
+  }, {
+    id: 'p-q3b', prompt: ['Question 3b. Write ', $m('f(t)'), ' as a product of three linear factors over the complex numbers.'],
+    build: choice([[$m('(t − 2)(t − (', F('5', '2'), ' + ', F('√3', '2'), 'i))(t − (', F('5', '2'), ' − ', F('√3', '2'), 'i))')],
+      [$m('(t + 2)(t + (', F('5', '2'), ' + ', F('√3', '2'), 'i))(t + (', F('5', '2'), ' − ', F('√3', '2'), 'i))')],
+      [$m('(t − 2)(t', E(2), ' − 5t + 7)')]], 0,
+      'Each zero c gives the factor (t − c); the leading coefficient is 1.',
+      [null, 'A zero c gives (t − c), not (t + c).', 'That is true, but t² − 5t + 7 is not linear; the Linear Factorization Theorem form needs three linear factors.']),
+  }, {
+    id: 'p-q8', prompt: [fromExam(8), $m('f(x)'), ' has real coefficients and the zero ', $m('3 + 5i'), '. What other number must be a zero?'],
+    build: choice([[$m('3 − 5i')], [$m('−3 + 5i')], [$m('−3 − 5i')]], 0, 'Its conjugate: same real part, opposite imaginary part.',
+      [null, 'Keep the real part 3; flip only the sign of 5i.', 'The conjugate keeps the real part 3.']),
+  }, {
+    id: 'p-q9', prompt: [fromExam(9), 'If ', $m('f(x) = (x − 4)', E(3)), ', then 4 is a zero of multiplicity'],
+    build: blanks([{ parts: [{ box: '3' }], why: 'The exponent on the factor (x − 4) is 3.', hint: 'Look at the exponent on (x − 4).' }]),
+  }, {
+    id: 'p-q11', prompt: [fromExam(11), 'Simplify ', $m('i', E(447)), '.'],
+    build: choice([[$m('i')], [$m('−1')], [$m('−i')], [$m('1')]], 2, '447 = 4 · 111 + 3, so i⁴⁴⁷ = i³ = −i.',
+      ['The remainder is 3: 447 = 4 · 111 + 3.', 'Remainder 2 would give −1; 447 leaves remainder 3.', null, 'Remainder 0 would give 1; 447 leaves remainder 3.']),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

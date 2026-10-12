@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Exponential and Log Equations · Math 141 Midterm 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 2 Review, Chapter 8. Practice midterm questions 4, 22, 23. Storyboard: books/math141-midterm2/chapters/ch08.md.
+const CHAPTER = { number: 8, title: 'Exponential and Log Equations', minutes: 7, language: 'en' };
+
+/* ---------- chapter data (checked in ch08.md) ---------- */
+const LG = b => ['log', SB(b)];
+const T3 = Math.log(3) / .04;                 // $1000 → $3000 at 4%: ≈ 27.47 years
+const RX = 1180;
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Exponential and log equations', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Exponentials and Logarithms · Chapter 8', 'Exponential and Log Equations', 'unknowns in exponents and inside logs', 'Practice midterm questions 4, 22 and 23');
+  }],
+  ['same', 'A common base', (m) => {
+    const p = panel(0), o = { xEq: 700, size: 50 };
+    eqLine(p, ['8', E('x + 1')], ['4', E('2x')], 160, .3, o);
+    eqLine(p, ['(2', E(3), ')', E('x + 1')], ['(2', E(2), ')', E('2x')], 260, m('rewrite', 1), o);
+    eqLine(p, ['2', E('3x + 3')], ['2', E('4x')], 360, m('power'), o);
+    eqLine(p, '3x + 3', '4x', 460, m('match'), { ...o, fill: COL.task });
+    tx(p, 'same base: exponents equal', 1140, 450, m('match', .4), { size: 28, fill: COL.task, weight: 600 });
+    eqLine(p, 'x', '3', 560, m('solve'), o);
+    const a = ml(p, ['solution set:  {3}'], 800, 680, m('set'), { size: 52, fill: COL.good });
+    boxMath(p, a, 800, 680, 52, m('set', .6));
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['same base   →   exponents equal'], 800, 380, .2, { size: 60, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-samebase', prompt: ['Solve ', $m('25', E('x + 1'), ' = 125', E('x')), '.'],
+    build: blanks([{ parts: ['x = ', { box: '2' }], why: '25 = 5², 125 = 5³: 5^(2x + 2) = 5^(3x), so 2x + 2 = 3x and x = 2.',
+      hint: 'Write both sides as powers of 5: 25 = 5² and 125 = 5³.' }]),
+  }], done) }],
+  ['logeq', 'A log equation', (m) => {
+    const p = panel(0), L = 220, sz = 46;
+    ml(p, [...LG(2), '(x) + ', ...LG(2), '(x − 2) = 3'], L, 160, .3, { size: sz, anchor: 'start' });
+    ml(p, [...LG(2), '(x(x − 2)) = 3'], L, 255, m('comb'), { size: sz, anchor: 'start' });
+    tx(p, 'product rule', 1000, 245, m('comb', .4), { size: 28, fill: COL.task, weight: 600 });
+    ml(p, ['x(x − 2) = 2', E(3), ' = 8'], L, 350, m('exp'), { size: sz, anchor: 'start' });
+    tx(p, 'rewrite as an exponential', 1000, 340, m('exp', .4), { size: 28, fill: COL.task, weight: 600 });
+    ml(p, ['x', E(2), ' − 2x − 8 = 0'], L, 445, m('quad'), { size: sz, anchor: 'start' });
+    ml(p, ['(x − 4)(x + 2) = 0'], L, 540, m('fact'), { size: sz, anchor: 'start' });
+    ml(p, ['x = 4'], 1040, 540, m('fact', 1.2), { size: sz, fill: COL.good });
+    const bad = ml(p, ['x = −2'], 1300, 540, m('fact', 1.6), { size: sz });
+    ml(p, ['need  x > 0  and  x − 2 > 0,  so  x > 2'], 1170, 440, m('check'), { size: 32, fill: COL.dim });
+    draw(path(p, `M1225 556L1375 510`, { stroke: COL.bad, 'stroke-width': 5 }, { d: 0 }), m('check', 2.5), .4);
+    tx(p, 'reject', 1300, 590, m('check', 2.8), { size: 28, fill: COL.bad, anchor: 'middle', weight: 600 });
+    const a = ml(p, ['solution set:  {4}'], 800, 660, m('ans'), { size: 52, fill: COL.good });
+    boxMath(p, a, 800, 660, 52, m('ans', .6));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['one log   →   exponential   →   check'], 800, 380, .2, { size: 56, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-logquot', prompt: ['Solve ', $m(...LG(3), '(x) − ', ...LG(3), '(x − 4) = 2'), '.'],
+    build: blanks([{ parts: ['x = ', { box: '9/2' }], why: 'log₃(x/(x − 4)) = 2, so x/(x − 4) = 9, x = 9x − 36, 8x = 36, x = 9/2. Check: 9/2 > 4.',
+      hint: 'Quotient rule: log₃(x/(x − 4)) = 2, so x/(x − 4) = 3² = 9.' }]),
+  }], done) }],
+  ['interest', 'Continuous interest', (m) => {
+    const p = panel(0);
+    const A = axes(p, { x0: 140, y0: 640, w: 560, h: 460, xs: [0, 40, 10], ys: [0, 5000, 1000], xl: 'time t (years)', yl: 'amount A (dollars)', t0: .1 });
+    draw(path(p, curveD(A, t => 1000 * Math.exp(.04 * t), 0, 40), { stroke: COL.whole, 'stroke-width': 4.5 }, { d: 0 }), .5, 1.2);
+    ml(p, ['A = Pe', E('rt')], RX, 150, .3, { size: 56, fill: COL.task });
+    ml(p, ['3000 = 1000e', E('0.04t')], RX, 255, m('set', 1.5), { size: 46 });
+    ml(p, ['3 = e', E('0.04t')], RX, 350, m('div'), { size: 46 });
+    ml(p, ['ln 3 = 0.04t'], RX, 445, m('ln'), { size: 46 });
+    ml(p, ['t = ', F('ln 3', '0.04')], RX, 555, m('exact'), { size: 50, fill: COL.task });
+    const a = ml(p, ['t ≈ 27.5 years'], RX, 665, m('approx'), { size: 50, fill: COL.good });
+    boxMath(p, a, RX, 665, 50, m('approx', .6));
+    dashed(p, `M${A.PX(0)} ${A.PY(3000)}H${A.PX(T3)}`, m('graph'), COL.task);
+    dashed(p, `M${A.PX(T3)} ${A.PY(3000)}V${A.PY(0)}`, m('graph', .5), COL.task);
+    const d = G(p, { x: A.PX(T3), y: A.PY(3000), s: 0, o: 0 });
+    mk('circle', { r: 11, fill: COL.good, stroke: COL.board, 'stroke-width': 2 }, d);
+    pop(d, m('graph', .3));
+    tx(p, '≈ 27.5', A.PX(T3), A.PY(0) - 16, m('graph', 1), { size: 24, fill: COL.good, anchor: 'middle', weight: 600 });
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['A = Pe', E('rt'), ':   divide by P,  take ln,  divide by r'], 800, 380, .2, { size: 46, fill: COL.task });
+  }, { ask: done => quiz({ ...LOW, y: 600, maxH: 290 }, [{
+    id: 'c-interest', prompt: ['$500 grows at 6% compounded continuously. Exactly when does it reach $2000?'],
+    build: choice([[$m('t = ', F('ln 4', '0.06'), ' years')], [$m('t = ', F('ln 2000', '0.06'), ' years')], [$m('t = 0.06 ln 4 years')]], 0,
+      '2000 = 500e^(0.06t), so 4 = e^(0.06t), ln 4 = 0.06t, t = ln 4 / 0.06 ≈ 23.1 years.',
+      [null, 'Divide by P = 500 first: 2000/500 = 4.', 'From ln 4 = 0.06t, divide by 0.06; don’t multiply.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Same base: set the exponents equal.', 'w1'], ['Log equation: one log → exponential → solve.', 'w2'],
+      ['Check answers in the original logs; reject the ones that fail.', 'w3'], ['Continuous interest: divide by P, take ln, divide by r.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q22', prompt: [fromExam(22), 'Solve ', $m('4', E('x − 1'), ' = 16', E('2x')), '. Fill in the solution set.'],
+    build: blanks([{ parts: ['{ ', { box: '-1/3' }, ' }'], why: '16 = 4², so 4^(x − 1) = 4^(4x): x − 1 = 4x, −1 = 3x, x = −1/3.',
+      hint: '16 = 4², so 16^(2x) = 4^(4x). Set the exponents equal.' }]),
+  }, {
+    id: 'p-q23', prompt: [fromExam(23), 'Solve ', $m(...LG(5), '(x) − ', ...LG(5), '(x − 100) = 1'), '. Fill in the solution set.'],
+    build: blanks([{ parts: ['{ ', { box: '125' }, ' }'], why: 'log₅(x/(x − 100)) = 1, so x/(x − 100) = 5, x = 5x − 500, 4x = 500, x = 125. Check: 125 > 100, so both logs are defined.',
+      hint: 'Quotient rule, then x/(x − 100) = 5¹. Multiply both sides by x − 100.' }]),
+  }, {
+    id: 'p-q4a', prompt: [fromExam(4), '$2000 is deposited at 5.5% compounded continuously. When will there be $15,000? The exact answer:'],
+    build: choice([[$m('t = ', F('ln 7.5', '0.055'), ' years')], [$m('t = ', F('ln 15000', '0.055'), ' years')], [$m('t = 0.055 ln 7.5 years')]], 0,
+      '15000 = 2000e^(0.055t), so 7.5 = e^(0.055t), ln 7.5 = 0.055t, t = ln 7.5 / 0.055.',
+      [null, 'Divide by P = 2000 first: 15000/2000 = 7.5.', 'From ln 7.5 = 0.055t, divide by 0.055.']),
+  }, {
+    id: 'p-q4b', prompt: ['Question 4, continued. Round to three significant digits.'],
+    build: blanks([{ parts: ['t ≈ ', { box: '36.6' }, ' years'], why: 'ln 7.5 / 0.055 = 2.01490… / 0.055 = 36.634… ≈ 36.6 years: the child will be about 36.6 years old.',
+      hint: 'Compute ln 7.5 ÷ 0.055, then keep three significant digits.' }]),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

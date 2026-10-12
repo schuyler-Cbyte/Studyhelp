@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Long Division of Polynomials · Math 141 Midterm 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 2 Review, Chapter 2. Practice midterm question 6. Storyboard: books/math141-midterm2/chapters/ch02.md.
+const CHAPTER = { number: 2, title: 'Long Division of Polynomials', minutes: 5, language: 'en', next: '../ch03/' };
+
+/* ---------- chapter data: (4x⁴ + 2x³ − 9x + 1) ÷ (2x² − 3) = 2x² + x + 3 + (−6x + 10)/(2x² − 3), checked in ch02.md ---------- */
+const CX = { 4: 650, 3: 830, 2: 1010, 1: 1190, 0: 1360 };          // one column per power of x
+const RY = { q: 170, d: 255, p1: 330, r1: 410, p2: 485, r2: 565, p3: 640, r3: 720 };
+const DSIZE = 46;
+const STEPS = [
+  { q: [['2x', E(2)], 2], n1: ['÷   4x', E(4), ' ÷ 2x', E(2), ' = 2x', E(2)], n2: ['×   2x', E(2), '(2x', E(2), ' − 3) = 4x', E(4), ' − 6x', E(2)],
+    prod: [[['4x', E(4)], 4], [['− 6x', E(2)], 2]], flip: [[['−4x', E(4)], 4], [['+ 6x', E(2)], 2]], py: RY.p1,
+    res: [[['2x', E(3)], 3], [['+ 6x', E(2)], 2]], down: [[['− 9x'], 1], [['+ 1'], 0]], from: RY.d, ry: RY.r1, left: 570 },
+  { q: [['+ x'], 1], n1: ['÷   2x', E(3), ' ÷ 2x', E(2), ' = x'], n2: ['×   x(2x', E(2), ' − 3) = 2x', E(3), ' − 3x'],
+    prod: [[['2x', E(3)], 3], [['− 3x'], 1]], flip: [[['−2x', E(3)], 3], [['+ 3x'], 1]], py: RY.p2,
+    res: [[['6x', E(2)], 2], [['− 6x'], 1]], down: [[['+ 1'], 0]], from: RY.r1, ry: RY.r2, left: 750 },
+  { q: [['+ 3'], 0], n1: ['÷   6x', E(2), ' ÷ 2x', E(2), ' = 3'], n2: ['×   3(2x', E(2), ' − 3) = 6x', E(2), ' − 9'],
+    prod: [[['6x', E(2)], 2], [['− 9'], 0]], flip: [[['−6x', E(2)], 2], [['+ 9'], 0]], py: RY.p3,
+    res: [[['−6x'], 1], [['+ 10'], 0]], down: [], ry: RY.r3, left: 930 },
+];
+const term = (p, parts, pow, y, t0, fill = COL.chalk) => ml(p, parts, CX[pow], y, t0, { size: DSIZE, fill });
+
+// One round of long division: divide, multiply, change signs and add, bring down. Notes on the left say each move.
+function divStep(m, k) {
+  const s = STEPS[k], L = S.L;
+  hide(S.notes || G(L), 0, .3);
+  const N = S.notes = G(L);
+  ml(N, s.n1, 40, 440, m('divide'), { size: 30, anchor: 'start', fill: COL.task });
+  term(L, s.q[0], s.q[1], RY.q, m('divide', 1.4), COL.task);
+  ml(N, s.n2, 40, 510, m('mult'), { size: 30, anchor: 'start' });
+  const prod = s.prod.map(([pt, pw], i) => term(L, pt, pw, s.py, m('mult', .8 + i * .3), COL.dim));
+  tx(N, '−   change the signs, then add', 40, 580, m('sub'), { size: 30, fill: COL.nat, weight: 600 });
+  prod.forEach(e => hide(e, m('sub', .7), .3));
+  s.flip.forEach(([pt, pw], i) => term(L, pt, pw, s.py, m('sub', .9 + i * .2), COL.nat));
+  draw(path(L, `M${s.left} ${s.py + 24}H1440`, { stroke: COL.chalk, 'stroke-width': 3 }, { d: 0 }), m('result'), .5);
+  s.res.forEach(([pt, pw], i) => term(L, pt, pw, s.ry, m('result', .4 + i * .4)));
+  s.down.forEach(([pt, pw], i) => {
+    const e = M(L, pt, { x: CX[pw], y: s.from, size: DSIZE, o: 0 });
+    tw(e, { o: 1, y: s.ry }, m('down', i * .3), .9);
+  });
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Long division', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Polynomial Functions · Chapter 2', 'Long Division of Polynomials', 'divide, multiply, subtract, bring down', 'Practice midterm question 6 · no calculator');
+  }],
+  ['setup', 'Placeholders', (m) => {
+    const p = panel(0);
+    const L = S.L = G(p);
+    ml(L, ['2x', E(2), ' − 3'], 530, RY.d, .2, { size: DSIZE, anchor: 'end' });
+    draw(path(L, 'M556 205Q588 242 556 284M556 205H1440', { stroke: COL.chalk, 'stroke-width': 3.5 }, { d: 0 }), .3, .8);
+    [[['4x', E(4)], 4], [['+ 2x', E(3)], 3], [['− 9x'], 1], [['+ 1'], 0]].forEach(([pt, pw], i) => term(L, pt, pw, RY.d, .4 + i * .12));
+    const gap = path(L, `M${CX[2] - 70} ${RY.d - 48}H${CX[2] + 70}V${RY.d + 18}H${CX[2] - 70}Z`, { stroke: COL.task, 'stroke-width': 3, 'stroke-dasharray': '8 8' }, { o: 0 });
+    show(gap, m('missing', 2)); hide(gap, m('zero', .6));
+    term(L, ['+ 0x', E(2)], 2, RY.d, m('zero', .3), COL.task);
+    [['x⁴', 4], ['x³', 3], ['x²', 2], ['x', 1], ['number', 0]].forEach(([s, pw], i) =>
+      tx(L, s, CX[pw], 110, m('cols', i * .15), { size: 24, fill: COL.faint, anchor: 'middle', weight: 600 }));
+  }],
+  ['step1', 'Divide, multiply, subtract', (m) => divStep(m, 0)],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-next-term', prompt: ['The new leading term is ', $m('2x', E(3)), '. What goes on top next?'],
+    build: choice([[$m('x')], [$m('2x')], [$m('x', E(3))]], 0, '2x³ ÷ 2x² = x: divide the numbers (2 ÷ 2 = 1) and subtract the exponents (3 − 2 = 1).',
+      [null, 'Divide the coefficients too: 2 ÷ 2 = 1, so the term is x.', 'Divide the leading terms: 2x³ ÷ 2x², not 2x³ ÷ 2. Exponents subtract: 3 − 2 = 1.']),
+  }], done) }],
+  ['step2', 'Repeat', (m) => divStep(m, 1)],
+  ['step3', 'The remainder', (m) => {
+    divStep(m, 2);
+    tx(S.notes, 'degree 1 < degree 2: stop', 40, 650, m('stop'), { size: 30, fill: COL.irr, weight: 600 });
+    ansBox(S.L, CX[1] - 90, RY.r3 - 52, CX[0] - CX[1] + 170, 74, m('stop', .4), COL.irr);
+  }],
+  ['answer', 'The answer', (m) => {
+    const p = panel(0), y = 330, sz = 44, by = y + sz * .35;
+    const lhs = frac(p, ['4x', E(4), ' + 2x', E(3), ' − 9x + 1'], ['2x', E(2), ' − 3'], 230, y, .3, { size: sz });
+    let x = 230 + lhs.w + 30;
+    ml(p, ['='], x, by, .3, { size: sz });
+    x += 56;
+    const q = ml(p, ['2x', E(2), ' + x + 3'], x, by, m('quot'), { size: sz, anchor: 'start', fill: COL.whole });
+    tx(p, 'polynomial', x + q._w / 2, 460, m('quot', .5), { size: 30, fill: COL.whole, anchor: 'middle', weight: 600 });
+    const qx = x;
+    x += q._w + 30;
+    ml(p, ['+'], x, by, m('rem'), { size: sz });
+    x += 36;
+    const r = frac(p, ['−6x + 10'], ['2x', E(2), ' − 3'], x, y, m('rem'), { size: sz, fill: COL.irr });
+    tx(p, 'proper rational expression', x + r.w / 2, 520, m('proper'), { size: 30, fill: COL.irr, anchor: 'middle', weight: 600 });
+    tx(p, 'top degree 1 < bottom degree 2', x + r.w / 2, 565, m('proper', .6), { size: 24, fill: COL.dim, anchor: 'middle' });
+    ansBox(p, qx - 16, 250, x + r.w + 24 - (qx - 16), 150, m('box'));
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz({ x: 160, y: 610, w: 1280, cls: 'side', maxH: 280 }, [{
+    id: 'c-stop', prompt: ['When does polynomial long division stop?'],
+    build: choice([['when the remainder’s degree is less than the divisor’s degree'], ['when the remainder is 0'], ['after one step for each term of the divisor']], 0,
+      'Stop as soon as the remainder has a lower degree than the divisor; it can’t be divided again.',
+      [null, 'A remainder of 0 does stop it, but most divisions end with a nonzero remainder of lower degree.', 'The number of steps depends on the degrees, not on how many terms the divisor has.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Fill every missing power with a 0 placeholder.', 'w1'], ['Divide leading terms, multiply, change signs and add, bring down.', 'w2'],
+      ['Stop when the remainder’s degree is less than the divisor’s.', 'w3'], ['Answer: quotient + remainder / divisor.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q6-zero', prompt: [fromExam(6), 'Divide ', $m(F('6x⁵ + 4x⁴ − 15x² − 14x', '2x³ − 5')), '. Which placeholders does the dividend need?'],
+    build: choice([[$m('+ 0x', E(3), '  and  + 0')], [$m('+ 0x', E(3), '  only')], [$m('+ 0x', E(2), '  and  + 0')]], 0,
+      'Powers 5, 4, 2, 1 are there; x³ and the constant are missing: 6x⁵ + 4x⁴ + 0x³ − 15x² − 14x + 0.',
+      [null, 'The constant term is missing too: the last term is −14x.', '−15x² is there. The missing power is x³ (and the constant).']),
+  }, {
+    id: 'p-q6-first', prompt: ['What is the first term on top?'],
+    build: blanks([{ parts: [{ box: '3' }, 'x', E(2)], why: '6x⁵ ÷ 2x³ = 3x².', hint: 'Divide the leading terms: 6x⁵ ÷ 2x³. Divide 6 by 2 and subtract exponents.' }]),
+  }, {
+    id: 'p-q6-ans', prompt: ['Finish the division. Which is the answer, as polynomial + proper rational expression?'],
+    build: choice([[$m('3x', E(2), ' + 2x + ', F('−4x', '2x³ − 5'))], [$m('3x', E(2), ' + 2x + ', F('−30x² − 4x', '2x³ − 5'))], [$m('3x', E(2), ' + 2x − 4x')]], 0,
+      '3x²(2x³ − 5) = 6x⁵ − 15x²; subtracting leaves 4x⁴ + 0x³ + 0x² − 14x. Then 2x(2x³ − 5) = 4x⁴ − 10x; subtracting leaves −4x, of degree 1 < 3. So 3x² + 2x + (−4x)/(2x³ − 5).',
+      [null, '−15x² − (−15x²) = 0, not −30x². Change the signs of the whole product, then add.', 'The remainder −4x stays over the divisor: + (−4x)/(2x³ − 5).']),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

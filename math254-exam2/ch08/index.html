@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Span · Math 254 Exam 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m254.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 254 Exam 2 Review, Chapter 8. Study guide problems 17, 18, 19, 21. Storyboard: books/math254-exam2/chapters/ch08.md.
+const CHAPTER = { number: 8, title: 'Span', minutes: 7, language: 'en', next: '../ch09/' };
+
+/* ---------- chapter data: u = (1, 0, 1), v = (1, 1, 0), w = (0, 1, 1); (3, 5, 4) = u + 2v + 3w; det[u v w] = 2;
+   span{(1, 1, 0), (0, 1, 1), (1, 2, 1)} is the plane y = x + z (checked in ch08.md) ---------- */
+const CU = COL.whole, CV = COL.nat, CW = COL.rat;
+const IO = { x: 1170, y: 500 }, IS = 85;
+const iso = (x, y, z) => [IO.x + IS * (y - x) * .866, IO.y + IS * (x + y) * .5 - IS * z];
+const isoArrow = (p, v, color, t0) => { const [x, y] = iso(...v); return arrowPx(p, IO.x, IO.y, x, y, color, t0); };
+const arrD = (ax, ay, bx, by, hd = 14) => {
+  const L = Math.hypot(bx - ax, by - ay), ux = (bx - ax) / L, uy = (by - ay) / L;
+  return `M${ax} ${ay}L${bx} ${by}M${bx - hd * ux - hd * .6 * uy} ${by - hd * uy + hd * .6 * ux}L${bx} ${by}L${bx - hd * ux + hd * .6 * uy} ${by - hd * uy - hd * .6 * ux}`;
+};
+function verdict(p, s, x, y, t0, color) {
+  const g = G(p, { o: 0 }), w = uiW(s, 30) + 44;
+  mk('rect', { x: x - w / 2, y: y - 36, width: w, height: 54, rx: 27, fill: 'none', stroke: color, 'stroke-width': 2.5 }, g);
+  T(g, s, { x, y, size: 30, fill: color, weight: 600, anchor: 'middle' });
+  show(g, t0);
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Span', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Span, Independence and Bases · Chapter 8', 'Span', 'everything a set of vectors can build', 'Study guide problems 17, 18, 19 and 21');
+  }],
+  ['combo', 'Writing a combination', (m) => {
+    const p = panel(0);
+    ml(p, ['(3, 5, 4) = a(1, 0, 1) + b(1, 1, 0) + c(0, 1, 1)'], 800, 120, .3, { size: 44 });
+    const Y = 330, ce = colEq(p, ['a', { col: ['1', '0', '1'], fill: CU }, '+ b', { col: ['1', '1', '0'], fill: CV }, '+ c', { col: ['0', '1', '1'], fill: CW }, '=', { col: ['3', '5', '4'] }], 400, Y, m('cols'), { size: 44 });
+    ['a + b = 3', 'b + c = 5', 'a + c = 4'].forEach((s, i) => ml(p, [s], 820, Y + ce.rowY(i), m('rows', i * .9), { size: 42, anchor: 'start' }));
+    ml(p, ['2a + 2b + 2c = 12   →   a + b + c = 6'], 820, 540, m('sum'), { size: 40, anchor: 'start', fill: COL.task });
+    [['c = 3', 'c'], ['a = 1', 'a'], ['b = 2', 'b']].forEach(([s, k], i) => ml(p, [s], 880 + i * 200, 630, m(k), { size: 44, fill: COL.good }));
+    const a = ml(p, ['(3, 5, 4) = u + 2v + 3w'], 800, 760, m('ans'), { size: 50, fill: COL.good });
+    boxMath(p, a, 800, 760, 50, m('ans', .5));
+  }],
+  ['poly', 'Polynomials work the same way', (m) => {
+    const p = panel(0);
+    ml(p, ['p₁ = 1 + x', E(2), ',    p₂ = 1 + x,    p₃ = x + x', E(2)], 800, 140, m('ps'), { size: 44 });
+    ml(p, ['3 + 5x + 4x', E(2), ' = a p₁ + b p₂ + c p₃'], 800, 240, m('target'), { size: 44, fill: COL.task });
+    const rows = [['constants:', 'a + b = 3'], ['x:', 'b + c = 5'], ['x²:', 'a + c = 4']];
+    rows.forEach(([l, s], i) => {
+      tx(p, l, 560, 360 + i * 80, m('match', i * .6), { size: 30, fill: COL.dim, anchor: 'end' });
+      ml(p, [s], 600, 362 + i * 80, m('match', i * .6 + .2), { size: 42, anchor: 'start' });
+    });
+    tx(p, 'the same system as before', 1150, 440, m('same'), { size: 32, fill: COL.task, anchor: 'middle', weight: 600 });
+    const a = ml(p, ['3 + 5x + 4x', E(2), ' = p₁ + 2p₂ + 3p₃'], 800, 680, m('ans'), { size: 50, fill: COL.good });
+    boxMath(p, a, 800, 680, 50, m('ans', .5));
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    colEq(p, ['a', { col: ['1', '0', '1'], fill: CU }, '+ b', { col: ['1', '1', '0'], fill: CV }, '+ c', { col: ['0', '1', '1'], fill: CW }, '=', { col: ['2', '3', '5'] }], 800, 380, .2, { size: 50 });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-combo', prompt: ['Write ', $m('(2, 3, 5)'), ' as ', $m('au + bv + cw'), '.'],
+    build: blanks([{ parts: ['a = ', { box: '2' }, ',  b = ', { box: '0' }, ',  c = ', { box: '3' }], why: 'a + b = 2, b + c = 3, a + c = 5. Adding: a + b + c = 5, so c = 3, a = 2, b = 0.',
+      hint: 'Add the three equations to get a + b + c, then subtract each equation.' }]),
+  }], done) }],
+  ['spans', 'Does it span ℝ³?', (m) => {
+    const p = panel(0);
+    tx(p, 'fewer than 3 vectors: never', 120, 190, m('count'), { size: 32, fill: COL.bad, weight: 600 });
+    tx(p, 'exactly 3 vectors: det ≠ 0', 120, 290, m('det'), { size: 32, fill: COL.task, weight: 600 });
+    const D = mat(p, [['1', '1', '0'], ['0', '1', '1'], ['1', '0', '1']], 260, 430, m('ex'), { size: 40, bars: true, colFill: [CU, CV, CW] });
+    ml(p, ['= 2 ≠ 0'], D.x1 + 20, 444, m('ex', 1), { size: 42, anchor: 'start', fill: COL.task });
+    verdict(p, 'spans ℝ³', 330, 590, m('yes'), COL.good);
+    tx(p, 'more than 3: row reduce, 3 pivots', 120, 720, m('more'), { size: 32, fill: COL.task, weight: 600 });
+    [[2.4, 0, 0], [0, 2.4, 0], [0, 0, 2.2]].forEach(v => path(p, `M${iso(...v.map(c => -c * .4))}L${iso(...v)}`, { stroke: COL.faint, 'stroke-width': 2 }));
+    const gA = G(p), gF = G(p, { o: 0 });   // three directions in space, then three arrows lying in one plane
+    isoArrow(gA, [2, 0, .8], CU, m('ex', .3));
+    isoArrow(gA, [0, 2, .3], CV, m('ex', .6));
+    isoArrow(gA, [.4, .6, 1.8], CW, m('ex', .9));
+    const ty = tx(p, 'three directions: they fill space', 1170, 170, m('yes'), { size: 28, fill: COL.good, anchor: 'middle', weight: 600 });
+    const c = [[-.8, -.8, 0], [2.4, -.8, 0], [2.4, 2.4, 0], [-.8, 2.4, 0]].map(v => iso(...v));
+    path(gF, `M${c.join('L')}Z`, { fill: COL.bad, 'fill-opacity': .14, stroke: COL.bad, 'stroke-width': 2 });
+    [[2, 0, 0, CU], [0, 2, 0, CV], [1.5, 1.2, 0, CW]].forEach(([x, y, z, col]) => { const [bx, by] = iso(x, y, z); path(gF, arrD(IO.x, IO.y, bx, by), { stroke: col, 'stroke-width': 4.5 }); });
+    hide(gA, m('flat'), .4); hide(ty, m('flat'), .4);
+    show(gF, m('flat', .3));
+    tx(p, 'det = 0: all in one plane', 1170, 820, m('flat', .6), { size: 28, fill: COL.bad, anchor: 'middle', weight: 600 });
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['3 vectors in ℝ³:   det ≠ 0  ⇔  span ℝ³'], 800, 380, .2, { size: 54, fill: COL.task });
+  }, { ask: done => quiz(LOW, [{
+    id: 'c-spans', prompt: ['Do ', $m('(1, 2, 3)'), ', ', $m('(0, 1, 4)'), ', ', $m('(0, 0, 5)'), ' span ℝ³?'],
+    build: choice([['Yes: the determinant is 5.'], ['No: the determinant is 0.'], ['No: you need four vectors.']], 0,
+      'As columns they form a triangular matrix; its determinant is 1 · 1 · 5 = 5 ≠ 0.',
+      [null, 'The matrix is triangular: the determinant is the product of the diagonal, 1 · 1 · 5.', 'Three vectors are enough for ℝ³ when the determinant is not 0.']),
+  }], done) }],
+  ['plane', 'The span of a dependent set', (m) => {
+    const p = panel(0);
+    ml(p, ['(1, 1, 0),   (0, 1, 1),   (1, 2, 1)'], 800, 120, m('set'), { size: 46 });
+    ml(p, ['(1, 2, 1) = (1, 1, 0) + (0, 1, 1)'], 800, 200, m('dep'), { size: 40, fill: COL.task });
+    tx(p, 'adds nothing new:  det = 0', 800, 250, m('dep', .6), { size: 28, fill: COL.task, anchor: 'middle' });
+    ml(p, ['(x, y, z) = a(1, 1, 0) + b(0, 1, 1)'], 800, 350, m('comb'), { size: 42 });
+    ml(p, ['x = a,    y = a + b,    z = b'], 800, 430, m('comp'), { size: 42 });
+    const a = ml(p, ['span = { (x, y, z) : y = x + z }'], 800, 530, m('eq'), { size: 46, fill: COL.good });
+    boxMath(p, a, 800, 530, 46, m('eq', .8));
+    ml(p, ['(2, 5, 3):   5 = 2 + 3   ✓  in the span'], 800, 650, m('in'), { size: 40, fill: COL.good });
+    ml(p, ['(1, 1, 1):   1 ≠ 1 + 1   ✗  not in the span'], 800, 740, m('out'), { size: 40, fill: COL.bad });
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['span = { (x, y, z) : y = x + z }'], 800, 380, .2, { size: 54, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-inspan', prompt: ['Is ', $m('(4, 7, 3)'), ' in the span of ', $m('(1, 1, 0)'), ' and ', $m('(0, 1, 1)'), '?'],
+    build: choice([['Yes'], ['No']], 0, '7 = 4 + 3: it is 4(1, 1, 0) + 3(0, 1, 1).', [null, 'Test the equation y = x + z: 7 = 4 + 3 holds.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Combination: one equation per component, then solve.', 'w1'], ['Polynomials: coefficients act like components.', 'w2'],
+      ['3 vectors span ℝ³ ⇔ det ≠ 0; more vectors need 3 pivots.', 'w3'], ['Not spanning: find the span’s equation and test against it.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-hw17', prompt: [fromHW(17), 'Express ', $m('(6, 11, 6)'), ' as ', $m('au + bv + cw'), ' with ', $m('u = (2, 1, 4)'), ', ', $m('v = (1, −1, 3)'), ', ', $m('w = (3, 2, 5)'), '.'],
+    build: blanks([{ parts: ['a = ', { box: '4' }, ',  b = ', { box: '-5' }, ',  c = ', { box: '1' }], why: 'Check: 4(2, 1, 4) − 5(1, −1, 3) + (3, 2, 5) = (6, 11, 6).',
+      hint: 'The system is 2a + b + 3c = 6, a − b + 2c = 11, 4a + 3b + 5c = 6. Eliminate b first by adding the first two equations.' }]),
+  }, {
+    id: 'p-hw18', prompt: [fromHW(18), 'For ', $m('6 + 11x + 6x', E(2)), ' with ', $m('p₁ = 2 + x + 4x', E(2)), ', ', $m('p₂ = 1 − x + 3x', E(2)), ', ', $m('p₃ = 3 + 2x + 5x', E(2)), ':'],
+    build: choice([[$m('4p₁ − 5p₂ + p₃')], [$m('6p₁ + 11p₂ + 6p₃')], [$m('p₁ + p₂ + p₃')]], 0,
+      'The coefficients of p₁, p₂, p₃ are the vectors u, v, w of problem 17, so the system and its answer are the same.',
+      [null, 'Those are the target’s coefficients, not the scalars.', 'Check the constant term: 2 + 1 + 3 = 6 works, but the x term gives 1 − 1 + 2 = 2, not 11.']),
+  }, {
+    id: 'p-hw19', prompt: [fromHW(19), 'Do the vectors span ℝ³?'],
+    build: grid([
+      { parts: ['(a)  (1, 2, 6), (3, 4, 1), (4, 3, 1), (3, 3, 1)'], ans: ['Y'], why: 'Four vectors: row reduce and count pivots (or find 3 of them with det ≠ 0).' },
+      { parts: ['(b)  (2, −1, 3), (4, 1, 2), (8, −1, 8)'], ans: ['N'], why: 'Three vectors: compute the 3 × 3 determinant.' },
+    ], VYN, { multi: false }),
+  }, {
+    id: 'p-hw21a', prompt: [fromHW(21), $m('V = {(1, 2, −1), (1, 1, 0), (1, 0, 1)}'), '. (a) Is ', $m('w = (2, 1, 1)'), ' in span(V)?'],
+    build: choice([['Yes'], ['No']], 0, 'The system a(1, 2, −1) + b(1, 1, 0) + c(1, 0, 1) = (2, 1, 1) has solutions (in fact infinitely many).',
+      [null, 'Set up the system and row reduce: it is consistent.']),
+  }, {
+    id: 'p-hw21b', prompt: ['(b) span(V) is'],
+    build: choice([['the plane x = y + z, so V does not span ℝ³.'], ['all of ℝ³.'], ['a line through the origin.']], 0,
+      'det = 0 and the vectors are not all parallel, so the span is a plane; every vector of V satisfies x = y + z.',
+      [null, 'The determinant of V is 0, so V cannot span ℝ³.', 'No two of these vectors are parallel, so the span is bigger than a line.']),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

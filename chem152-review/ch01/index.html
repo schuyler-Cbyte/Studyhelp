@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Empirical Formula from Percent Composition · CHEM 152 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+<style>
+/* Chemical formulas in cards: upright element symbols, real subscripts. */
+.ef-f { font-family: "STIX Two Text", "Cambria Math", "Iowan Old Style", Palatino, Georgia, serif; font-style: normal; white-space: nowrap; }
+.ef-f sub { font-size: .7em; vertical-align: -.3em; line-height: 0; }
+.ef-subs { display: flex; align-items: baseline; gap: 2px; }
+.ef-subs .ef-sym { font: 54px "STIX Two Text", "Cambria Math", "Iowan Old Style", Palatino, Georgia, serif; }
+.ef-subs .box { height: 44px; width: 3ch; font-size: 28px; vertical-align: 0; transform: translateY(14px); margin: 0 10px 0 2px; }
+.ef-subs .mark { margin-left: 14px; font-size: 30px; font-weight: 700; }
+.ef-subs .mark.good { color: var(--good); }
+.ef-subs .mark.bad { color: var(--bad); }
+</style>
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Review, Chapter 1 (pilot). Storyboard: books/chem152-review/chapters/ch01.md.
+// Course sequence (Prof. Rajah): percent to mass; mass to mole; divide by small; multiply 'til whole; subscripts in the given order.
+const CHAPTER = { number: 1, title: 'Empirical Formula from Percent Composition', minutes: 6, language: 'en', next: '../ch02/' };
+
+/* ---------- chapter data: the course example (Sn, Cl, I), checked in ch01.md ---------- */
+// moles = grams / atomic mass, shown to 4 decimals; ratio = shown moles / 0.2258, shown to 3 decimals.
+const EF = [
+  { sym: 'Sn', name: 'tin',      pct: '26.8', g: '26.8', am: '118.71', mol: '0.2258', ratio: '1.000', whole: 1, x: 560 },
+  { sym: 'Cl', name: 'chlorine', pct: '16.0', g: '16.0', am: '35.45',  mol: '0.4513', ratio: '1.999', whole: 2, x: 940 },
+  { sym: 'I',  name: 'iodine',   pct: '57.2', g: '57.2', am: '126.90', mol: '0.4507', ratio: '1.996', whole: 2, x: 1320 },
+];
+const EC = { Sn: COL.whole, Cl: COL.irr, I: COL.real };   // one colour per element, all chapter
+const BAR = { x: 380, w: 1120, y: 140, h: 60 };            // the 100 g sample, drawn to scale (11.2 px per percent)
+const ROW = { mass: 290, mol: 410, ratio: 530, whole: 625 };
+const STEPS = ['Percent → mass', 'Mass → mole', 'Divide by small', "Multiply 'til whole", 'Write subscripts'];
+const SERIF = MATH;
+
+/* ---------- chapter drawing helpers (prefixed ef to avoid engine names) ---------- */
+const efT = (p, str, x, y, { size = 28, fill = COL.chalk, anchor = 'start', weight = 500, font = UI, o = 0 } = {}) =>
+  T(p, str, { x, y, size, fill, anchor, weight, font, o });
+// A rounded value box centred on (x, y).
+function efBox(p, str, color, x, y, { size = 32, o = 0, font = SERIF } = {}) {
+  const g = G(p, { x, y, o });
+  ctx2d.font = `${size}px ${font}`;
+  const w = Math.max(120, ctx2d.measureText(str).width + 44), hh = size * 1.6;
+  g._rect = mk('rect', { x: -w / 2, y: -hh / 2, width: w, height: hh, rx: hh / 2, fill: COL.board, stroke: color, 'stroke-width': 3 }, g);
+  T(g, str, { y: size * .34, size, fill: COL.chalk, font, anchor: 'middle' });
+  g._w = w; g._h = hh;
+  return g;
+}
+// A formula in SVG: parts [[symbol, subscript], ...]; upright symbols, lowered subscripts.
+function efFormula(p, parts, x, y, { size = 60, fill = COL.chalk, colors = null, o = 0 } = {}) {
+  const t = mk('text', { 'font-size': size, 'font-family': SERIF, 'text-anchor': 'middle', fill }, p);
+  for (const [s, sub] of parts) {
+    const a = mk('tspan', colors ? { fill: colors[s] || fill } : {}, t); a.textContent = s;
+    if (sub) { const b = mk('tspan', { 'font-size': size * .62, dy: size * .22 }, t); b.textContent = sub; mk('tspan', { dy: -size * .22 }, t).textContent = '​'; }
+  }
+  return put(t, { x, y, o });
+}
+const efArrow = (p, x, y1, y2) => path(p, `M${x} ${y1}V${y2}M${x - 8} ${y2 - 10}L${x} ${y2}L${x + 8} ${y2 - 10}`, { stroke: COL.dim, 'stroke-width': 2.5 }, { d: 0 });
+// Formula in HTML (cards): fml('Sn', '', 'Cl', '2', 'I', '2').
+function fml(...a) {
+  const s = h('span', 'ef-f');
+  for (let i = 0; i < a.length; i += 2) { s.append(a[i]); if (a[i + 1]) s.append(h('sub', '', a[i + 1])); }
+  return s;
+}
+// The five-step rail along the top; efStep(k) lights step k and dims the steps already done.
+function efRail(t0) {
+  const g = S.rail = G(scene, { o: 0 }), w = 268.8, gap = 16;
+  S.railChips = STEPS.map((str, k) => {
+    const c = G(g, { x: 96 + k * (w + gap), y: 34, o: .4 });
+    const r = mk('rect', { width: w, height: 44, rx: 22, fill: COL.board, stroke: COL.faint, 'stroke-width': 2 }, c);
+    T(c, `${k + 1}  ${str}`, { x: w / 2, y: 30, size: 21, fill: COL.chalk, weight: 600, anchor: 'middle' });
+    c._r = r;
+    return c;
+  });
+  show(g, t0);
+}
+function efStep(k, t0) {
+  S.railChips.forEach((c, i) => {
+    tw(c, { o: i === k ? 1 : i < k ? .6 : .4 }, t0, .4);
+    tw(c._r, { c_stroke: i === k ? COL.task : COL.faint }, t0, .4);
+  });
+}
+// A typed-subscript question: element symbols with a box after each (blank or 1 = no subscript written).
+const efSubs = (syms, ans, why, hintFor) => (body, api) => {
+  const line = h('div', 'bline ef-subs'), mark = h('span', 'mark');
+  const boxes = syms.map(s => {
+    const b = h('input', 'box');
+    Object.assign(b, { type: 'text', inputMode: 'numeric', autocomplete: 'off', spellcheck: false });
+    b.setAttribute('aria-label', `Subscript for ${s}`);
+    line.append(h('span', 'ef-sym', s), b);
+    return b;
+  });
+  line.append(mark);
+  body.classList.add('blanks');
+  body.append(h('div', 'brow', [line]));
+  requestAnimationFrame(() => boxes[0].focus({ preventScroll: true }));
+  const val = b => { const t = b.value.trim(); return t === '' ? 1 : /^\d+$/.test(t) ? Number(t) : NaN; };
+  const judge = () => {
+    const v = boxes.map(val), ok = v.every((x, i) => x === ans[i]);
+    boxes.forEach((b, i) => { b.classList.toggle('good', v[i] === ans[i]); b.classList.toggle('bad', v[i] !== ans[i]); });
+    mark.className = 'mark ' + (ok ? 'good' : 'bad');
+    mark.textContent = ok ? '✓' : '✗';
+    return [ok, v];
+  };
+  return {
+    check() { const [ok, v] = judge(); api.grade(ok, ok ? why : hintFor(v)); },
+    reveal() { boxes.forEach((b, i) => { b.value = String(ans[i]); }); judge(); return why; },
+    lock() { boxes.forEach(b => { b.disabled = true; }); },
+    hint: ['type each subscript (leave blank or type 1 where none is written), ', kbd('Tab'), ' next box, ', kbd('Enter'), ' check, ', kbd('Esc'), ' leave the box'],
+  };
+};
+
+/* ---------- beats: [id, title, run(m, D), { ask }?] ---------- */
+const BEATS = [
+  ['intro', 'The formula is a ratio', (m, D) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Composition · Chapter 1', { x: 800, y: 270, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Empirical Formula', { x: 800, y: 380, size: 92, weight: 600, anchor: 'middle' });
+    T(g, 'from Percent Composition', { x: 800, y: 460, size: 52, fill: COL.chalk, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    const sub = efT(p, 'the simplest whole-number ratio of the elements in a compound', 800, 570, { size: 34, fill: COL.dim, anchor: 'middle' });
+    show(sub, m('sub', .2));
+    tw(g, { o: 0, y: -24 }, m('bars', -.3), .6); hide(sub, m('bars', -.3), .6);
+    // The sample as one bar, split to scale by percent. It moves up into the table in the next beat.
+    const bar = S.bar = G(p, { y: 220 });
+    let x = BAR.x;
+    S.seg = EF.map(e => {
+      const w = BAR.w * e.pct / 100, cx = x + w / 2;
+      const r = put(mk('rect', { x, y: BAR.y, width: w, height: BAR.h, fill: EC[e.sym] }, bar), { o: 0 });
+      const lp = efT(bar, `${e.sym}  ${e.pct}%`, cx, BAR.y + 40, { size: 28, fill: COL.board, weight: 700, anchor: 'middle' });
+      const lg = efT(bar, `${e.sym}  ${e.g} g`, cx, BAR.y + 40, { size: 28, fill: COL.board, weight: 700, anchor: 'middle' });
+      x += w;
+      return { r, lp, lg, cx };
+    });
+    S.seg.forEach((s, i) => { show(s.r, m('bars', .3 + i * 1.6)); show(s.lp, m('bars', .5 + i * 1.6)); });
+    S.teaser = efFormula(p, [['Sn', '?'], ['Cl', '?'], ['I', '?']], 800, 520, { size: 72, colors: EC });
+    show(S.teaser, m('goal'), .6);
+  }],
+  ['percent-to-mass', 'Assume 100 grams', (m) => {
+    efRail(0); efStep(0, .1);
+    hide(S.teaser, 0, .4);
+    tw(S.bar, { y: 0 }, .2, .9);
+    S.lab = G(S.panel);
+    show(efT(S.lab, 'Percent', 96, BAR.y + 40, { size: 26, fill: COL.dim, weight: 600 }), .9);
+    const br = G(S.panel, { o: 0 });
+    path(br, `M${BAR.x} ${BAR.y - 4}V${BAR.y - 16}H${BAR.x + BAR.w}V${BAR.y - 4}`, { stroke: COL.task, 'stroke-width': 3 });
+    T(br, 'Assume a 100 g sample', { x: BAR.x + BAR.w / 2, y: BAR.y - 26, size: 24, fill: COL.task, weight: 600, anchor: 'middle' });
+    show(br, m('assume'));
+    S.seg.forEach((s, i) => { hide(s.lp, m('same', i * .3), .4); show(s.lg, m('same', .3 + i * .3), .4); });
+    show(efT(S.lab, 'Mass', 96, ROW.mass + 10, { size: 26, fill: COL.dim, weight: 600 }), m('sn'));
+    S.gBox = {};
+    EF.forEach((e, i) => {
+      const s = S.seg[i], b = S.gBox[e.sym] = efBox(S.panel, `${e.g} g`, EC[e.sym], s.cx, BAR.y + BAR.h / 2);
+      const t = m(['sn', 'cl', 'i'][i]);
+      tw(b, { o: 1 }, t, .3);
+      tw(b, { x: e.x, y: ROW.mass }, t, .8);
+    });
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-grams', prompt: ['A sample is 16.0% chlorine. How many grams of chlorine are in the assumed 100 g sample?'],
+    build: blanks([{ parts: [{ box: '16.0' }, ' grams'], why: '16.0% of 100 g is 16.0 g. With a 100 g sample, each percent becomes the same number of grams.',
+      hint: 'Assume 100 g in total. 16.0% of 100 g is the same number, in grams.', fx: () => pulseFx(S.gBox.Cl, 1.25) }]),
+  }], done) }],
+  ['mass-to-moles', 'Convert each element separately', (m) => {
+    efStep(1, .1);
+    show(efT(S.lab, 'Moles', 96, ROW.mol + 10, { size: 26, fill: COL.dim, weight: 600 }), m('each'));
+    S.molBox = {};
+    EF.forEach((e, i) => {
+      const t = i ? m(['sn', 'cl', 'i'][i]) : m('each', .6);
+      draw(efArrow(S.panel, e.x, ROW.mass + 30, ROW.mol - 30), t, .5);
+      show(efT(S.panel, `÷ ${e.am} g/mol`, e.x + 16, (ROW.mass + ROW.mol) / 2 + 8, { size: 22, fill: COL.dim, font: SERIF }), t + .2);
+      const b = S.molBox[e.sym] = efBox(S.panel, `≈ ${e.mol} mol`, EC[e.sym], e.x, ROW.mol);
+      tw(b, { o: 1 }, i ? t + .4 : m('sn'), .5);
+    });
+    const big = S.gBox.I, few = S.molBox.Sn;
+    tw(big._rect, { 'a_stroke-width': 7 }, m('note'), .3); tw(big._rect, { 'a_stroke-width': 3 }, m('note', 1.8), .4);
+    tw(few._rect, { 'a_stroke-width': 7 }, m('note', 1.6), .3); tw(few._rect, { 'a_stroke-width': 3 }, m('note', 3.4), .4);
+  }],
+  ['divide-by-smallest', 'Divide by the smallest', (m) => {
+    efStep(2, .1);
+    const sm = S.molBox.Sn;
+    tw(sm._rect, { c_stroke: COL.task, 'a_stroke-width': 5 }, m('pick'), .4);
+    show(efT(S.panel, 'smallest', EF[0].x - sm._w / 2 - 14, ROW.mol + 8, { size: 22, fill: COL.task, weight: 700, anchor: 'end' }), m('pick', .2));
+    show(efT(S.lab, '÷ smallest', 96, ROW.ratio + 10, { size: 26, fill: COL.dim, weight: 600 }), m('div'));
+    EF.forEach((e, i) => {
+      const t = m('div', .3 + i * .5);
+      draw(efArrow(S.panel, e.x, ROW.mol + 30, ROW.ratio - 34), t, .5);
+      show(efT(S.panel, '÷ 0.2258', e.x + 16, (ROW.mol + ROW.ratio) / 2 + 6, { size: 22, fill: COL.task, font: SERIF }), t + .2);
+      show(efT(S.panel, (i ? '≈ ' : '') + e.ratio, e.x, ROW.ratio + 12, { size: 36, font: SERIF, anchor: 'middle' }), m('res', i * 1.2));
+    });
+    show(efT(S.lab, 'Whole ratio', 96, ROW.whole + 8, { size: 26, fill: COL.dim, weight: 600 }), m('round'));
+    EF.forEach((e, i) => {
+      const n = G(S.panel, { x: e.x, y: ROW.whole, s: 0, o: 0 });
+      T(n, String(e.whole), { y: 18, size: 56, fill: COL.task, font: SERIF, weight: 600, anchor: 'middle' });
+      pop(n, m('round', 1.2 + i * .5));
+    });
+    S.molPick = EF.map(e => ({ el: S.molBox[e.sym], box: [e.x - S.molBox[e.sym]._w / 2 - 10, ROW.mol - 36, S.molBox[e.sym]._w + 20, 72], label: `${e.mol} moles of ${e.name}` }));
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-smallest', prompt: ['Which mole amount do you divide every mole amount by? Click it in the Moles row.'],
+    build: pickEls(S.molPick, 0, "Tin's 0.2258 mol is the smallest mole amount. Dividing by the smallest makes it 1, and the others come out at 1 or more.",
+      i => i === 2 ? 'Iodine has the most grams, but not the fewest moles. Compare the Moles row and pick the smallest amount.'
+        : "That isn't the smallest mole amount. Divide by the smallest, so the smallest becomes 1."),
+  }], done) }],
+  ['multiply-to-whole', "Multiply 'til whole", (m) => {
+    const p = panel(0);
+    efStep(3, .1);
+    show(efT(p, 'If a ratio is a recognizable fraction…', 800, 190, { size: 28, fill: COL.dim, anchor: 'middle' }), .3);
+    const X3 = [600, 800, 1000];
+    const top = ['1', '1.5', '1'], bot = ['2', '3', '2'];
+    X3.forEach((x, i) => {
+      show(efT(p, top[i], x, 290, { size: 64, font: SERIF, anchor: 'middle' }), m('ex', i * .4));
+      if (i) show(efT(p, ':', x - 100, 286, { size: 64, font: SERIF, fill: COL.dim, anchor: 'middle' }), m('ex', i * .4));
+      show(efT(p, '× 2', x, 365, { size: 36, font: SERIF, fill: COL.task, anchor: 'middle' }), m('x2', .4 + i * .3));
+      show(efT(p, bot[i], x, 460, { size: 64, font: SERIF, fill: COL.good, anchor: 'middle' }), m('res', i * .3));
+      if (i) show(efT(p, ':', x - 100, 456, { size: 64, font: SERIF, fill: COL.dim, anchor: 'middle' }), m('res', i * .3));
+    });
+    show(efT(p, 'Cases from the course slides', 800, 560, { size: 24, fill: COL.dim, weight: 600, anchor: 'middle' }), m('slide'));
+    [['1.33 × 3 ≈ 4', 440], ['2.25 × 4 = 9', 800], ['2.50 × 2 = 5', 1160]].forEach(([s, x], i) =>
+      show(efT(p, s, x, 620, { size: 38, font: SERIF, anchor: 'middle' }), m('slide', 1.2 + i * 1.6)));
+    const ours = G(p, { o: 0 });
+    T(ours, 'Our compound:  Sn : Cl : I  =  1 : 2 : 2', { x: 800, y: 740, size: 34, anchor: 'middle', weight: 600 });
+    T(ours, 'already whole, so nothing to multiply', { x: 800, y: 790, size: 26, fill: COL.good, anchor: 'middle' });
+    show(ours, m('ours'));
+  }],
+  ['write-formula', 'Ratios become subscripts', (m) => {
+    const p = panel(0);
+    efStep(4, .1);
+    const size = 130, sub = size * .62, Y = 520;
+    // Lay out Sn [1] Cl [2] I [2], centred; the "1" slot closes later.
+    ctx2d.font = `${size}px ${SERIF}`; const ws = EF.map(e => ctx2d.measureText(e.sym).width);
+    ctx2d.font = `${sub}px ${SERIF}`; const wD = ctx2d.measureText('2').width + 6;
+    const total = ws.reduce((a, b) => a + b, 0) + 3 * wD;
+    let x = 800 - total / 2;
+    const slots = EF.map((e, i) => { const sx = x; x += ws[i]; const dx = x; x += wD; return { sx, dx }; });
+    show(efT(p, 'Ratio from step 3', 800, 150, { size: 26, fill: COL.dim, weight: 600, anchor: 'middle' }), .3);
+    const nums = EF.map((e, i) => {
+      const cx = slots[i].sx + ws[i] / 2, g = G(p, { o: 0 });
+      for (let k = 0; k < e.whole; k++) mk('circle', { cx: cx + (k - (e.whole - 1) / 2) * 46, cy: 210, r: 17, fill: EC[e.sym] }, g);
+      show(g, .3 + i * .3);
+      const n = efT(p, String(e.whole), cx, 320, { size: sub, font: SERIF, fill: COL.task, weight: 600, anchor: 'middle' });
+      show(n, .5 + i * .3);
+      return n;
+    });
+    show(efT(p, 'Order given in the problem: Sn, Cl, I', 800, 400, { size: 26, fill: COL.dim, anchor: 'middle' }), m('order'));
+    const syms = EF.map((e, i) => {
+      const t = efT(p, e.sym, slots[i].sx, Y, { size, font: SERIF, fill: EC[e.sym] });
+      show(t, m('order', .8 + i * .7));
+      return t;
+    });
+    // Each ratio number drops into its subscript place.
+    EF.forEach((e, i) => tw(nums[i], { x: slots[i].dx + wD / 2 - 3, y: Y + size * .22 }, m('subs', .2 + i * .4), .8));
+    // A subscript of 1 is not written: it fades and the gap closes.
+    const ones = efT(p, '1 is not written', slots[0].sx + ws[0] / 2, Y + 90, { size: 24, fill: COL.dim, anchor: 'middle' });
+    show(ones, m('one', .1));
+    hide(nums[0], m('one', .6), .5);
+    const shift = wD / 2;
+    tw(syms[0], { x: slots[0].sx + shift }, m('one', 1.2), .6);
+    hide(ones, m('one', 1.2), .4);
+    [1, 2].forEach(i => { tw(syms[i], { x: slots[i].sx - shift }, m('one', 1.2), .6); tw(nums[i], { x: slots[i].dx + wD / 2 - 3 - shift }, m('one', 1.2), .6); });
+    const box = put(mk('rect', { x: 800 - total / 2 - 30, y: Y - size * .82, width: total - wD + 60, height: size * 1.25, rx: 20, fill: 'none', stroke: COL.task, 'stroke-width': 3 }, p), { o: 0 });
+    show(box, m('ans'));
+    show(efT(p, 'Empirical formula', 800, Y + 130, { size: 32, fill: COL.task, weight: 600, anchor: 'middle' }), m('ans', .3));
+  }],
+  ['q3', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-formula', prompt: ['Which is the empirical formula for 26.8% Sn, 16.0% Cl and 57.2% I, written the course way?'],
+    build: choice([[fml('Sn', '', 'Cl', '2', 'I', '2')], [fml('Sn', '2', 'Cl', '', 'I', '')], [fml('Sn', '', 'Cl', '', 'I', '')], [fml('I', '2', 'Cl', '2', 'Sn', '')]], 0,
+      'The ratio is 1 : 2 : 2, written in the given order Sn, Cl, I. The 1 is not written.',
+      [null, 'That flips the ratio. Tin has the fewest moles, so its count is 1; chlorine and iodine are 2 each.',
+        'Chlorine and iodine each have about twice the moles of tin, so each gets a subscript of 2.',
+        'Same counts, but out of order. The course method writes the elements in the order the problem gives: Sn, Cl, I.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    hide(S.rail, 0, .4);
+    [['Percent to mass: assume a 100 g sample.', 'w1'], ['Mass to mole: divide by each atomic mass.', 'w2'],
+      ['Divide every mole amount by the smallest.', 'w3'], ["Multiply 'til whole, then write subscripts in the given order.", 'w4']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 250 + i * 130, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 36, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    show(efFormula(p, [['Sn', ''], ['Cl', '2'], ['I', '2']], 800, 140, { size: 56, colors: EC }), .3);
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-step', prompt: ['A compound is 26.8% Sn, 16.0% Cl and 57.2% I. In a 100 g sample, the moles are about 0.2258 mol Sn, 0.4513 mol Cl and 0.4507 mol I. What is the next step?'],
+    build: choice([['Divide every mole amount by the smallest, 0.2258'], ['Divide every mole amount by the largest, 0.4513'],
+      ['Round each mole amount to the nearest whole number'], ['Multiply each mole amount by 100']], 0,
+      'Divide by small: dividing by 0.2258 gives about 1 : 2 : 2.',
+      [null, 'Dividing by the largest gives numbers below 1. Divide by the smallest, so the smallest becomes 1.',
+        'Rounding 0.2258 mol gives 0, which loses the tin. Divide by the smallest first, then round only ratios very close to whole numbers.',
+        'The 100 belongs to step one, the 100 g sample. After mass to mole comes divide by the smallest.']),
+  }, {
+    id: 'p-formula', prompt: ['Now write the empirical formula. Type each subscript, keeping the order Sn, Cl, I.'],
+    build: efSubs(['Sn', 'Cl', 'I'], [1, 2, 2], ['0.2258 : 0.4513 : 0.4507, divided by 0.2258, is about 1 : 2 : 2, so the formula is ', fml('Sn', '', 'Cl', '2', 'I', '2'), '.'],
+      v => v.every(Number.isInteger) && v[0] > 1 && v[1] === 2 * v[0] && v[2] === 2 * v[0]
+        ? 'That has the right proportions, but an empirical formula uses the simplest whole numbers.'
+        : v[0] === 2 && v[1] === 1 && v[2] === 1 ? 'That flips the ratio. Tin has the fewest moles, so its count is 1.'
+          : 'Divide each mole amount by the smallest, 0.2258, and round results that are very close to whole numbers.'),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+// Silent preview: narration audio has not been generated yet (Edge TTS awaits approval). Captions start on, the
+// missing clips fall back to the lesson clock without the per-beat sound warning, and the chapter cover says why.
+if (window.TIMINGS_SILENT) {
+  captions = true; $('bCC').setAttribute('aria-pressed', 'true');
+  soundFailed = () => { P.afail = true; };
+}
+boot();
+if (window.TIMINGS_SILENT) $('coverMeta').textContent = `About ${CHAPTER.minutes} minutes, with quick checks. Silent preview: narration audio not generated yet; captions are on.`;
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subspaces · Math 254 Exam 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m254.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 254 Exam 2 Review, Chapter 7. Study guide problems 14, 15, 16, 26(a), 30(b). Storyboard: books/math254-exam2/chapters/ch07.md.
+const CHAPTER = { number: 7, title: 'Subspaces', minutes: 7, language: 'en', next: '../ch08/' };
+
+/* ---------- chapter data: (a, 0, 2a) is a subspace, (a, b, 1) is not; a + b + c = 0 yes, = 1 no (checked in ch07.md) ---------- */
+const IO = { x: 1150, y: 470 }, IS = 80;
+const iso = (x, y, z) => [IO.x + IS * (y - x) * .866, IO.y + IS * (x + y) * .5 - IS * z];
+const TESTS = [['contains 0', 'z'], ['closed under +', 'add'], ['closed under ×', 'mul']];
+function verdict(p, s, x, y, t0, color) {
+  const g = G(p, { o: 0 }), w = uiW(s, 30) + 44;
+  mk('rect', { x: x - w / 2, y: y - 36, width: w, height: 54, rx: 27, fill: 'none', stroke: color, 'stroke-width': 2.5 }, g);
+  T(g, s, { x, y, size: 30, fill: color, weight: 600, anchor: 'middle' });
+  show(g, t0);
+}
+// Three test rows: [computation, passes?] for each test, keyed by narration marks.
+function testRows(p, m, rows, y0 = 270, dy = 120) {
+  rows.forEach(([s, ok, key], i) => {
+    if (s === null) return;
+    const y = y0 + i * dy, k = key || TESTS[i][1];
+    tx(p, TESTS[i][0], 140, y - 6, m(k), { size: 30, fill: COL.dim });
+    ml(p, [s], 460, y, m(k, .3), { size: 40, anchor: 'start', fill: ok ? COL.chalk : COL.bad });
+    ml(p, [ok ? '✓' : '✗'], 1470, y, m(k, 1.2), { size: 44, fill: ok ? COL.good : COL.bad });
+  });
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Subspaces', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Vector Spaces and Subspaces · Chapter 7', 'Subspaces', 'three tests decide it', 'Study guide problems 14, 15, 16, 26(a) and 30(b)');
+  }],
+  ['tests', 'Three tests', (m) => {
+    const p = panel(0);
+    [['0 ∈ W', 't1'], ['u, v ∈ W   ⇒   u + v ∈ W', 't2'], ['u ∈ W   ⇒   ku ∈ W', 't3']].forEach(([s, k], i) => {
+      const y = 260 + i * 130;
+      const g = G(p, { o: 0, x: -16 });
+      mk('circle', { cx: 150, cy: y - 12, r: 24, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 150, y: y - 1, size: 28, fill: COL.board, weight: 700, anchor: 'middle' });
+      tw(g, { o: 1, x: 0 }, m(k), .5);
+      ml(p, [s], 200, y, m(k, .2), { size: 42, anchor: 'start' });
+    });
+    const ax = [[2.6, 0, 0], [0, 2.6, 0], [0, 0, 2.4]];
+    ax.forEach((v, i) => draw(path(p, `M${iso(...v.map(c => -c * .6))}L${iso(...v)}`, { stroke: COL.faint, 'stroke-width': 2 }, { d: 0 }), m('pic', i * .2), .5));
+    mk('circle', { cx: IO.x, cy: IO.y, r: 7, fill: COL.chalk }, p);
+    tx(p, '0', IO.x + 14, IO.y + 30, m('pic'), { size: 24, fill: COL.dim });
+    draw(path(p, `M${iso(1.3, -1.56, -1.95)}L${iso(-1.3, 1.56, 1.95)}`, { stroke: COL.good, 'stroke-width': 4.5 }, { d: 0 }), m('line'), .7);
+    tx(p, 'line through 0: subspace', 1180, 160, m('line', .5), { size: 28, fill: COL.good, anchor: 'middle', weight: 600 });
+    const Z = -2, c = [[-1.3, -1.3, Z], [1.3, -1.3, Z], [1.3, 1.3, Z], [-1.3, 1.3, Z]].map(v => iso(...v));
+    const pl = path(p, `M${c.join('L')}Z`, { fill: COL.bad, 'fill-opacity': .15, stroke: COL.bad, 'stroke-width': 2.5 }, { o: 0 });
+    show(pl, m('off'));
+    tx(p, 'plane missing 0: not a subspace', 1180, 820, m('off', .4), { size: 28, fill: COL.bad, anchor: 'middle', weight: 600 });
+  }],
+  ['ex1', 'A subspace', (m) => {
+    const p = panel(0);
+    ml(p, ['all vectors (a, 0, 2a)'], 800, 140, .3, { size: 50, fill: COL.task });
+    testRows(p, m, [['a = 0:   (0, 0, 0)', true], ['(a, 0, 2a) + (b, 0, 2b) = (a + b, 0, 2(a + b))', true], ['k(a, 0, 2a) = (ka, 0, 2ka)', true]]);
+    verdict(p, 'subspace', 800, 690, m('yes'), COL.good);
+  }],
+  ['ex2', 'Not a subspace', (m) => {
+    const p = panel(0);
+    ml(p, ['all vectors (a, b, 1)'], 800, 140, .3, { size: 50, fill: COL.task });
+    testRows(p, m, [['(0, 0, 0) would need 1 = 0', false, 'z'], ['(0, 0, 1) + (0, 0, 1) = (0, 0, 2)', false, 'also']]);
+    verdict(p, 'not a subspace', 800, 690, m('no'), COL.bad);
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    tx(p, 'contains 0,   closed under +,   closed under ×', 800, 200, .2, { size: 40, fill: COL.task, anchor: 'middle', weight: 600 });
+  }, { ask: done => quiz(WIDE, [{
+    id: 'c-subsp', prompt: ['Is the set of all vectors of this form a subspace of ℝ³?'],
+    build: grid([
+      { parts: ['(a, 2a, 0)'], ans: ['Y'], why: 'A line through 0: it passes all three tests.' },
+      { parts: ['(a, b, a + b)'], ans: ['Y'], why: 'Sums and multiples keep the third component = first + second.' },
+      { parts: ['(a, a', E(2), ', 0)'], ans: ['N'], why: '2(1, 1, 0) = (2, 2, 0), but the form needs (2, 4, 0).' },
+      { parts: ['(a, b, 3)'], ans: ['N'], why: 'The zero vector would need 3 = 0.' },
+    ], VYN, { multi: false }),
+  }], done) }],
+  ['eqn', 'Sets given by equations', (m) => {
+    const p = panel(0);
+    ml(p, ['{ (a, b, c) : a + b + c = 0 }'], 800, 130, m('s1'), { size: 48, fill: COL.task });
+    ml(p, ['sum:   (a + a′) + (b + b′) + (c + c′) = 0 + 0 = 0'], 180, 240, m('add'), { size: 38, anchor: 'start' });
+    ml(p, ['multiple:   ka + kb + kc = k · 0 = 0'], 180, 320, m('mul'), { size: 38, anchor: 'start' });
+    ml(p, ['zero:   0 + 0 + 0 = 0'], 180, 400, m('z'), { size: 38, anchor: 'start' });
+    ['add', 'mul', 'z'].forEach((k, i) => ml(p, ['✓'], 1470, 240 + i * 80, m(k, 1), { size: 44, fill: COL.good }));
+    verdict(p, 'subspace', 1250, 400, m('z', 1.5), COL.good);
+    ml(p, ['{ (a, b, c) : a + b + c = 1 }'], 800, 540, m('s2'), { size: 48, fill: COL.task });
+    ml(p, ['zero:   0 + 0 + 0 = 0 ≠ 1'], 180, 630, m('s2', 1.5), { size: 38, anchor: 'start', fill: COL.bad });
+    ml(p, ['✗'], 1470, 630, m('s2', 2), { size: 44, fill: COL.bad });
+    verdict(p, 'not a subspace', 1250, 630, m('s2', 2.5), COL.bad);
+    tx(p, 'linear equations  = 0  give subspaces', 800, 760, m('rule'), { size: 34, fill: COL.task, anchor: 'middle', weight: 600 });
+  }],
+  ['other', 'Matrices and polynomials', (m) => {
+    const p = panel(0);
+    path(p, 'M800 110V790M110 450H1490', { stroke: COL.faint, 'stroke-width': 1.5 });
+    mat(p, [['a', 'b'], ['0', 'c']], 300, 250, m('up'), { size: 44 });
+    tx(p, 'upper triangular', 560, 230, m('up', .3), { size: 30 });
+    tx(p, 'subspace  ✓', 560, 280, m('up', 2.5), { size: 30, fill: COL.good, weight: 600 });
+    ml(p, ['det(A) = 1'], 1000, 230, m('det'), { size: 42 });
+    ml(p, ['det(0) = 0 ≠ 1'], 1000, 310, m('det', 1.5), { size: 38, fill: COL.bad });
+    tx(p, 'not a subspace  ✗', 1300, 270, m('det', 2.5), { size: 30, fill: COL.bad, weight: 600, anchor: 'middle' });
+    ml(p, ['a + bx + cx', E(2), ',   a = 0'], 450, 560, m('poly'), { size: 42 });
+    tx(p, 'subspace of P₂  ✓', 450, 640, m('poly', 3), { size: 30, fill: COL.good, weight: 600, anchor: 'middle' });
+    tx(p, 'a subspace must be a subset', 1150, 530, m('sub'), { size: 30, fill: COL.task, anchor: 'middle', weight: 600 });
+    ml(p, ['(x, y)   vs   (x, y, 0)'], 1150, 610, m('r2'), { size: 40 });
+    ml(p, ['ℝ² ⊄ ℝ³'], 1150, 700, m('r2', 1.5), { size: 46, fill: COL.bad });
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    tx(p, 'contains 0,   closed under +,   closed under ×', 800, 200, .2, { size: 40, fill: COL.task, anchor: 'middle', weight: 600 });
+  }, { ask: done => quiz(WIDE, [{
+    id: 'c-subsp2', prompt: ['With the standard operations, is each set a subspace?'],
+    build: grid([
+      { parts: ['all 2 × 2 diagonal matrices'], ans: ['Y'], why: 'Sums and multiples of diagonal matrices are diagonal, and 0 is diagonal.' },
+      { parts: ['all 2 × 2 matrices with det(A) = 1'], ans: ['N'], why: 'The zero matrix has determinant 0.' },
+      { parts: ['polynomials a + bx + cx² with a = 1'], ans: ['N'], why: 'The zero polynomial has a = 0.' },
+      { parts: ['polynomials a + bx + cx² with b = 0'], ans: ['Y'], why: 'A linear condition set equal to 0.' },
+    ], VYN, { multi: false, text: true }),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Three tests: contains 0, closed under +, closed under ×.', 'w1'], ['Check 0 first: the fastest way to rule a set out.', 'w2'],
+      ['Linear equations = 0 give subspaces; a nonzero constant breaks them.', 'w3'], ['A subspace must be a subset: ℝ² is not inside ℝ³.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-hw14', prompt: [fromHW(14), 'Which are subspaces of ℝ³?'],
+    build: grid([
+      { parts: ['(a)  all (a, 1, a)'], ans: ['N'], why: 'Can (a, 1, a) ever be the zero vector?' },
+      { parts: ['(b)  all (a, b, c) with b = 2a − c'], ans: ['Y'], why: 'Rewrite it as 2a − b − c = 0: a linear equation equal to 0.' },
+    ], VYN, { multi: false }),
+  }, {
+    id: 'p-hw15', prompt: [fromHW(15), 'Subspace of the n × n matrices, with the standard operations?'],
+    build: grid([
+      { parts: ['(a)  all symmetric matrices'], ans: ['Y'], why: 'Check (A + B)ᵀ and (kA)ᵀ.' },
+      { parts: ['(b)  all A with det(A) = 0'], ans: ['N'], why: 'Look for two matrices with determinant 0 whose sum is the identity.' },
+      { parts: ['(c)  all A with tr(A) = 0'], ans: ['Y'], why: 'tr(A + B) = tr A + tr B and tr(kA) = k tr A.' },
+    ], VYN, { multi: false, text: true }),
+  }, {
+    id: 'p-hw16', prompt: [fromHW(16), 'and problem 26(a). Subspace?'],
+    build: grid([
+      { parts: ['Problem 16: all ax³ + bx² + cx + d with a + b + c + d = 0, in P₃'], ans: ['Y'], why: 'A linear condition on the coefficients, set equal to 0.' },
+      { parts: ['Problem 26(a): all at² + (a + b)t + b, in P₂'], ans: ['Y'], why: 'It is a(t² + t) + b(t + 1): add two of them, or scale one, and the result has the same form.' },
+    ], VYN, { multi: false, text: true }),
+  }, {
+    id: 'p-hw30b', prompt: [fromHW('30(b)'), $m('ℝ²'), ' is a subspace of ', $m('ℝ³'), '.'],
+    build: grid([{ parts: ['(b)'], ans: ['F'], why: 'A subspace must be a subset, and pairs are not triples.' }], VTF, { multi: false }),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Logarithm Rules and Change of Base · Math 141 Midterm 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 2 Review, Chapter 7. Practice midterm questions 5, 20, 21. Storyboard: books/math141-midterm2/chapters/ch07.md.
+const CHAPTER = { number: 7, title: 'Logarithm Rules and Change of Base', minutes: 6, language: 'en', next: '../ch08/' };
+
+/* ---------- chapter data (checked in ch07.md): log₃ 50 = ln 50 / ln 3 ≈ 3.5609; log₂ 100 ≈ 6.6439; log₅ 1234 ≈ 4.4227 ---------- */
+const LG = b => ['log', SB(b)];
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Logarithm rules', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Exponentials and Logarithms · Chapter 7', ['Logarithm Rules', 'and Change of Base'], 'evaluate, expand, approximate', 'Practice midterm questions 5, 20 and 21');
+  }],
+  ['meaning', 'A log is an exponent', (m) => {
+    const p = panel(0), y = 300, sz = 66;
+    const L = tokens(p, ['log', { t: [SB(2)], fill: COL.whole }, '(', { t: '8', fill: COL.irr }, ') = '], { x: 380, y, size: sz, o: 0 });
+    L.forEach(e => show(e, .3));
+    const qm = ml(p, ['?'], L[4]._px + L[4]._w / 2 + 24, y, .3, { size: sz, fill: COL.task });
+    const R2 = tokens(p, [{ t: '2', fill: COL.whole }, { t: [E(3)], fill: COL.task }, ' = ', { t: '8', fill: COL.irr }], { x: 1060, y, size: sz, o: 0 });
+    R2.forEach(e => show(e, m('arrow')));
+    arc(p, L[1]._px, y + 30, R2[0]._px, y + 30, 90, COL.whole, m('arrow', .3));
+    hide(qm, m('ans'), .3);
+    const three = ml(p, ['3'], st(qm).x, y, m('ans', .2), { size: sz, fill: COL.task });
+    arc(p, R2[1]._px, y - 70, st(three).x, y - 70, -80, COL.task, m('ans'));
+    ml(p, ['log', SB('b'), '(a) = c     means     b', E('c'), ' = a'], 800, 560, m('gen'), { size: 50 });
+  }],
+  ['eval', 'Exact values', (m) => {
+    const p = panel(0), o = { xEq: 560, size: 46 };
+    eqLine(p, [...LG(9), '(3)'], 'c', 160, .3, o);
+    eqLine(p, ['9', E('c')], '3', 250, m('set', 1.6), o);
+    eqLine(p, ['(3', E(2), ')', E('c')], ['3', E(1)], 340, m('same'), o);
+    eqLine(p, ['3', E('2c')], ['3', E(1)], 430, m('exp'), o);
+    eqLine(p, '2c', '1', 520, m('exp', 2.6), o);
+    eqLine(p, 'c', F(1, 2), 615, m('ans'), { ...o, fill: COL.good });
+    ansBox(p, 470, 560, 200, 90, m('ans', .5));
+    ml(p, [...LG(2), '(', F(1, 8), ') = −3'], 1200, 290, m('more', 1.6), { size: 48 });
+    ml(p, ['since  2', E('−3'), ' = ', F(1, 8)], 1200, 360, m('more', 2.2), { size: 32, fill: COL.dim });
+    ml(p, [...LG(5), '(5', E(7), ') = 7'], 1200, 500, m('inv'), { size: 48 });
+    tx(p, 'the log undoes the power', 1200, 555, m('inv', .6), { size: 28, fill: COL.dim, anchor: 'middle' });
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['log', SB('b'), '(a) = c    means    b', E('c'), ' = a'], 800, 330, .2, { size: 56, fill: COL.task });
+  }, { ask: done => quiz({ ...LOW, y: 520, maxH: 370 }, [{
+    id: 'c-logs', prompt: ['Evaluate exactly.'],
+    build: blanks([
+      { parts: [...LG(4), '(', F(1, 16), ') = ', { box: '-2' }], why: '1/16 = 4⁻², so the log is −2.', hint: '16 = 4², and a reciprocal is a negative power.' },
+      { parts: [...LG(27), '(3) = ', { box: '1/3' }], why: '27 = 3³, so 27^(1/3) = 3: the log is 1/3.', hint: '27 = 3³. Which power of 27 gives 3?' },
+    ]),
+  }], done) }],
+  ['rules', 'The rules', (m) => {
+    const p = panel(0), o = { xEq: 640, size: 52, noteX: 1130 };
+    eqLine(p, 'ln(AB)', 'ln A + ln B', 200, m('prod'), { ...o, note: 'product rule' });
+    eqLine(p, ['ln ', F('A', 'B')], 'ln A − ln B', 340, m('quot'), { ...o, note: 'quotient rule' });
+    eqLine(p, ['ln(A', E('p'), ')'], 'p ln A', 480, m('pow'), { ...o, note: 'power rule' });
+    eqLine(p, ['ln(e', E('k'), ')'], 'k', 620, m('ek'), { ...o, note: 'ln undoes e' });
+  }],
+  ['expand', 'Expanding', (m) => {
+    const p = panel(0), sz = 48, y = 175;
+    const f = fracEq(p, 'ln', ['e', E(4), ' ', R('x', 3)], ['y', E(3), 'z', E(2)], 300, y, .3, { size: sz });
+    const fx0 = 300 + mathW(['ln'], sz) + sz * .25 - 10, fx1 = f.x1 + 10;
+    draw(path(p, `M${fx0 + 10} ${y - 70}H${fx0}V${y + 70}H${fx0 + 10}M${fx1 - 10} ${y - 70}H${fx1}V${y + 70}H${fx1 - 10}`, { stroke: COL.chalk, 'stroke-width': 3 }, { d: 0 }), .4, .5);
+    ml(p, ['x, y, z > 0'], 1300, 150, .6, { size: 30, fill: COL.dim });
+    ml(p, ['= ln(e', E(4), ' ', R('x', 3), ') − ln(y', E(3), 'z', E(2), ')'], 300, 340, m('q'), { size: 46, anchor: 'start' });
+    tx(p, 'quotient rule', 1300, 330, m('q', .4), { size: 28, fill: COL.task, anchor: 'middle', weight: 600 });
+    const a = ml(p, ['= ln e', E(4), ' + ln ', R('x', 3), ' '], 300, 450, m('p'), { size: 46, anchor: 'start' });
+    const b = ml(p, ['− (ln y', E(3), ' + ln z', E(2), ')'], 300 + a._w + 8, 450, m('p', .8), { size: 46, anchor: 'start', fill: COL.nat });
+    pulse(b, m('minus'), 1.08);
+    ml(p, ['−(A + B) = −A − B'], 1300, 440, m('minus', .5), { size: 34, fill: COL.nat });
+    ml(p, ['='], 300, 590, m('ans'), { size: 50, anchor: 'start' });
+    const c = ml(p, ['4 + ', F(1, 3), ' ln x − 3 ln y − 2 ln z'], 362, 590, m('ans'), { size: 50, anchor: 'start', fill: COL.good });
+    ansBox(p, 344, 530, c._w + 36, 90, m('ans', .7));
+    tx(p, 'power rule;  ln e⁴ = 4', 1300, 580, m('pw', .4), { size: 28, fill: COL.task, anchor: 'middle', weight: 600 });
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz({ ...LOW, y: 650, maxH: 240 }, [{
+    id: 'c-expand', prompt: ['Expand ', $m('ln ', F('√x', 'yz')), ' (with ', $m('x, y, z > 0'), ').'],
+    build: choice([[$m(F(1, 2), ' ln x − ln y − ln z')], [$m(F(1, 2), ' ln x − ln y + ln z')], [$m('2 ln x − ln y − ln z')]], 0,
+      'ln √x − ln(yz) = (1/2) ln x − (ln y + ln z) = (1/2) ln x − ln y − ln z.',
+      [null, 'The minus applies to all of ln(yz) = ln y + ln z, so both terms are subtracted.', '√x = x^(1/2): the power rule gives (1/2) ln x, not 2 ln x.']),
+  }], done) }],
+  ['cob', 'Change of base', (m) => {
+    const p = panel(0);
+    ml(p, ['log', SB('b'), '(a) = ', F('ln a', 'ln b')], 800, 190, m('formula'), { size: 62, fill: COL.task });
+    ml(p, [...LG(3), '(50)'], 640, 370, .3, { size: 56, anchor: 'end' });
+    ml(p, [' = ', F('ln 50', 'ln 3')], 650, 370, m('ex'), { size: 56, anchor: 'start' });
+    ml(p, ['≈ ', F('3.9120…', '1.0986…')], 800, 520, m('vals'), { size: 56 });
+    const a = ml(p, ['≈ 3.5609'], 800, 670, m('ans'), { size: 62, fill: COL.good });
+    boxMath(p, a, 800, 670, 62, m('ans', .6));
+    tx(p, 'keep every digit; round only at the end', 800, 760, m('ans', 1.4), { size: 28, fill: COL.dim, anchor: 'middle' });
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['log', SB('b'), '(a) = ', F('ln a', 'ln b')], 800, 380, .2, { size: 70, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-cob', prompt: ['Approximate ', $m(...LG(2), '(100)'), ' to four decimal places.'],
+    build: blanks([{ parts: [...LG(2), '(100) ≈ ', { box: '6.6439' }], why: 'ln 100 / ln 2 = 4.60517… / 0.69314… = 6.64385… ≈ 6.6439.', hint: 'Compute ln 100 ÷ ln 2 on a calculator, then round to 4 decimal places.' }]),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['A log is an exponent: log₂(8) = 3 because 2³ = 8.', 'w1'], ['Exact values: write both numbers as powers of one base.', 'w2'],
+      ['Product, quotient, power rules; a minus before ( ) hits every term.', 'w3'], ['Change of base: ln of the number ÷ ln of the base.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q20', prompt: [fromExam(20), 'Simplify each.'],
+    build: blanks([
+      { parts: ['a)   ', ...LG(16), '(2) = ', { box: '1/4' }], why: '16 = 2⁴, so 16^(1/4) = 2.', hint: '16 = 2⁴. Which power of 16 is 2?' },
+      { parts: ['b)   ', ...LG(8), '(8', E(12), ') = ', { box: '12' }], why: 'The log base 8 undoes the power of 8.', hint: 'A log undoes a power of its own base.' },
+      { parts: ['c)   ', ...LG(3), '(', F(1, 27), ') = ', { box: '-3' }], why: '1/27 = 3⁻³.', hint: '27 = 3³, and 1/27 is a negative power of 3.' },
+    ]),
+  }, {
+    id: 'p-q21', prompt: [fromExam(21), 'Expand and evaluate where appropriate: ', $m('ln ', F('e³ √x', 'y² z⁵')), ' (with ', $m('x, y, z > 0'), ').'],
+    build: choice([[$m('3 + ', F(1, 2), ' ln x − 2 ln y − 5 ln z')], [$m('3 + ', F(1, 2), ' ln x − 2 ln y + 5 ln z')], [$m('3 ln e + 2 ln x − 2 ln y − 5 ln z')]], 0,
+      'ln(e³√x) − ln(y²z⁵) = ln e³ + ln x^(1/2) − (ln y² + ln z⁵) = 3 + (1/2) ln x − 2 ln y − 5 ln z.',
+      [null, 'The minus applies to all of ln(y²z⁵): −2 ln y − 5 ln z.', '√x = x^(1/2), so its coefficient is 1/2; and ln e³ evaluates to 3.']),
+  }, {
+    id: 'p-q5', prompt: [fromExam(5), 'Approximate ', $m(...LG(5), '(1234)'), ' to four decimal places, using change of base.'],
+    build: blanks([{ parts: [...LG(5), '(1234) = ', F('ln 1234', 'ln 5'), ' ≈ ', { box: '4.4227' }], why: 'ln 1234 / ln 5 = 7.11801… / 1.60943… = 4.42267… ≈ 4.4227.',
+      hint: 'Divide ln 1234 by ln 5 on the calculator; round only the final answer.' }]),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

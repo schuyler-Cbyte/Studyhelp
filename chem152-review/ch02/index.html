@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Percent Composition by Mass from a Formula · CHEM 152 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Review, Chapter 2. Storyboard: books/chem152-review/chapters/ch02.md.
+// The formula-to-percent procedure is a standard method, not yet confirmed by instructor slides; the lesson says so.
+const CHAPTER = { number: 2, title: 'Percent Composition by Mass from a Formula', minutes: 4, language: 'en', next: '../ch03/' };
+
+/* ---------- chapter data (checked in ch02.md) ---------- */
+const EC2 = { Fe: COL.nat, O: COL.whole, Sn: COL.whole, Cl: COL.irr, I: COL.real };
+const GPX = 7;                                        // mass bar: 7 px per gram, to scale
+const BAR2 = { x: 800 - 159.70 * GPX / 2, y: 320, h: 70 };
+const PARTS = [
+  { sym: 'Fe', calc: '2 × 55.85 = 111.70 g', g: 111.70, pct: '69.94', div: '111.70 ÷ 159.70 × 100 ≈ 69.94%' },
+  { sym: 'O',  calc: '3 × 16.00 = 48.00 g',  g: 48.00,  pct: '30.06', div: '48.00 ÷ 159.70 × 100 ≈ 30.06%' },
+];
+const WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };   // card for questions with long options
+const SRC_NOTE = 'Standard method · not yet confirmed by course slides';
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Mass shares', (m, D) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Composition · Chapter 2', { x: 800, y: 300, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Percent Composition', { x: 800, y: 410, size: 92, weight: 600, anchor: 'middle' });
+    T(g, 'by Mass from a Formula', { x: 800, y: 490, size: 52, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cT(p, "how much of a compound's mass comes from each element", 800, 590, { size: 34, fill: COL.dim, anchor: 'middle' }), m('sub', .2));
+    const n = G(p, { o: 0 });
+    const w = uiW(SRC_NOTE, 26) + 48;
+    mk('rect', { x: 800 - w / 2, y: 650, width: w, height: 50, rx: 25, fill: 'none', stroke: COL.task, 'stroke-width': 2 }, n);
+    T(n, SRC_NOTE, { x: 800, y: 684, size: 26, fill: COL.task, weight: 600, anchor: 'middle' });
+    show(n, m('note'));
+  }],
+  ['molar-mass', 'Molar mass from the formula', (m) => {
+    const p = S.p2 = panel(0);
+    show(cFormula(p, [['Fe', '2'], ['O', '3']], 800, 160, { size: 84, colors: EC2 }), .2);
+    let x = BAR2.x;
+    S.parts = PARTS.map((e, i) => {
+      const w = e.g * GPX, cx = x + w / 2, mk1 = i ? 'o' : 'fe';
+      show(cT(p, e.calc, cx, 270, { size: 34, font: CFONT, anchor: 'middle' }), m(mk1));
+      const r = put(mk('rect', { x, y: BAR2.y, width: w, height: BAR2.h, fill: EC2[e.sym] }, p), { o: 0 });
+      show(r, m(mk1, 1.2));
+      const lg = cT(p, `${e.sym}  ${e.g.toFixed(2)} g`, cx, BAR2.y + 46, { size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      show(lg, m(mk1, 1.4));
+      const lp = cT(p, `${e.sym}  ${e.pct}%`, cx, BAR2.y + 46, { size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      x += w;
+      return { r, lg, lp, cx };
+    });
+    const br = G(p, { o: 0 });
+    path(br, `M${BAR2.x} ${BAR2.y + BAR2.h + 6}V${BAR2.y + BAR2.h + 18}H${BAR2.x + 159.70 * GPX}V${BAR2.y + BAR2.h + 6}`, { stroke: COL.task, 'stroke-width': 3 });
+    T(br, 'one mole: 111.70 + 48.00 = 159.70 g', { x: 800, y: BAR2.y + BAR2.h + 54, size: 30, fill: COL.task, weight: 600, anchor: 'middle' });
+    show(br, m('sum'));
+    S.bracket = br;
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-oxygen', prompt: ['In ', chemH(['Fe', '2'], ['O', '3']), ', how many grams of oxygen are in one mole? (O = 16.00)'],
+    build: chemBlanks([{ parts: ['3 × 16.00 = ', { box: '48.00', tol: .005 }, { t: ' g', ui: true }],
+      why: 'Three oxygen atoms, each 16.00 g/mol: 48.00 g in one mole.', hint: 'The subscript 3 means three oxygen atoms. Multiply 3 by 16.00.',
+      fx: () => pulseFx(S.parts[1].r, 1.05) }]),
+  }], done) }],
+  ['percent', 'Each part over the whole', (m) => {
+    hide(S.bracket, 0, .4);
+    PARTS.forEach((e, i) => {
+      const s = S.parts[i], t = m(i ? 'o' : 'fe');
+      show(cT(S.p2, e.div, s.cx, 500, { size: 30, font: CFONT, anchor: 'middle' }), t);
+      hide(s.lg, t + 2.4, .4); show(s.lp, t + 2.6, .4);
+    });
+  }],
+  ['check-sum', 'Check: they add to 100%', (m) => {
+    show(cT(S.p2, '69.94% + 30.06% = 100.00%', 800, 600, { size: 42, font: CFONT, anchor: 'middle' }), m('add'));
+    const ok = cT(S.p2, '✓', 1120, 600, { size: 44, fill: COL.good, weight: 700 });
+    show(ok, m('ok', 1.5));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'percent by mass = ( element’s mass in one mole ÷ ? ) × 100', 800, 200, { size: 40, font: CFONT, anchor: 'middle' }), .2);
+  }, { ask: done => quiz(WIDE, [{
+    id: 'c-divide', prompt: ["To get an element's percent by mass, you divide its mass in one mole by…"],
+    build: choice([["the compound's molar mass"], ["the element's atomic mass"], ['100'], ['the number of atoms of that element']], 0,
+      'Part over whole: the element’s mass in one mole divided by the molar mass, times 100.',
+      [null, 'That gives the number of atoms, not a share of the mass. Divide by the whole: the molar mass.',
+        'The 100 multiplies at the end to make a percent. First divide by the molar mass.',
+        'The subscript was already used to find the element’s mass. Now divide by the molar mass.']),
+  }], done) }],
+  ['round-trip', "Chapter 1's compound, the other way", (m) => {
+    const p = panel(0);
+    show(cT(p, 'Chapter 1 went from percentages to a formula.', 800, 140, { size: 30, fill: COL.dim, anchor: 'middle' }), .3);
+    show(cT(p, 'This method goes from the formula back to percentages.', 800, 190, { size: 30, fill: COL.chalk, anchor: 'middle', weight: 600 }), m('back'));
+    show(cFormula(p, [['Sn', ''], ['Cl', '2'], ['I', '2']], 800, 300, { size: 80, colors: EC2 }), .5);
+    show(cT(p, '118.71 + 2(35.45) + 2(126.90) = 443.41 g/mol', 800, 390, { size: 36, font: CFONT, anchor: 'middle' }), m('mm'));
+    [['Sn', '≈ 26.77%', 420], ['Cl', '≈ 15.99%', 800], ['I', '≈ 57.24%', 1180]].forEach(([s, v, x], i) => {
+      const b = cBox(p, `${s}  ${v}`, EC2[s], x, 500, { size: 34, minW: 240 });
+      tw(b, { o: 1 }, m('pct', i * 1.4), .5);
+    });
+    show(cT(p, 'Chapter 1 started from 26.8% Sn, 16.0% Cl, 57.2% I', 800, 610, { size: 32, fill: COL.good, anchor: 'middle', weight: 600 }), m('match'));
+  }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [["Each element's mass in one mole: subscript × atomic mass.", 'w1'], ['Add the parts to get the molar mass.', 'w2'],
+      ['Percent = part ÷ molar mass × 100. The percents add to 100.', 'w3']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 300 + i * 140, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 36, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    show(cT(p, SRC_NOTE, 800, 760, { size: 26, fill: COL.task, anchor: 'middle' }), m('end'));
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-molar', prompt: ['Find the molar mass of ', chemH(['Sn', ''], ['Cl', '2'], ['I', '2']), '. Use Sn 118.71, Cl 35.45, I 126.90.'],
+    build: chemBlanks([{ parts: [{ box: '443.41', tol: .011 }, { t: ' g/mol', ui: true }],
+      why: '118.71 + 2(35.45) + 2(126.90) = 118.71 + 70.90 + 253.80 = 443.41 g/mol.',
+      hint: 'Multiply each atomic mass by its subscript (no subscript means 1), then add the three parts.' }]),
+  }, {
+    id: 'p-iodine', prompt: ['What percent of the mass of ', chemH(['Sn', ''], ['Cl', '2'], ['I', '2']), ' is iodine? Round to two decimal places.'],
+    build: chemBlanks([{ parts: [{ box: '57.24', tol: .021 }, { t: ' %', ui: true }],
+      why: 'Iodine’s part is 2 × 126.90 = 253.80 g; 253.80 ÷ 443.41 × 100 ≈ 57.24%.',
+      hint: 'Iodine’s part is 2 × 126.90 = 253.80 g. Divide it by the molar mass, 443.41, then multiply by 100.' }]),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

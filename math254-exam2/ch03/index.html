@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Projections, Parallel and Orthogonal · Math 254 Exam 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m254.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 254 Exam 2 Review, Chapter 3. Study guide problems 4, 5. Storyboard: books/math254-exam2/chapters/ch03.md.
+const CHAPTER = { number: 3, title: 'Projections, Parallel and Orthogonal', minutes: 6, language: 'en', next: '../ch04/' };
+
+/* ---------- chapter data: proj of v = (1, 3) onto w = (4, 2) is (10/20) w = (2, 1); k = 1 makes (1, −2, 3, 0) ⊥ (k, 2, 1, 5) (checked in ch03.md) ---------- */
+const CU = COL.whole, CV = COL.nat, CW = COL.rat, RX = 1150;
+// Right-angle marker at F (plane units) between directions d and n (unit vectors, plane units), side s units.
+function rightMark(P, p, F, d, n, s, t0) {
+  const a = [F[0] - s * d[0], F[1] - s * d[1]], b = [a[0] + s * n[0], a[1] + s * n[1]], c = [F[0] + s * n[0], F[1] + s * n[1]];
+  show(path(p, `M${P.PX(a[0])} ${P.PY(a[1])}L${P.PX(b[0])} ${P.PY(b[1])}L${P.PX(c[0])} ${P.PY(c[1])}`, { stroke: COL.dim, 'stroke-width': 2.5 }, { o: 0 }), t0);
+}
+const S5 = Math.sqrt(5), DW = [2 / S5, 1 / S5], NW = [-1 / S5, 2 / S5];
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Projections', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Vectors in ℝⁿ · Chapter 3', 'Projections, Parallel and Orthogonal', 'what makes sense, shadows and right angles', 'Study guide problems 4 and 5');
+  }],
+  ['types', 'Scalar or vector?', (m) => {
+    const p = panel(0);
+    const L = [['‖u‖', 'scalar', 'norm'], ['u · v', 'scalar', 'dot'], ['u + v', 'vector', 'sum'], ['ku', 'vector', 'mult']];
+    L.forEach(([e, t, k], i) => {
+      const y = 220 + i * 110, t0 = i ? m(k) : .3;
+      ml(p, [e], 330, y, t0, { size: 50, anchor: 'end' });
+      tx(p, t, 380, y - 4, i ? m(k, .3) : m('norm'), { size: 34, fill: t === 'scalar' ? COL.task : CU, weight: 600 });
+    });
+    path(p, 'M640 150V680', { stroke: COL.faint, 'stroke-width': 2 });
+    const R3 = [['‖u‖ + ‖v‖', 'scalar + scalar', 'ok', COL.good], ['(u · v)w', 'scalar × vector', 'ok2', COL.good], ['‖u‖ − v', 'scalar − vector', 'bad', COL.bad]];
+    R3.forEach(([e, t, k], i) => {
+      const y = 240 + i * 150;
+      ml(p, [e], 920, y, m(k), { size: 50 });
+      tx(p, t, 1240, y - 4, m(k, .4), { size: 32, fill: i < 2 ? COL.good : COL.bad, anchor: 'middle', weight: 600 });
+      ml(p, [i < 2 ? '✓' : '✗'], 1450, y, m(k, .8), { size: 50, fill: i < 2 ? COL.good : COL.bad });
+    });
+    draw(path(p, 'M810 552L1030 500', { stroke: COL.bad, 'stroke-width': 5 }, { d: 0 }), m('cross'), .4);
+    tx(p, 'cannot be evaluated', 1100, 640, m('cross', .5), { size: 34, fill: COL.bad, anchor: 'middle', weight: 600 });
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['scalar ± vector   ✗'], 800, 200, .2, { size: 56, fill: COL.bad });
+  }, { ask: done => quiz(WIDE, [{
+    id: 'c-types', prompt: ['u, v and w are vectors in ℝ⁴. Can each expression be evaluated?'],
+    build: grid([
+      { parts: ['‖u‖v'], ans: ['Y'], why: 'A scalar times a vector: a vector.' },
+      { parts: ['u · v + w'], ans: ['N'], why: 'u · v is a scalar; adding the vector w is undefined.' },
+      { parts: ['‖u + v‖'], ans: ['Y'], why: 'u + v is a vector, and its norm is a scalar.' },
+      { parts: ['‖u‖ + 3'], ans: ['Y'], why: 'Scalar plus scalar.' },
+    ], VYN, { multi: false }),
+  }], done) }],
+  ['proj', 'Projection', (m) => {
+    const p = panel(0);
+    const P = plane(p, { cx: 245, cy: 560, u: 95, x0: -1, x1: 5, y0: -1, y1: 4, t0: .1 });
+    P.layer = p;
+    P.arrow(0, 0, 1, 3, CV, m('vw'), { label: 'v' });
+    P.arrow(0, 0, 4, 2, CW, m('vw', 1));
+    ml(p, ['w'], P.PX(4) + 22, P.PY(2) + 30, m('vw', 1.3), { size: 32, fill: CW });
+    show(path(p, `M${P.PX(-1)} ${P.PY(-.5)}L${P.PX(5.2)} ${P.PY(2.6)}`, { stroke: CW, 'stroke-width': 2, 'stroke-dasharray': '6 8' }, { o: 0 }), m('drop'));
+    draw(path(p, `M${P.PX(1)} ${P.PY(3)}L${P.PX(2)} ${P.PY(1)}`, { stroke: COL.dim, 'stroke-width': 3, 'stroke-dasharray': '8 8' }, { d: 0 }), m('drop', .5), .8);
+    rightMark(P, p, [2, 1], DW, NW, .22, m('foot'));
+    P.arrow(0, 0, 2, 1, COL.good, m('foot', .3));
+    ml(p, ['proj', SB('w'), 'v'], P.PX(2) + 30, P.PY(1) + 52, m('foot', .8), { size: 32, fill: COL.good });
+    ml(p, ['proj', SB('w'), 'v = ', F('v · w', 'w · w'), 'w'], RX, 180, m('rule'), { size: 50, fill: COL.task });
+    ml(p, ['v · w = 4 + 6 = 10'], RX, 310, m('vw2'), { size: 44 });
+    ml(p, ['w · w = 16 + 4 = 20'], RX, 400, m('ww'), { size: 44 });
+    const a = ml(p, ['proj', SB('w'), 'v = ', F('10', '20'), '(4, 2) = (2, 1)'], RX, 540, m('ans'), { size: 48, fill: COL.good });
+    boxMath(p, a, RX, 538, 48, m('ans', .6), COL.good, 30);
+    tx(p, 'a vector along w', RX, 650, m('along'), { size: 32, fill: CW, anchor: 'middle', weight: 600 });
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['proj', SB('w'), 'v = ', F('v · w', 'w · w'), 'w'], 800, 380, .2, { size: 60, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-proj', prompt: ['Project ', $m('v = (3, 1)'), ' onto ', $m('w = (1, 1)'), '.'],
+    build: blanks([{ parts: ['proj', SB('w'), 'v = (', { box: '2' }, ', ', { box: '2' }, ')'], why: 'v · w = 4 and w · w = 2, so the projection is 2w = (2, 2).',
+      hint: 'v · w = 3 + 1 = 4 and w · w = 1 + 1 = 2. Multiply w by 4/2.' }]),
+  }], done) }],
+  ['par', 'Parallel', (m) => {
+    const p = panel(0);
+    ml(p, ['(2, −1, 4)   and   (−4, 2, −8)'], RX, 190, m('ex'), { size: 46 });
+    ml(p, ['(−4, 2, −8) = −2(2, −1, 4)'], RX, 300, m('k'), { size: 46, fill: COL.task });
+    tx(p, 'a scalar multiple: parallel', RX, 360, m('k', .6), { size: 30, fill: COL.task, anchor: 'middle', weight: 600 });
+    const P = plane(p, { cx: 380, cy: 440, u: 62, x0: -4, x1: 5, y0: -3, y1: 3, t0: m('pic') });
+    P.layer = p;
+    show(path(p, `M${P.PX(-4.4)} ${P.PY(-2.2)}L${P.PX(5.4)} ${P.PY(2.7)}`, { stroke: COL.faint, 'stroke-width': 2, 'stroke-dasharray': '6 8' }, { o: 0 }), m('pic', .3));
+    P.arrow(0, 0, 2, 1, CU, m('pic', .5), { label: 'u' });
+    P.arrow(0, 0, 4, 2, COL.good, m('pic', 1.1), { label: '2u' });
+    P.arrow(0, 0, -3, -1.5, COL.good, m('pic', 1.7));
+    ml(p, ['−1.5u'], P.PX(-3), P.PY(-1.5) + 46, m('pic', 2), { size: 28, fill: COL.good });
+    ml(p, ['any ku with k ≠ 0'], RX, 520, m('make'), { size: 46, fill: COL.good });
+  }],
+  ['orth', 'Orthogonal', (m) => {
+    const p = panel(0);
+    const P = plane(p, { cx: 380, cy: 440, u: 62, x0: -4, x1: 5, y0: -3, y1: 3, t0: .1 });
+    P.layer = p;
+    P.arrow(0, 0, 2, 1, CU, .3, { label: 'u' });
+    P.arrow(0, 0, -1, 2, CV, .5, { label: 'v' });
+    rightMark(P, p, [0, 0], [-DW[0], -DW[1]], NW, .35, m('rule'));
+    ml(p, ['u · v = 0'], RX, 170, m('rule'), { size: 54, fill: COL.task });
+    ml(p, ['(1, −2, 3, 0) · (k, 2, 1, 5)'], RX, 290, m('ex'), { size: 44 });
+    ml(p, ['= k − 4 + 3 + 0'], RX, 380, m('dot'), { size: 44 });
+    ml(p, ['= k − 1 = 0'], RX, 470, m('set'), { size: 44 });
+    const a = ml(p, ['k = 1'], RX, 600, m('ans'), { size: 54, fill: COL.good });
+    boxMath(p, a, RX, 600, 54, m('ans', .5));
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['orthogonal:   u · v = 0'], 800, 380, .2, { size: 60, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-orth', prompt: ['For which k are ', $m('(k, 3, −1)'), ' and ', $m('(2, 1, 4)'), ' orthogonal?'],
+    build: blanks([{ parts: ['k = ', { box: '1/2' }], why: '2k + 3 − 4 = 0, so 2k = 1 and k = 1/2.', hint: 'Set the dot product to zero: 2k + 3 − 4 = 0.' }]),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Check types first: never scalar ± vector.', 'w1'], ['Projection onto w: (v · w / w · w) w, a vector along w.', 'w2'],
+      ['Parallel: one is a nonzero multiple of the other.', 'w3'], ['Orthogonal: the dot product is 0.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-hw4a', prompt: [fromHW(4), $m('u = (3, −2, 0, 5)'), ', ', $m('v = (7, −1, −2, 4)'), ', ', $m('w = (0, 1, 1, −3)'), '. (a) Evaluate ', $m('2u − (v + 3w)'), '.'],
+    build: blanks([{ parts: ['(', { box: '-1' }, ', ', { box: '-6' }, ', ', { box: '-1' }, ', ', { box: '15' }, ')'], why: '2u = (6, −4, 0, 10) and v + 3w = (7, 2, 1, −5); subtract.',
+      hint: 'Work inside the parentheses first: v + 3w = (7, 2, 1, −5). Then 2u minus that.' }]),
+  }, {
+    id: 'p-hw4types', prompt: ['Problem 4, parts (b)–(f): can each one be evaluated?'],
+    build: grid([
+      { parts: ['(b)  ‖u‖ + v'], ans: ['N'], why: 'Scalar plus vector: undefined. Say so in your answer.' },
+      { parts: ['(c)  ‖v + w‖'], ans: ['Y'], why: 'The norm of a vector.' },
+      { parts: ['(d)  ‖w‖ + ‖−2u‖'], ans: ['Y'], why: 'Scalar plus scalar.' },
+      { parts: ['(e)  ‖u‖w'], ans: ['Y'], why: 'A scalar times a vector.' },
+      { parts: ['(f)  proj', SB('w'), 'v'], ans: ['Y'], why: 'A projection is a vector along w.' },
+    ], VYN, { multi: false }),
+  }, {
+    id: 'p-hw4c', prompt: ['(c) ', $m('v + w = (7, 0, −1, 1)'), '. So'],
+    build: blanks([{ parts: ['‖v + w‖ = √', { box: '51' }], why: '49 + 0 + 1 + 1 = 51.', hint: 'Square each component of (7, 0, −1, 1) and add.' }]),
+  }, {
+    id: 'p-hw4d', prompt: ['(d) ', $m('‖w‖ + ‖−2u‖'), ' equals'],
+    build: choice([[$m('√11 + 2√38')], [$m('√11 − 2√38')], [$m('√11 + 4√38')]], 0, '‖w‖ = √11 and ‖−2u‖ = |−2| ‖u‖ = 2√38 ≈ 15.65 in total.',
+      [null, 'A norm is never negative: ‖−2u‖ = |−2| ‖u‖ = 2√38.', 'The scalar comes out as |−2| = 2, not its square.']),
+  }, {
+    id: 'p-hw4f', prompt: ['(f) For ', $m('proj', SB('w'), 'v'), ', the two dot products are'],
+    build: blanks([{ parts: ['v · w = ', { box: '-15' }, ',    w · w = ', { box: '11' }], why: 'v · w = 0 − 1 − 2 − 12 = −15 and w · w = 0 + 1 + 1 + 9 = 11, so proj_w v = (−15/11) w.',
+      hint: 'v · w = 7·0 + (−1)·1 + (−2)·1 + 4·(−3).' }]),
+  }, {
+    id: 'p-hw5a', prompt: [fromHW(5), $m('u = (2, −3, 0, 5)'), '. (a) Which vector is parallel to u?'],
+    build: choice([[$m('(−4, 6, 0, −10)')], [$m('(2, 3, 0, 5)')], [$m('(4, −6, 0, 5)')]], 0, 'It is −2u. Any nonzero multiple works, so answers vary.',
+      [null, 'Only one sign changed; a multiple changes every component by the same factor.', 'The first three components are 2u but the last is not: 2 · 5 = 10.']),
+  }, {
+    id: 'p-hw5b', prompt: ['(b) For which k are u and ', $m('v = (k, 1, −4, −7)'), ' orthogonal?'],
+    build: blanks([{ parts: ['k = ', { box: '19' }], why: 'u · v = 2k − 3 + 0 − 35 = 2k − 38 = 0, so k = 19.', hint: 'Set u · v = 2k − 3 + 0 − 35 equal to 0.' }]),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

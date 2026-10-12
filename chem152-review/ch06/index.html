@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Name Each Compound in a Chemical Equation · CHEM 152 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Review, Chapter 6. Storyboard: books/chem152-review/chapters/ch06.md.
+// Standard naming method, approved by the user in place of instructor slides; labelled on screen.
+const CHAPTER = { number: 6, title: 'Name Each Compound in a Chemical Equation', minutes: 5, language: 'en', next: '../ch07/' };
+
+/* ---------- chapter data (equations checked in ch06.md) ---------- */
+const EC6 = { Na: MCOL, Fe: MCOL, Ca: MCOL, Cl: NCOL, C: NCOL, O: NCOL, '(OH)': PCOL, OH: PCOL, CO: PCOL };
+const EQ_NA = [{ f: [['Na', '']], coef: 2 }, { f: [['Cl', '2']] }, { f: [['Na', ''], ['Cl', '']], coef: 2 }];
+const EQ_FE = [{ f: [['Fe', ''], ['Cl', '3']] }, { f: [['Na', ''], ['OH', '']], coef: 3 }, { f: [['Fe', ''], ['(OH)', '3']] }, { f: [['Na', ''], ['Cl', '']], coef: 3 }];
+const EQ_CA = [{ f: [['Ca', ''], ['CO', '3']] }, { f: [['Ca', ''], ['O', '']] }, { f: [['C', ''], ['O', '2']] }];
+const WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };
+// Write a name under species i of an equation row, at its own height.
+const nameUnder = (p, row, i, str, dy, t0, fill = COL.chalk) => show(cT(p, str, row.items[i].x, row.y + dy, { size: 30, fill, anchor: 'middle', weight: 600 }), t0);
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Reading an equation', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Nomenclature · Chapter 6', { x: 800, y: 300, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Name Each Compound', { x: 800, y: 410, size: 88, weight: 600, anchor: 'middle' });
+    T(g, 'in a Chemical Equation', { x: 800, y: 490, size: 52, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cT(p, 'name every substance, one at a time', 800, 590, { size: 34, fill: COL.dim, anchor: 'middle' }), m('sub', .2));
+    srcBadge(p, 690, m('note'));
+  }],
+  ['parts', 'Parts of an equation', (m) => {
+    const p = panel(0);
+    const row = eqRow(p, EQ_NA, 2, 330, { size: 80, colors: EC6 });
+    show(row.g, .3);
+    const L = row.items[0].left, M1 = row.items[1].left + row.items[1].w, R0 = row.items[2].left, R1 = R0 + row.items[2].w;
+    const br = G(p, { o: 0 });
+    path(br, `M${L} 372V386H${M1}V372`, { stroke: COL.dim, 'stroke-width': 3 });
+    T(br, 'reactants', { x: (L + M1) / 2, y: 420, size: 28, fill: COL.dim, anchor: 'middle' });
+    path(br, `M${R0} 372V386H${R1}V372`, { stroke: COL.dim, 'stroke-width': 3 });
+    T(br, 'products', { x: (R0 + R1) / 2, y: 420, size: 28, fill: COL.dim, anchor: 'middle' });
+    show(br, m('sides'));
+    show(cT(p, 'coefficients count units; they are not part of the name', 800, 190, { size: 32, fill: COL.task, anchor: 'middle', weight: 600 }), m('coef'));
+    [0, 2].forEach(i => pulse(row.items[i].el, m('coef', .6 + i * .3), 1.35));
+    nameUnder(p, row, 0, 'sodium', 190, m('na'), MCOL);
+    nameUnder(p, row, 1, 'chlorine', 190, m('cl2'), NCOL);
+    nameUnder(p, row, 2, 'sodium chloride', 190, m('nacl'));
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-2nacl', prompt: ['What is the name of the substance written ', chemH(['2 NaCl', '']), '?'],
+    build: choice([['sodium chloride'], ['disodium chloride'], ['sodium dichloride']], 0,
+      'The 2 is a coefficient (two units of NaCl). The substance is sodium chloride.',
+      [null, 'The 2 in front is a coefficient: how many units. It is not part of the name.', 'There is one Cl in NaCl; the 2 in front counts units of NaCl.']),
+  }], done) }],
+  ['ionic-eq', 'A longer equation', (m) => {
+    const p = panel(0);
+    const row = eqRow(p, EQ_FE, 2, 300, { size: 60, colors: EC6 });
+    show(row.g, .3);
+    nameUnder(p, row, 0, 'iron(III) chloride', 90, m('fecl3'));
+    nameUnder(p, row, 1, 'sodium hydroxide', 150, m('naoh'));
+    nameUnder(p, row, 2, 'iron(III) hydroxide', 90, m('feoh3'));
+    nameUnder(p, row, 3, 'sodium chloride', 150, m('nacl'));
+    show(cT(p, 'hydroxide, OH⁻, is a polyatomic ion', 800, 560, { size: 28, fill: PCOL, anchor: 'middle' }), m('naoh', 1.5));
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-feoh3', prompt: ['Name ', chemH(['Fe', ''], ['(OH)', '3']), '.'],
+    build: choice([['iron(III) hydroxide'], ['iron hydroxide'], ['iron trihydroxide']], 0,
+      'Three OH⁻ make 3−, so iron is 3+: iron(III) hydroxide.',
+      [null, 'Iron can have more than one charge, so the name needs a Roman numeral: three OH⁻ make 3−, so iron(III).',
+        'Prefixes are only for molecular compounds; Fe(OH)₃ is ionic.']),
+  }], done) }],
+  ['mixed-eq', 'Ionic and molecular together', (m) => {
+    const p = panel(0);
+    const row = S.caRow = eqRow(p, EQ_CA, 1, 300, { size: 72, colors: EC6 });
+    show(row.g, .3);
+    nameUnder(p, row, 0, 'calcium carbonate', 100, m('caco3'));
+    nameUnder(p, row, 1, 'calcium oxide', 100, m('cao'));
+    nameUnder(p, row, 2, 'carbon dioxide', 100, m('co2'), NCOL);
+    show(cT(p, 'only nonmetals → prefixes', row.items[2].x, 450, { size: 26, fill: NCOL, anchor: 'middle' }), m('co2', 1.2));
+    const w = G(p, { o: 0 });
+    cFormula(w, [['H', '2'], ['O', '']], 760, 580, { size: 56, anchor: 'end', o: 1 });
+    T(w, '= water', { x: 780, y: 576, size: 40, weight: 600 });
+    show(w, m('water'));
+    S.caPick = row.items.map((it, i) => ({ el: it.form, box: [it.left - 6, 300 - 70, it.w + 12, 96], label: ['CaCO3', 'CaO', 'CO2'][i] }));
+  }],
+  ['q3', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-prefix', prompt: ['Click the compound in this equation that is named with prefixes.'],
+    build: pickEls(S.caPick, 2, 'CO₂ has only nonmetals, so it is molecular: carbon dioxide.',
+      i => i === 0 ? 'Calcium is a metal, so CaCO₃ is ionic: calcium carbonate, no prefixes.' : 'Calcium is a metal, so CaO is ionic: calcium oxide, no prefixes.'),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [['Coefficients count units; they are not part of names.', 'w1'], ['Elements take the element name (Cl₂ is chlorine).', 'w2'],
+      ['Name each compound with the Chapter 5 rules.', 'w3']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 280 + i * 140, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 36, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    srcBadge(p, 760, m('end'));
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-cuo', prompt: ['Name every substance, in order: ', chemH(['CuO + H', '2'], [' → Cu + H', '2'], ['O', ''])],
+    build: choice([['copper(II) oxide + hydrogen → copper + water'], ['copper oxide + hydrogen → copper + water'],
+      ['copper(II) oxide + dihydrogen → copper + water']], 0,
+      'Oxide is 2−, so copper(II) oxide; H₂ is the element hydrogen; Cu is copper; H₂O is water.',
+      [null, 'Copper can have more than one charge: oxide is 2−, so copper(II) oxide.', 'H₂ is the element hydrogen; element names take no prefixes.']),
+  }, {
+    id: 'p-kbr', prompt: ['Name every substance, in order: ', chemH(['2 K + Br', '2'], [' → 2 KBr', ''])],
+    build: choice([['potassium + bromine → potassium bromide'], ['dipotassium + dibromine → dipotassium bromide'], ['potassium + bromide → potassium bromine']], 0,
+      'K is potassium, Br₂ is the element bromine, and KBr is the ionic compound potassium bromide.',
+      [null, 'Coefficients, and the 2 in Br₂, are not part of the names.', 'Br₂ alone is the element bromine; in KBr the bromine is the ion bromide.']),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

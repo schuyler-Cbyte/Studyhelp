@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Write a Formula from a Name · CHEM 152 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Review, Chapter 7. Storyboard: books/chem152-review/chapters/ch07.md.
+// Standard method, approved by the user in place of instructor slides; labelled on screen.
+const CHAPTER = { number: 7, title: 'Write a Formula from a Name (including Lead(IV) Oxide)', minutes: 5, language: 'en', next: '../ch08/' };
+
+/* ---------- chapter data ---------- */
+const U = 40, BX = 440, CAT_Y = 280, AN_Y = 410;   // charge blocks: unit size, left edge, row tops
+const WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };
+
+/* ---------- helpers ---------- */
+// A charge scene: the name on top, the cation and anion labels at the left of their block rows.
+function chargeScene(p, name, cat, an, t0) {
+  show(cT(p, name, 800, 170, { size: 48, weight: 600, anchor: 'middle' }), .2);
+  const c = ionF(p, cat[0], cat[1], BX - 30, CAT_Y + 30, { size: 44, fill: MCOL, anchor: 'end' });
+  const a = ionF(p, an[0], an[1], BX - 30, AN_Y + 30, { size: 44, fill: an[2] || NCOL, anchor: 'end' });
+  show(c, t0); show(a, t0 + .5);
+}
+// The k-th ion of a row: q blocks after the k earlier ions, with a bracket below.
+function ionBlocks(p, k, q, sign, t0) {
+  const y = sign > 0 ? CAT_Y : AN_Y, x = BX + k * q * U;
+  const g = chargeBlocks(p, q, sign, x, y, { unit: U });
+  path(g, `M${x + 2} ${y + U + 4}V${y + U + 12}H${x + q * U - 6}V${y + U + 4}`, { stroke: COL.dim, 'stroke-width': 2 });
+  show(g, t0, .4);
+  return g;
+}
+// Both rows are now the same length: a dashed line at their end and "total charge 0".
+function balanced(p, n, t0) {
+  const x = BX + n * U - 2;
+  draw(path(p, `M${x} ${CAT_Y - 16}V${AN_Y + U + 16}`, { stroke: COL.good, 'stroke-width': 3, 'stroke-dasharray': '8 8' }, { d: 0 }), t0, .5);
+  show(cT(p, `${n}+ and ${n}−: total charge 0`, x + 24, (CAT_Y + AN_Y + U) / 2 + 10, { size: 30, fill: COL.good, weight: 600 }), t0 + .3);
+}
+const result = (p, parts, t0, colors) => show(cFormula(p, parts, 1280, 640, { size: 96, colors }), t0);
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'From name to formula', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Nomenclature · Chapter 7', { x: 800, y: 300, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Write a Formula from a Name', { x: 800, y: 410, size: 84, weight: 600, anchor: 'middle' });
+    T(g, 'including lead(IV) oxide', { x: 800, y: 490, size: 48, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cT(p, 'go from a name back to a formula', 800, 590, { size: 34, fill: COL.dim, anchor: 'middle' }), m('sub', .2));
+    srcBadge(p, 690, m('note'));
+  }],
+  ['charges', 'Charges must total zero', (m) => {
+    const p = panel(0);
+    chargeScene(p, 'magnesium chloride', [[['Mg', '']], '2+'], [[['Cl', '']], '−'], m('ions'));
+    ionBlocks(p, 0, 2, 1, m('ions', .3)); ionBlocks(p, 0, 1, -1, m('ions', .8));
+    show(cT(p, 'the total charge must be 0', 800, 600, { size: 32, fill: COL.task, anchor: 'middle', weight: 600 }), m('balance'));
+    ionBlocks(p, 1, 1, -1, m('two'));
+    balanced(p, 2, m('two', .6));
+    result(p, [['Mg', ''], ['Cl', '2']], m('formula'), { Mg: MCOL, Cl: NCOL });
+  }],
+  ['lcm', 'Match the charges', (m) => {
+    const p = panel(0);
+    chargeScene(p, 'aluminum oxide', [[['Al', '']], '3+'], [[['O', '']], '2−'], m('ions'));
+    ionBlocks(p, 0, 3, 1, m('ions', .3)); ionBlocks(p, 0, 2, -1, m('ions', .8));
+    show(cT(p, 'add ions until the charges match', 800, 600, { size: 32, fill: COL.task, anchor: 'middle', weight: 600 }), m('match'));
+    ionBlocks(p, 1, 3, 1, m('six'));
+    ionBlocks(p, 1, 2, -1, m('six', .8)); ionBlocks(p, 2, 2, -1, m('six', 1.4));
+    balanced(p, 6, m('six', 2));
+    result(p, [['Al', '2'], ['O', '3']], m('formula'), { Al: MCOL, O: NCOL });
+  }],
+  ['lead', 'Lead(IV) oxide', (m) => {
+    const p = panel(0);
+    show(cT(p, 'lead(IV) oxide', 800, 170, { size: 48, weight: 600, anchor: 'middle' }), .2);
+    show(cT(p, '(IV) → lead is 4+', 800, 225, { size: 30, fill: COL.task, anchor: 'middle', weight: 600 }), m('iv'));
+    const c = ionF(p, [['Pb', '']], '4+', BX - 30, CAT_Y + 30, { size: 44, fill: MCOL, anchor: 'end' });
+    show(c, m('iv', .6)); ionBlocks(p, 0, 4, 1, m('iv', .9));
+    const a = ionF(p, [['O', '']], '2−', BX - 30, AN_Y + 30, { size: 44, fill: NCOL, anchor: 'end' });
+    show(a, m('ox')); ionBlocks(p, 0, 2, -1, m('ox', .3));
+    ionBlocks(p, 1, 2, -1, m('two'));
+    balanced(p, 4, m('two', .6));
+    result(p, [['Pb', ''], ['O', '2']], m('formula'), { Pb: MCOL, O: NCOL });
+    const low = G(p, { o: 0 });
+    cFormula(low, [['Pb', '2'], ['O', '4']], 330, 650, { size: 56, fill: COL.dim, o: 1 });
+    T(low, '→  lowest ratio  →', { x: 600, y: 645, size: 30, fill: COL.dim, anchor: 'middle' });
+    cFormula(low, [['Pb', ''], ['O', '2']], 860, 650, { size: 56, o: 1 });
+    show(low, m('lowest'));
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-fe2o3', prompt: ['Write the formula for iron(III) oxide. (Leave a box empty, or type 1, for no subscript.)'],
+    build: chemBlanks([{ parts: ['Fe', { box: '2', sub: true, empty: 1, label: 'Subscript for Fe' }, 'O', { box: '3', sub: true, empty: 1, label: 'Subscript for O' }],
+      why: 'Fe³⁺ and O²⁻: two irons make 6+, three oxides make 6−, so Fe₂O₃ (the compound from Chapter 2).',
+      hint: 'Iron(III) is 3+ and oxide is 2−. Find how many of each make equal + and − totals (6 each).' }]),
+  }], done) }],
+  ['poly', 'Parentheses for polyatomic ions', (m) => {
+    const p = panel(0);
+    chargeScene(p, 'calcium nitrate', [[['Ca', '']], '2+'], [[['NO', '3']], '−', PCOL], m('ions'));
+    ionBlocks(p, 0, 2, 1, m('ions', .3)); ionBlocks(p, 0, 1, -1, m('ions', 1.2));
+    ionBlocks(p, 1, 1, -1, m('two'));
+    balanced(p, 2, m('two', .5));
+    result(p, [['Ca', ''], ['(NO', '3'], [')', '2']], m('paren'), { Ca: MCOL, '(NO': PCOL, ')': PCOL });
+    show(cT(p, 'more than one nitrate → parentheses', 800, 600, { size: 30, fill: PCOL, anchor: 'middle', weight: 600 }), m('paren', .6));
+  }],
+  ['molecular', 'Molecular: prefixes give subscripts', (m) => {
+    const p = panel(0);
+    show(cT(p, 'Molecular: the prefixes give the subscripts', 800, 160, { size: 36, weight: 600, anchor: 'middle' }), m('prefix'));
+    show(cT(p, 'di + nitrogen → N₂     tetra + oxide → O₄', 800, 260, { size: 36, fill: COL.task, anchor: 'middle', font: CFONT }), m('n2o4'));
+    show(cFormula(p, [['N', '2'], ['O', '4']], 800, 380, { size: 96 }), m('n2o4', 1));
+    const no = G(p, { o: 0 });
+    T(no, 'not reduced to', { x: 700, y: 480, size: 30, fill: COL.dim, anchor: 'end' });
+    cFormula(no, [['N', ''], ['O', '2']], 780, 482, { size: 48, fill: COL.dim, o: 1 });
+    path(no, 'M730 448L830 494', { stroke: COL.bad, 'stroke-width': 4 });
+    T(no, 'N₂O₄ is the real molecule', { x: 870, y: 480, size: 30, fill: COL.dim });
+    show(no, m('noreduce'));
+    show(cT(p, 'sulfur trioxide → SO₃', 800, 600, { size: 40, anchor: 'middle', font: CFONT }), m('so3'));
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-n2o4', prompt: ['Write dinitrogen tetroxide.'],
+    build: choice([[chemH(['N', '2'], ['O', '4'])], [chemH(['N', ''], ['O', '2'])], [chemH(['N', '4'], ['O', '2'])]], 0,
+      'di → N₂, tetra → O₄: N₂O₄. Molecular formulas are not reduced.',
+      [null, 'Molecular formulas are not reduced: the prefixes give the real counts, N₂O₄.', 'di goes with nitrogen and tetra with oxygen: N₂O₄.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [['Ionic: find each charge; a Roman numeral gives the metal’s.', 'w1'], ['Use the fewest ions that make the total charge 0.', 'w2'],
+      ['More than one polyatomic ion: use parentheses.', 'w3'], ['Molecular: prefixes give subscripts; do not reduce.', 'w4']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 230 + i * 120, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 36, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    srcBadge(p, 760, m('end'));
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-formulas', prompt: ['Write each formula. Leave a box empty, or type 1, for no subscript.'],
+    build: chemBlanks([
+      { parts: [{ t: 'magnesium chloride:  ', ui: true }, 'Mg', { box: '1', sub: true, empty: 1 }, 'Cl', { box: '2', sub: true, empty: 1 }],
+        why: 'Mg²⁺ needs two Cl⁻: MgCl₂.', hint: 'Mg is 2+ and Cl is 1−.' },
+      { parts: [{ t: 'lead(IV) oxide:  ', ui: true }, 'Pb', { box: '1', sub: true, empty: 1 }, 'O', { box: '2', sub: true, empty: 1 }],
+        why: 'Pb⁴⁺ needs two O²⁻: PbO₂ (lowest ratio).', hint: 'IV means Pb is 4+; oxide is 2−. Use the lowest ratio.' },
+      { parts: [{ t: 'sulfur trioxide:  ', ui: true }, 'S', { box: '1', sub: true, empty: 1 }, 'O', { box: '3', sub: true, empty: 1 }],
+        why: 'tri → O₃, and no prefix on sulfur means one: SO₃.', hint: 'Molecular: read the prefixes. tri means 3.' },
+    ]),
+  }, {
+    id: 'p-nh4so4', prompt: ['Write ammonium sulfate. (Ammonium is NH₄⁺; sulfate is SO₄²⁻.)'],
+    build: choice([[chemH(['(NH', '4'], [')', '2'], ['SO', '4'])], [chemH(['NH', '4'], ['SO', '4'])], [chemH(['NH', '4'], ['(SO', '4'], [')', '2'])]], 0,
+      'Two NH₄⁺ (2+) balance one SO₄²⁻ (2−); the two ammoniums need parentheses: (NH₄)₂SO₄.',
+      [null, 'One NH₄⁺ (1+) cannot balance SO₄²⁻ (2−). You need two ammoniums.', 'That has too much negative charge: one NH₄⁺ against two SO₄²⁻. Use two ammoniums and one sulfate.']),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Domains and Ranges · Math 141 Midterm 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 2 Review, Chapter 6. Practice midterm questions 15–19. Storyboard: books/math141-midterm2/chapters/ch06.md.
+const CHAPTER = { number: 6, title: 'Domains and Ranges', minutes: 5, language: 'en', next: '../ch07/' };
+
+/* ---------- chapter data (checked in ch06.md) ---------- */
+const NX = v => 800 + v * 80, NY = 520;                      // the number line: −7 … 7
+
+// Number line with arrows and integer ticks; labels at multiples of 3.
+function nline(p, t0) {
+  const g = G(p, { o: 0 });
+  path(g, `M${NX(-7.6)} ${NY}H${NX(7.6)}M${NX(7.6) - 14} ${NY - 9}L${NX(7.6)} ${NY}L${NX(7.6) - 14} ${NY + 9}M${NX(-7.6) + 14} ${NY - 9}L${NX(-7.6)} ${NY}L${NX(-7.6) + 14} ${NY + 9}`, { stroke: COL.chalk, 'stroke-width': 3 });
+  for (let v = -7; v <= 7; v++) {
+    path(g, `M${NX(v)} ${NY - 8}V${NY + 8}`, { stroke: COL.dim, 'stroke-width': 2 });
+    if (v % 3 === 0) T(g, num(v), { x: NX(v), y: NY + 40, size: 24, fill: COL.dim, font: MATH, anchor: 'middle' });
+  }
+  show(g, t0);
+  return g;
+}
+// A thick ray from v towards −∞ (dir −1) or +∞ (dir 1), drawn on.
+function nray(p, v, dir, t0, color = COL.good) {
+  const end = NX(7.5 * dir);
+  draw(path(p, `M${NX(v)} ${NY}H${end}M${end - 18 * dir} ${NY - 13}L${end} ${NY}L${end - 18 * dir} ${NY + 13}`, { stroke: color, 'stroke-width': 7 }, { d: 0 }), t0, .8);
+}
+function ndot(p, v, t0, color, closed = true) {
+  const d = G(p, { x: NX(v), y: NY, s: 0, o: 0 });
+  mk('circle', { r: 12, fill: closed ? color : COL.board, stroke: color, 'stroke-width': 4 }, d);
+  pop(d, t0);
+  return d;
+}
+// A thick band along an axis of plane P, from (xa, ya) to (xb, yb), drawn on.
+const band = (p, P, xa, ya, xb, yb, color, t0) => draw(path(p, `M${P.PX(xa)} ${P.PY(ya)}L${P.PX(xb)} ${P.PY(yb)}`, { stroke: color, 'stroke-width': 9, 'stroke-opacity': .75 }, { d: 0 }), t0, .9);
+function openAt(p, P, t0, color) { const d = G(p, { x: P.PX(0), y: P.PY(0), s: 0, o: 0 }); mk('circle', { r: 10, fill: COL.board, stroke: color, 'stroke-width': 4 }, d); pop(d, t0); }
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Domains and ranges', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Rational Functions and Domains · Chapter 6', 'Domains and Ranges', 'where a function lives, in interval form', 'Practice midterm questions 15 to 19 · no calculator');
+  }],
+  ['root', 'Even roots', (m) => {
+    const p = panel(0);
+    ml(p, ['f(x) = ', R('x² − 9', 4)], 800, 150, .3, { size: 56 });
+    ml(p, ['x² − 9 ≥ 0'], 800, 270, m('even', 1.5), { size: 50, fill: COL.task });
+    tx(p, 'even root: the inside must be ≥ 0', 800, 322, m('even', 2), { size: 28, fill: COL.dim, anchor: 'middle' });
+    nline(p, m('bound'));
+    ndot(p, -3, m('bound', 1.2), COL.task, false); ndot(p, 3, m('bound', 1.5), COL.task, false);
+    [[-5, '+', '16', 0], [0, '−', '−9', 1.6], [5, '+', '16', 3.2]].forEach(([v, s, val, dt]) => {
+      tx(p, `x = ${num(v)}:  ${val}`, NX(v), NY - 92, m('test', dt), { size: 24, fill: COL.dim, anchor: 'middle' });
+      ml(p, [s], NX(v), NY - 34, m('test', dt + .4), { size: 52, fill: s === '+' ? COL.good : COL.bad });
+    });
+    nray(p, -3, -1, m('shade')); nray(p, 3, 1, m('shade', .3));
+    ndot(p, -3, m('shade', .9), COL.good); ndot(p, 3, m('shade', 1.1), COL.good);
+    const a = ml(p, ['(−∞, −3] ∪ [3, ∞)'], 800, 700, m('ans'), { size: 56, fill: COL.good });
+    boxMath(p, a, 800, 700, 56, m('ans', .8));
+  }],
+  ['odd', 'Odd roots', (m) => {
+    const p = panel(0);
+    ml(p, ['g(x) = ', R('x² − 9', 3)], 800, 170, .3, { size: 56 });
+    ml(p, [R('−8', 3), ' = −2'], 800, 320, m('cube'), { size: 50, fill: COL.task });
+    tx(p, 'odd root: any real number is allowed inside', 800, 375, m('cube', .8), { size: 28, fill: COL.dim, anchor: 'middle' });
+    nline(p, m('all'));
+    nray(p, 0, -1, m('all', .5)); nray(p, 0, 1, m('all', .5));
+    const a = ml(p, ['(−∞, ∞)'], 800, 700, m('all', 1.3), { size: 56, fill: COL.good });
+    boxMath(p, a, 800, 700, 56, m('all', 1.8));
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['even root:  inside ≥ 0'], 800, 380, .2, { size: 60, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-dom', prompt: ['Find the domain of ', $m('f(x) = ', R('25 − x²', 6)), '.'],
+    build: choice([[$m('[−5, 5]')], [$m('(−∞, −5] ∪ [5, ∞)')], [$m('(−5, 5)')]], 0,
+      '25 − x² ≥ 0 means x² ≤ 25: between −5 and 5, endpoints included.',
+      [null, 'Test x = 0: 25 − 0 = 25 ≥ 0, so the middle is allowed; the outside pieces are negative.', 'At x = ±5 the inside is 0, and the sixth root of 0 is 0: include the endpoints.']),
+  }], done) }],
+  ['expo', 'Exponential functions', (m) => {
+    const p = panel(0);
+    const P = S.P = plane(p, { cx: 520, cy: 430, u: 42, x0: -4, x1: 8, y0: -4, y1: 8, t0: .1 });
+    P.layer = p;
+    const ex = S.ex = G(p);
+    P.fn(Math.exp, -4, 2.2, COL.whole, .4);
+    ml(p, ['y = e', E('x')], P.PX(2.2) + 12, 130, .9, { size: 32, fill: COL.whole, anchor: 'start' });
+    P.fn(x => 10 ** x, -4, 1, COL.dim, m('ten'), { into: ex, w: 3 });
+    ml(ex, ['y = 10', E('x')], P.PX(-.2), P.PY(4.6), m('ten', .5), { size: 30, fill: COL.dim, anchor: 'end' });
+    band(ex, P, -4, 0, 8, 0, COL.irr, m('dom'));
+    ml(ex, ['domain:  (−∞, ∞)'], 1240, 300, m('dom', .6), { size: 44, fill: COL.irr });
+    band(ex, P, 0, 0, 0, 8, COL.task, m('rng'));
+    openAt(ex, P, m('rng', .8), COL.task);
+    ml(ex, ['range:  (0, ∞)'], 1240, 400, m('rng', .6), { size: 44, fill: COL.task });
+    ml(ex, ['asymptote:  y = 0'], 1240, 500, m('asym'), { size: 40, fill: COL.nat });
+  }],
+  ['log', 'Logarithms', (m) => {
+    const p = S.panel, P = S.P;
+    hide(S.ex, 0, .5);
+    P.line(-4, -4, 8, 8, COL.dim, m('mirror'), { dash: '6 8', w: 2.5 });
+    P.fn(Math.log, Math.exp(-4), 8, COL.task, m('mirror', .8), { dur: 1.4 });
+    ml(p, ['y = ln x'], P.PX(8) - 6, P.PY(Math.log(8)) + 44, m('mirror', 1.6), { size: 32, fill: COL.task, anchor: 'end' });
+    P.dot(1, Math.E, COL.whole, m('swap'), { label: '(1, e)', dx: -36, dy: -20, anchor: 'end' });
+    P.dot(Math.E, 1, COL.task, m('swap', .6), { label: '(e, 1)', dy: 26 });
+    dashed(p, `M${P.PX(1)} ${P.PY(Math.E)}L${P.PX(Math.E)} ${P.PY(1)}`, m('swap', .4), COL.dim);
+    band(p, P, 0, 0, 8, 0, COL.irr, m('dom'));
+    openAt(p, P, m('dom', .8), COL.irr);
+    ml(p, ['domain of ln x:  (0, ∞)'], 1240, 300, m('dom', .5), { size: 42, fill: COL.irr });
+    band(p, P, 0, -4, 0, 8, COL.task, m('rng'));
+    ml(p, ['range of ln x:  (−∞, ∞)'], 1240, 400, m('rng', .5), { size: 42, fill: COL.task });
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-rng', prompt: ['What is the range of ', $m('f(x) = 3', E('x')), '?'],
+    build: choice([[$m('(0, ∞)')], [$m('(−∞, ∞)')], [$m('[0, ∞)')]], 0, 'An exponential with a positive base gives only positive outputs, and never 0: (0, ∞).',
+      [null, 'That is its domain. Its outputs are always positive.', '3ˣ gets close to 0 but never equals 0, so 0 is not included.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Even root: inside ≥ 0; test each piece.', 'w1'], ['Odd root: no restriction.', 'w2'],
+      ['Exponential: domain (−∞, ∞), range (0, ∞).', 'w3'], ['Logarithm: domain (0, ∞), range (−∞, ∞).', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q15', prompt: [fromExam(15), 'Write the domain of ', $m('f(x) = ', R('x² − 16', 4)), ' in interval form.'],
+    build: choice([[$m('(−∞, −4] ∪ [4, ∞)')], [$m('[−4, 4]')], [$m('(−∞, −4) ∪ (4, ∞)')]], 0,
+      'x² − 16 ≥ 0: test 0 (−16, no), ±5 (9, yes). Keep the outside pieces with the endpoints ±4.',
+      [null, 'Test x = 0: 0 − 16 = −16 < 0, so the middle is not allowed.', 'At x = ±4 the inside is 0 and the fourth root of 0 is 0: use brackets.']),
+  }, {
+    id: 'p-q16-19', prompt: ['Questions 16 to 19. Choose the interval for each.'],
+    build: grid([
+      { parts: ['16.  Domain of ', $m('f(x) = 10', E('x'))], ans: ['all'], why: 'You can raise 10 to any power.' },
+      { parts: ['17.  Range of ', $m('f(x) = 10', E('x'))], ans: ['pos'], why: '10ˣ is always positive and never 0.' },
+      { parts: ['18.  Domain of ', $m('f(x) = ln(x)')], ans: ['pos'], why: 'You can only take the log of a positive number.' },
+      { parts: ['19.  Range of ', $m('f(x) = ln(x)')], ans: ['all'], why: 'ln x takes every real value.' },
+    ], [['all', '(−∞, ∞)'], ['pos', '(0, ∞)'], ['nonneg', '[0, ∞)']], { multi: false, text: true }),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

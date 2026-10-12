@@ -1,0 +1,52 @@
+{
+  "shelf": "Local Papermorph bookshelf",
+  "statuses": [
+    "Draft",
+    "Pilot / in review",
+    "Ready"
+  ],
+  "books": [
+    {
+      "slug": "chem152-review",
+      "title": "CHEM 152 Review",
+      "subtitle": "All 8 chapters: composition, atomic structure, nomenclature and balancing",
+      "status": "Pilot / in review",
+      "href": "chem152-review/",
+      "chapters": {
+        "available": 8,
+        "planned": 8
+      },
+      "note": "Chapter 1 approved; chapters 2–8 in review. Chapters 2 and 5–8 use standard methods not yet confirmed by course slides.",
+      "updated": "2026-10-10",
+      "hue": "#f4a48c"
+    },
+    {
+      "slug": "math141-midterm2",
+      "title": "Math 141 Midterm 2",
+      "subtitle": "All 23 practice-midterm questions in 8 chapters: parabolas, polynomials, rational functions, exponentials and logs",
+      "status": "Pilot / in review",
+      "href": "math141-midterm2/",
+      "chapters": {
+        "available": 8,
+        "planned": 8
+      },
+      "note": "All chapters awaiting your review; none approved yet. Standard methods, not yet checked against Prof. Kuniyuki's class notes.",
+      "updated": "2026-10-10",
+      "hue": "#86c9e8"
+    },
+    {
+      "slug": "math254-exam2",
+      "title": "Math 254 Exam 2",
+      "subtitle": "All 30 study-guide problems in 10 chapters: vectors, cross product, vector spaces, span, independence and bases",
+      "status": "Pilot / in review",
+      "href": "math254-exam2/",
+      "chapters": {
+        "available": 10,
+        "planned": 10
+      },
+      "note": "All chapters awaiting your review; none approved yet. Standard methods, not yet checked against your class notes. Practice checks answers and strategy; written proofs stay yours.",
+      "updated": "2026-10-10",
+      "hue": "#bba8ee"
+    }
+  ]
+}

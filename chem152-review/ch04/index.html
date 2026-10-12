@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electron Box Diagrams · CHEM 152 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Review, Chapter 4. Storyboard: books/chem152-review/chapters/ch04.md. Neutral atoms only.
+const CHAPTER = { number: 4, title: 'Electron Box Diagrams', minutes: 5, language: 'en', next: '../ch05/' };
+
+/* ---------- chapter data ---------- */
+const WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };   // card for questions with long options
+const SUBS = [['s', 2, 220], ['p', 6, 340], ['d', 10, 460], ['f', 14, 580]];
+// Silicon, 14 electrons: rows bottom-up by energy; [label, boxes, electrons, box top y, narration mark].
+const SI = [['1s', 1, 2, 640, 's1'], ['2s', 1, 2, 540, 's2'], ['2p', 3, 6, 440, 'p2'], ['3s', 1, 2, 340, 's3'], ['3p', 3, 2, 240, 'p3']];
+
+/* ---------- helpers ---------- */
+// Fill a row's boxes with k electrons: one up in each box first, then the downs (Hund), from t0, dt apart.
+// Unpaired electrons are centred; returns the end time.
+function fillRow(p, row, k, t0, dt = .3) {
+  const n = row._boxes.length, ups = Math.min(k, n), downs = k - ups;
+  let t = t0;
+  for (let i = 0; i < ups; i++) { const a = oArrow(p, row._boxes[i], 'u', { single: i >= downs }); show(a, t, .3); t += dt; }
+  for (let i = 0; i < downs; i++) { const a = oArrow(p, row._boxes[i], 'd'); show(a, t, .3); t += dt; }
+  return t;
+}
+// Two up arrows in one box (the Pauli mistake): left and right halves both pointing up.
+function upUp(p, b) {
+  const g = G(p);
+  for (const dx of [-11, 11]) {
+    const cx = b.x + OB / 2 + dx, y1 = b.y + 12, y2 = b.y + OB - 12;
+    path(g, `M${cx} ${y2}V${y1}M${cx - 8} ${y1 + 11}L${cx} ${y1}L${cx + 8} ${y1 + 11}`, { stroke: COL.task, 'stroke-width': 4 });
+  }
+  return g;
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Boxes and arrows', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Atomic Structure · Chapter 4', { x: 800, y: 300, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Electron Box Diagrams', { x: 800, y: 420, size: 92, weight: 600, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cT(p, 'every orbital a box, every electron an arrow', 800, 530, { size: 34, fill: COL.dim, anchor: 'middle' }), m('sub', .2));
+    const r = oRow(p, '', 3, 800 - 1.5 * OB, 600);
+    show(r, m('sub', 1.2));
+    fillRow(p, r, 4, m('sub', 1.8), .35);
+  }],
+  ['one-box', 'One box, two electrons', (m) => {
+    const p = panel(0);
+    const big = G(p, { x: 800, y: 420, s: 2.4 });
+    const r = oRow(big, '', 1, -OB / 2, -OB / 2, { o: 0 });
+    show(r, .2);
+    show(cT(p, 'one box = one orbital', 800, 230, { size: 36, weight: 600, anchor: 'middle' }), .3);
+    show(oArrow(big, r._boxes[0], 'u'), m('up'), .4);
+    show(oArrow(big, r._boxes[0], 'd'), m('down'), .4);
+    show(cT(p, 'at most 2 electrons per box', 800, 610, { size: 34, anchor: 'middle' }), m('down', .5));
+    show(cT(p, 'opposite spins: one up, one down', 800, 670, { size: 34, fill: COL.task, anchor: 'middle', weight: 600 }), m('spin'));
+    show(cT(p, 'Pauli exclusion principle', 800, 730, { size: 30, fill: COL.dim, anchor: 'middle' }), m('pauli'));
+  }],
+  ['subshell-boxes', 'Boxes per subshell', (m) => {
+    const p = panel(0);
+    show(cT(p, 'boxes = capacity ÷ 2', 800, 140, { size: 34, weight: 600, anchor: 'middle' }), .3);
+    SUBS.forEach(([lab, cap, y], i) => {
+      const n = cap / 2, t = i ? m(lab) : m('s');
+      const r = oRow(p, lab, n, 500, y, { size: 40 });
+      show(r, t, .5);
+      show(cT(p, `${cap} ÷ 2 = ${n} box${n === 1 ? '' : 'es'}`, 1010, y + OB / 2 + 12, { size: 34, font: CFONT }), t + .4);
+    });
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-pboxes', prompt: ['How many boxes does a p subshell have?'],
+    build: chemBlanks([{ parts: [{ box: '3' }, { t: ' boxes', ui: true }], why: 'p holds 6 electrons, 2 per box: 3 boxes.', hint: 'A p subshell holds 6 electrons, and each box holds 2.' }]),
+  }], done) }],
+  ['hund', "Hund's rule", (m) => {
+    const p = panel(0);
+    show(cT(p, 'Two electrons into the 3p boxes', 800, 170, { size: 34, weight: 600, anchor: 'middle' }), .3);
+    const L = oRow(p, '3p', 3, 300, 330, { size: 38 }), R = oRow(p, '3p', 3, 1040, 330, { size: 38 });
+    show(L, .4);
+    show(oArrow(p, L._boxes[0], 'u'), m('wrong', .2), .3); show(oArrow(p, L._boxes[0], 'd'), m('wrong', .6), .3);
+    draw(cCross(p, 280, 315, 3 * OB + 40, OB + 30), m('no'), .5);
+    show(cT(p, 'pairs too early', 396, 470, { size: 30, fill: COL.bad, anchor: 'middle', weight: 600 }), m('no', .3));
+    show(cT(p, "Hund's rule: single electrons in equal-energy boxes before pairing", 800, 610, { size: 32, anchor: 'middle', weight: 600 }), m('rule'));
+    show(R, m('right'));
+    show(oArrow(p, R._boxes[0], 'u', { single: true }), m('right', .3), .3);
+    show(oArrow(p, R._boxes[1], 'u', { single: true }), m('right', .7), .3);
+    show(cT(p, 'one per box, both up', 1136, 470, { size: 30, fill: COL.good, anchor: 'middle', weight: 600 }), m('same'));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    S.opts = [180, 700, 1220].map((x, i) => {
+      const r = oRow(p, '', 3, x, 330, { o: 0 });
+      show(r, .2 + i * .2);
+      show(cT(p, 'ABC'[i], x + 1.5 * OB, 300, { size: 32, fill: COL.dim, anchor: 'middle', weight: 700 }), .2 + i * .2);
+      const b = r._boxes;
+      if (i === 0) { show(oArrow(p, b[0], 'u'), .3); show(oArrow(p, b[0], 'd'), .3); }
+      if (i === 1) { show(oArrow(p, b[0], 'u', { single: true }), .5); show(oArrow(p, b[1], 'u', { single: true }), .5); }
+      if (i === 2) show(upUp(p, b[0]), .7);
+      return { el: r, box: [x - 14, 316, 3 * OB + 28, OB + 28], label: `Diagram ${'ABC'[i]}` };
+    });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-pick3p', prompt: ['Two electrons go into 3p. Which diagram is right? Click it.'],
+    build: pickEls(S.opts, 1, 'B: one electron in each of two boxes, before any pairing (Hund’s rule).',
+      i => i === 0 ? 'A pairs the electrons while other boxes are still empty. Hund’s rule: singles first.'
+        : 'C puts two electrons in one box with the same spin. Two in one box must be opposite (Pauli).'),
+  }], done) }],
+  ['silicon', 'Silicon, 14 electrons', (m) => {
+    const p = panel(0);
+    show(cT(p, 'Silicon · 14 electrons', 1180, 230, { size: 34, weight: 600, anchor: 'middle' }), .3);
+    const cfg = cTerms(p, SI.map(([lab, , k]) => [lab, String(k)]), 1180, 330, { size: 54 });
+    SI.forEach(([lab, n, k, y, mark], i) => {
+      const r = oRow(p, lab, n, 540, y, { size: 36 }), t = m(mark);
+      show(r, i ? t : .4, .4);
+      fillRow(p, r, k, t + .3, n === 3 ? .28 : .35);
+      show(cfg[i], t + .3);
+    });
+    show(cT(p, '2 + 2 + 6 + 2 + 2 = 14', 1180, 440, { size: 40, font: CFONT, fill: COL.good, anchor: 'middle' }), m('count'));
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    const r = oRow(p, '', 1, 800 - OB / 2, 150, { o: 0 });
+    show(r, .2); show(T(p, '?', { x: 800, y: 196, size: 44, fill: COL.task, anchor: 'middle', weight: 700, o: 0 }), .3);
+  }, { ask: done => quiz(WIDE, [{
+    id: 'c-pauli', prompt: ['Two electrons in the same box must have…'],
+    build: choice([['opposite spins: one up, one down'], ['the same spin: both up'], ['any spins; it does not matter']], 0,
+      'Pauli exclusion principle: two electrons in one orbital have opposite spins.',
+      [null, 'Two electrons in one box can’t have the same spin. That breaks the Pauli exclusion principle.',
+        'It does matter: the Pauli exclusion principle requires opposite spins in one box.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [['One box = one orbital: at most 2 electrons, opposite spins.', 'w1'], ['Boxes: s 1, p 3, d 5, f 7.', 'w2'],
+      ['Hund: single electrons in equal-energy boxes before pairing.', 'w3']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 330 + i * 140, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 36, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    const r = oRow(p, '3p', 3, 800 - 1.5 * OB, 110, { size: 36 });
+    show(r, .3); fillRow(p, r, 2, .6, .3);
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-cl3p', prompt: ['Chlorine ends in ', chemH(['3p', '5'], { sup: true }), '. Draw its 3p electrons.'],
+    build: boxBuild('3p', 3, st => st.filter(x => x === 2).length === 2 && st.filter(x => x === 1).length === 1, [2, 2, 1],
+      'Five electrons in three boxes: one in each first (Hund), then two of them pair. Two pairs and one single.',
+      st => { const n = st.reduce((a, b) => a + b, 0); return n !== 5 ? `That shows ${n} electron${n === 1 ? '' : 's'}; 3p⁵ needs 5.` : 'Each box holds at most 2.'; }),
+  }, {
+    id: 'p-si', prompt: ["Look back at silicon's box diagram (1s² 2s² 2p⁶ 3s² 3p²)."],
+    build: chemBlanks([
+      { parts: [{ t: 'Electrons in the whole diagram: ', ui: true }, { box: '14' }], why: '2 + 2 + 6 + 2 + 2 = 14.', hint: 'Add the superscripts: 2 + 2 + 6 + 2 + 2.' },
+      { parts: [{ t: '3p boxes holding a single electron: ', ui: true }, { box: '2' }], why: '3p² puts one electron in each of two boxes; the third stays empty.', hint: 'Hund’s rule: the two 3p electrons do not pair.' },
+    ]),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

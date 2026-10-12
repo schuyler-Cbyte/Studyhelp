@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Basis, Coordinates and Dimension · Math 254 Exam 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m254.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 254 Exam 2 Review, Chapter 10. Study guide problems 24–28, 30(f)–(j). Storyboard: books/math254-exam2/chapters/ch10.md.
+const CHAPTER = { number: 10, title: 'Basis, Coordinates and Dimension', minutes: 8, language: 'en' };
+
+/* ---------- chapter data: basis {(1, 1), (1, −1)}, (5, 1) = 3b₁ + 2b₂; (a, b, a + b) has basis {(1, 0, 1), (0, 1, 1)};
+   at² + bt + (a − b) = a(t² + 1) + b(t − 1); 2 × 2 symmetric: dim 3 (checked in ch10.md) ---------- */
+const C1 = COL.whole, C2 = COL.nat;
+function verdict(p, s, x, y, t0, color) {
+  const g = G(p, { o: 0 }), w = uiW(s, 30) + 44;
+  mk('rect', { x: x - w / 2, y: y - 36, width: w, height: 54, rx: 27, fill: 'none', stroke: color, 'stroke-width': 2.5 }, g);
+  T(g, s, { x, y, size: 30, fill: color, weight: 600, anchor: 'middle' });
+  show(g, t0);
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Basis and dimension', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Span, Independence and Bases · Chapter 10', ['Basis, Coordinates', 'and Dimension'], 'the smallest set that builds a whole space', 'Study guide problems 24–28 and 30(f)–(j)');
+  }],
+  ['basis', 'What a basis is', (m) => {
+    const p = panel(0);
+    tx(p, 'basis  =', 330, 220, .3, { size: 44, weight: 700, anchor: 'end' });
+    tx(p, 'linearly independent', 370, 190, m('ind'), { size: 38, fill: C1, weight: 600 });
+    tx(p, 'no repeats', 860, 190, m('ind', .4), { size: 28, fill: COL.dim });
+    tx(p, '+  spans the space', 370, 260, m('span'), { size: 38, fill: C2, weight: 600 });
+    tx(p, 'nothing missing', 860, 260, m('span', .4), { size: 28, fill: COL.dim });
+    tx(p, 'n vectors in ℝⁿ:  det ≠ 0 checks both', 800, 380, m('rn'), { size: 34, fill: COL.task, anchor: 'middle', weight: 600 });
+    const D = mat(p, [['1', '1'], ['1', '−1']], 560, 530, m('ex'), { size: 48, bars: true, colFill: [C1, C2] });
+    ml(p, ['= −1 − 1 = −2 ≠ 0'], D.x1 + 24, 546, m('ex', 1), { size: 46, anchor: 'start' });
+    verdict(p, '{(1, 1), (1, −1)} is a basis of ℝ²', 800, 700, m('yes'), COL.good);
+  }],
+  ['coords', 'Coordinates', (m) => {
+    const p = panel(0);
+    const P = plane(p, { cx: 200, cy: 430, u: 60, x0: -1, x1: 6, y0: -3, y1: 5, t0: .1 });
+    P.layer = p;
+    let d = '';
+    for (let i = 0; i <= 4; i++) d += `M${P.PX(i - 1)} ${P.PY(i + 1)}L${P.PX(i + 2)} ${P.PY(i - 2)}`;
+    for (let j = -1; j <= 3; j++) d += `M${P.PX(j)} ${P.PY(-j)}L${P.PX(j + 3)} ${P.PY(3 - j)}`;
+    show(path(p, d, { stroke: COL.task, 'stroke-opacity': .35, 'stroke-width': 2 }, { o: 0 }), m('grid'));
+    P.arrow(0, 0, 1, 1, C1, m('grid', .3), { label: 'b₁' });
+    P.arrow(0, 0, 1, -1, C2, m('grid', .6), { label: 'b₂' });
+    P.dot(5, 1, COL.good, m('w'), { label: 'w = (5, 1)', dx: 14, dy: -16 });
+    [[0, 0], [1, 1], [2, 2]].forEach(([x, y], k) => P.arrow(x, y, x + 1, y + 1, C1, m('walk', k * .5)));
+    [[3, 3], [4, 2]].forEach(([x, y], k) => P.arrow(x, y, x + 1, y - 1, C2, m('walk', 1.6 + k * .5)));
+    ml(p, ['w = a b₁ + b b₂'], 1150, 170, m('w', .5), { size: 46, fill: COL.task });
+    ml(p, ['a + b = 5'], 1150, 290, m('sys'), { size: 44 });
+    ml(p, ['a − b = 1'], 1150, 370, m('sys', 1.2), { size: 44 });
+    ml(p, ['a = 3,   b = 2'], 1150, 470, m('ans'), { size: 46, fill: COL.good });
+    const a = ml(p, ['(w)', SB('B'), ' = (3, 2)'], 1150, 600, m('ans', 1), { size: 52, fill: COL.good });
+    boxMath(p, a, 1150, 600, 52, m('ans', 1.6));
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['b₁ = (1, 1),    b₂ = (1, −1)'], 800, 380, .2, { size: 56, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-coords', prompt: ['Coordinates of ', $m('(4, 2)'), ' relative to the basis ', $m('{(1, 1), (1, −1)}'), ':'],
+    build: blanks([{ parts: ['(', { box: '3' }, ', ', { box: '1' }, ')'], why: 'a + b = 4 and a − b = 2, so a = 3, b = 1: (4, 2) = 3(1, 1) + 1(1, −1).',
+      hint: 'Solve a + b = 4 and a − b = 2: add them.' }]),
+  }], done) }],
+  ['sub', 'A basis for a subspace', (m) => {
+    const p = panel(0);
+    ml(p, ['(a, b, a + b)'], 400, 150, m('set'), { size: 46, fill: COL.task });
+    ml(p, ['= a(1, 0, 1) + b(0, 1, 1)'], 400, 240, m('split'), { size: 42 });
+    ml(p, ['basis {(1, 0, 1), (0, 1, 1)}'], 400, 350, m('basis'), { size: 40, fill: COL.good });
+    ml(p, ['dim = 2'], 400, 440, m('dim'), { size: 46, fill: COL.good });
+    path(p, 'M800 110V780', { stroke: COL.faint, 'stroke-width': 1.5 });
+    ml(p, ['a​t', E(2), ' + bt + (a − b)'], 1200, 150, m('poly'), { size: 44, fill: COL.task });
+    ml(p, ['= a(t', E(2), ' + 1) + b(t − 1)'], 1200, 240, m('psplit'), { size: 42 });
+    ml(p, ['basis {t', E(2), ' + 1, t − 1},  dim 2'], 1200, 350, m('psplit', 2.5), { size: 40, fill: COL.good });
+    ml(p, ['3t', E(2), ' + 2t + 1:   a = 3, b = 2'], 1200, 500, m('test'), { size: 40 });
+    ml(p, ['a − b = 1  ✓'], 1200, 580, m('test', 2), { size: 40, fill: COL.good });
+    const a = ml(p, ['coordinates (3, 2)'], 1200, 690, m('test', 4), { size: 44, fill: COL.good });
+    boxMath(p, a, 1200, 690, 44, m('test', 4.5));
+  }],
+  ['mats', 'Matrices', (m) => {
+    const p = panel(0), sz = 42, y = 380;
+    mat(p, [['a', 'b'], ['b', 'c']], 200, y, m('sym'), { size: sz });
+    const pieces = [['=  a', 300], ['+  b', 640], ['+  c', 980]], M3 = [[['1', '0'], ['0', '0']], [['0', '1'], ['1', '0']], [['0', '0'], ['0', '1']]];
+    pieces.forEach(([s, x], i) => {
+      ml(p, [s], x, y + 14, m('parts', i * .7), { size: sz, anchor: 'start' });
+      mat(p, M3[i], x + 150, y, m('parts', i * .7 + .2), { size: sz, fill: i === 1 ? COL.task : COL.chalk });
+    });
+    tx(p, 'symmetric 2 × 2', 200, 520, m('sym', .4), { size: 26, fill: COL.dim, anchor: 'middle' });
+    tx(p, 'ones in both mirror positions', 840, 520, m('dim', 2), { size: 26, fill: COL.task, anchor: 'middle' });
+    const a = ml(p, ['3 basis matrices:   dim = 3'], 800, 660, m('dim'), { size: 48, fill: COL.good });
+    boxMath(p, a, 800, 660, 48, m('dim', .6));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    mat(p, [['a', 'b'], ['0', 'c']], 800, 360, .2, { size: 60 });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-dim', prompt: ['What is the dimension of the space of 2 × 2 upper triangular matrices?'],
+    build: blanks([{ parts: ['dim = ', { box: '3' }], why: 'Three free entries a, b, c, so three basis matrices.', hint: 'Count the entries that can be chosen freely.' }]),
+  }], done) }],
+  ['facts', 'Counting with dimension', (m) => {
+    const p = panel(0);
+    tx(p, 'in a space of dimension n:', 800, 130, .3, { size: 32, fill: COL.dim, anchor: 'middle' });
+    [['fewer than n vectors:  cannot span', COL.bad, 'few'], ['more than n vectors:  dependent', COL.bad, 'many'], ['exactly n vectors:  independent ⇔ spans', COL.good, 'exact']]
+      .forEach(([s, c, k], i) => tx(p, s, 800, 220 + i * 80, m(k), { size: 36, fill: c, anchor: 'middle', weight: 600 }));
+    [['dim ℝⁿ = n'], ['dim P', SB('n'), ' = n + 1'], ['dim M', SB('mn'), ' = mn'], ['dim {0} = 0']]
+      .forEach((q, i) => ml(p, q, 260 + i * 360, 620, m('dims', i * 1.4), { size: 42, fill: COL.task }));
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    tx(p, 'always true,  or  sometimes false?', 800, 200, .2, { size: 46, fill: COL.task, anchor: 'middle', weight: 600 });
+  }, { ask: done => quiz(WIDE, [{
+    id: 'c-dimtf', prompt: ['Use the dimension to decide.'],
+    build: grid([
+      { parts: ['any 4 vectors in ℝ³ are dependent'], ans: ['T'], why: 'More than 3 vectors in a 3-dimensional space.' },
+      { parts: ['some set of 3 vectors spans ℝ⁴'], ans: ['F'], why: 'Fewer than 4 vectors can never span ℝ⁴.' },
+      { parts: ['dim P₂ = 2'], ans: ['F'], why: 'P₂ has basis {1, t, t²}: dimension 3.' },
+      { parts: ['4 independent vectors in ℝ⁴ form a basis'], ans: ['T'], why: 'Exactly n independent vectors also span.' },
+    ], VTF, { multi: false, text: true }),
+  }], done) }],
+  ['proof', 'Proving a new basis', (m) => {
+    const p = panel(0);
+    ml(p, ['{v₁, v₂} basis   ⇒   {v₁, v₁ + v₂} basis'], 800, 130, m('claim'), { size: 44, fill: COL.task });
+    tx(p, 'dim V = 2 and 2 vectors: independence is enough', 800, 210, m('count'), { size: 30, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['c₁v₁ + c₂(v₁ + v₂) = 0'], 800, 320, m('set'), { size: 44 });
+    ml(p, ['(c₁ + c₂)v₁ + c₂v₂ = 0'], 800, 420, m('coll'), { size: 44 });
+    ml(p, ['c₁ + c₂ = 0,    c₂ = 0'], 800, 520, m('use'), { size: 44, fill: COL.task });
+    tx(p, 'v₁, v₂ independent', 1300, 520, m('use', .5), { size: 26, fill: COL.dim, anchor: 'middle' });
+    const a = ml(p, ['c₂ = 0,   c₁ = 0'], 800, 640, m('back'), { size: 48, fill: COL.good });
+    boxMath(p, a, 800, 640, 48, m('back', .6));
+    verdict(p, 'independent  →  basis', 800, 760, m('back', 2), COL.good);
+  }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Basis: independent and spanning; n vectors in ℝⁿ: det ≠ 0.', 'w1'], ['Coordinates: the scalars that build the vector.', 'w2'],
+      ['Subspace basis: split off the free parameters; count = dimension.', 'w3'], ['Exactly n vectors in dimension n: one check is enough.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-hw24a', prompt: [fromHW(24), $m('V = {(3, 1, −4), (2, 5, 6), (1, 4, 8)}'), '. (a) The determinant of the matrix with these vectors as columns:'],
+    build: blanks([{ parts: ['det = ', { box: '26' }], why: '26 ≠ 0, so the three vectors form a basis of ℝ³.', hint: 'Expand along the first row: 3(5 · 8 − 4 · 6) − 2(1 · 8 − 4 · (−4)) + 1(1 · 6 − 5 · (−4)).' }]),
+  }, {
+    id: 'p-hw24b', prompt: ['(b) The coordinate vector of ', $m('w = (1, ', F('3', '2'), ', 4)'), ' relative to V:'],
+    build: blanks([{ parts: ['(', { box: '1/2' }, ', ', { box: '-1' }, ', ', { box: '3/2' }, ')'], why: 'Check: ½(3, 1, −4) − (2, 5, 6) + 3/2(1, 4, 8) = (1, 3/2, 4).',
+      hint: 'Solve 3a + 2b + c = 1, a + 5b + 4c = 3/2, −4a + 6b + 8c = 4.' }]),
+  }, {
+    id: 'p-hw25', prompt: [fromHW(25), 'Vectors ', $m('(a, b, c, d)'), ' in ℝ⁴ with ', $m('c = a − b'), ' and ', $m('d = a + b'), ':'],
+    build: choice([['basis {(1, 0, 1, 1), (0, 1, −1, 1)}, dimension 2'], ['basis {(1, 0, 1, 1), (0, 1, 1, 1)}, dimension 2'], ['basis {(1, 1, 0, 2)}, dimension 1']], 0,
+      '(a, b, a − b, a + b) = a(1, 0, 1, 1) + b(0, 1, −1, 1): two free parameters.',
+      [null, 'c = a − b, so the b-vector has c = −1.', 'a and b are both free, so you need two basis vectors.']),
+  }, {
+    id: 'p-hw26b', prompt: [fromHW(26), $m('S = {a​t', E(2), ' + (a + b)t + b}'), '. (b) A basis and the dimension:'],
+    build: choice([[$m('{t', E(2), ' + t, t + 1}'), ', dim 2'], [$m('{t', E(2), ', t, 1}'), ', dim 3'], [$m('{t', E(2), ' + t + 1}'), ', dim 1']], 0,
+      'Split off a and b: a(t² + t) + b(t + 1).',
+      [null, 'That is a basis of all of P₂; S has only two free parameters.', 'a and b are separate parameters, so S needs two basis vectors.']),
+  }, {
+    id: 'p-hw26c1', prompt: ['(c)(i) Is ', $m('p(t) = 3t', E(2), ' + 2t − 3'), ' in S?'],
+    build: choice([['No'], ['Yes']], 0, 'a = 3 and b = −3 would force the middle coefficient a + b = 0, but it is 2.',
+      [null, 'Match coefficients: a = 3, b = −3, then check the t coefficient.']),
+  }, {
+    id: 'p-hw26c2', prompt: ['(c)(ii) Coordinates of ', $m('q(t) = 2t', E(2), ' + 3t + 1'), ' relative to your basis from (b):'],
+    build: blanks([{ parts: ['(', { box: '2' }, ', ', { box: '1' }, ')'], why: 'a = 2, b = 1, and a + b = 3 matches: q = 2(t² + t) + 1(t + 1).',
+      hint: 'Match t² and the constant first: a = 2, b = 1. Then check the t coefficient.' }]),
+  }, {
+    id: 'p-hw27', prompt: [fromHW(27), 'The dimension of the space of all 3 × 3 symmetric matrices:'],
+    build: blanks([{ parts: ['dim = ', { box: '6' }], why: 'Three diagonal entries plus three mirrored pairs above the diagonal.', hint: 'Count free entries on and above the diagonal.' }]),
+  }, {
+    id: 'p-hw28', prompt: [fromHW(28), 'To prove ', $m('{v₁, v₁ + v₂, v₁ + v₂ + v₃}'), ' is a basis, the shortest route is'],
+    build: choice([['dim V = 3 and there are 3 vectors, so prove independence: collect the coefficients of v₁, v₂, v₃.'], ['show a determinant is not 0.'], ['show each vector is in V.']], 0,
+      'Set a combination equal to 0, collect terms, and use the independence of v₁, v₂, v₃ to get every scalar 0.',
+      [null, 'The vᵢ are abstract vectors, not number columns, so there is no determinant to compute.', 'Being in V is not enough: they must also be independent.']),
+  }, {
+    id: 'p-hw30fj', prompt: [fromHW(30), 'Always true, or sometimes false? (Justify each in your write-up.)'],
+    build: grid([
+      { parts: ['(f)  every set spanning M₂,₃ has at least 6 vectors'], ans: ['T'], why: 'What is dim M₂,₃?' },
+      { parts: ['(g)  if span(S₁) = span(S₂), then S₁ = S₂'], ans: ['F'], why: 'Different sets can span the same space.' },
+      { parts: ['(h)  a zero vector space has dimension zero'], ans: ['T'], why: 'Its basis is the empty set.' },
+      { parts: ['(i)  there is a set of 7 vectors that spans ℝ⁹'], ans: ['F'], why: 'Compare 7 with dim ℝ⁹.' },
+      { parts: ['(j)  every set of five vectors that spans ℝ⁵ is a basis'], ans: ['T'], why: 'Exactly n vectors in dimension n.' },
+    ], VTF, { multi: false, text: true }),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

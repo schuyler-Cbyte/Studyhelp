@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linear Independence · Math 254 Exam 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m254.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 254 Exam 2 Review, Chapter 9. Study guide problems 20, 22, 23, 29, 30(c)–(e). Storyboard: books/math254-exam2/chapters/ch09.md.
+const CHAPTER = { number: 9, title: 'Linear Independence', minutes: 7, language: 'en', next: '../ch10/' };
+
+/* ---------- chapter data: det[(1,0,2),(0,1,1),(2,1,5)] = 0 with (2,1,5) = 2(1,0,2) + (0,1,1); det[(k,1,0),(1,k,0),(0,0,1)] = k² − 1;
+   W(1, x, eˣ) = eˣ (checked in ch09.md) ---------- */
+const C1 = COL.whole, C2 = COL.nat, C3 = COL.rat;
+const EX = ['e', E('x')];
+function verdict(p, s, x, y, t0, color) {
+  const g = G(p, { o: 0 }), w = uiW(s, 30) + 44;
+  mk('rect', { x: x - w / 2, y: y - 36, width: w, height: 54, rx: 27, fill: 'none', stroke: color, 'stroke-width': 2.5 }, g);
+  T(g, s, { x, y, size: 30, fill: color, weight: 600, anchor: 'middle' });
+  show(g, t0);
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Linear independence', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Span, Independence and Bases · Chapter 9', 'Linear Independence', 'does any vector repeat the others?', 'Study guide problems 20, 22, 23, 29 and 30(c)–(e)');
+  }],
+  ['def', 'The definition', (m) => {
+    const p = panel(0);
+    ml(p, ['c₁v₁ + c₂v₂ + … + c', SB('k'), 'v', SB('k'), ' = 0   only when every  c = 0'], 800, 130, m('eq'), { size: 40, fill: COL.task });
+    tx(p, 'otherwise dependent: one vector is a combination of the others', 800, 200, m('dep'), { size: 28, fill: COL.dim, anchor: 'middle' });
+    const A = plane(p, { cx: 260, cy: 600, u: 62, x0: -1, x1: 5, y0: -1, y1: 4, t0: m('ind'), labels: false });
+    A.layer = p;
+    A.arrow(0, 0, 3, 1, C1, m('ind', .3), { label: 'v₁' });
+    A.arrow(0, 0, 1, 3, C2, m('ind', .7), { label: 'v₂' });
+    verdict(p, 'independent', 450, 760, m('ind', 1.2), COL.good);
+    const B = plane(p, { cx: 1000, cy: 600, u: 62, x0: -1, x1: 5, y0: -1, y1: 4, t0: m('par'), labels: false });
+    B.layer = p;
+    B.arrow(0, 0, 4, 2, C2, m('par', .3));
+    B.arrow(0, 0, 2, 1, C1, m('par', .7));
+    ml(p, ['v₁'], B.PX(1) - 6, B.PY(.5) + 44, m('par', 1), { size: 28, fill: C1 });
+    ml(p, ['v₂ = 2v₁'], B.PX(4) + 10, B.PY(2) - 24, m('par', 1.2), { size: 28, fill: C2 });
+    verdict(p, 'dependent:  2v₁ − v₂ = 0', 1190, 760, m('rel'), COL.bad);
+  }],
+  ['test', 'Count, then determinant', (m) => {
+    const p = panel(0);
+    tx(p, 'more than n vectors in ℝⁿ:  always dependent', 800, 130, m('count'), { size: 32, fill: COL.bad, anchor: 'middle', weight: 600 });
+    tx(p, 'exactly n vectors in ℝⁿ:  determinant', 800, 210, m('det'), { size: 32, fill: COL.task, anchor: 'middle', weight: 600 });
+    const D = mat(p, [['1', '0', '2'], ['0', '1', '1'], ['2', '1', '5']], 360, 400, m('ex'), { size: 44, bars: true, colFill: [C1, C2, C3] });
+    ml(p, ['= 1(5 − 1) − 0 + 2(0 − 2) = 0'], D.x1 + 24, 414, m('zero'), { size: 42, anchor: 'start' });
+    tx(p, 'columns: the three vectors', 360, 530, m('ex', 1), { size: 24, fill: COL.dim, anchor: 'middle' });
+    verdict(p, 'dependent', 1060, 520, m('dep'), COL.bad);
+    ml(p, ['(2, 1, 5) = 2(1, 0, 2) + (0, 1, 1)'], 800, 640, m('rel'), { size: 44, fill: C3 });
+    tx(p, 'det ≠ 0  →  independent        det = 0  →  dependent', 800, 750, m('rule'), { size: 32, fill: COL.task, anchor: 'middle', weight: 600 });
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    tx(p, 'count first,  then the determinant', 800, 200, .2, { size: 44, fill: COL.task, anchor: 'middle', weight: 600 });
+  }, { ask: done => quiz(WIDE, [{
+    id: 'c-indep', prompt: ['Is the set linearly independent?'],
+    build: grid([
+      { parts: ['(1, 0, 0), (1, 1, 0), (1, 1, 1)'], ans: ['Y'], why: 'The determinant is 1 (triangular), not 0.' },
+      { parts: ['(1, 2), (2, 4)'], ans: ['N'], why: '(2, 4) = 2(1, 2).' },
+      { parts: ['(1, 0), (0, 1), (1, 1)'], ans: ['N'], why: 'Three vectors in ℝ²: more than 2.' },
+      { parts: ['(0, 0, 0), (1, 2, 3)'], ans: ['N'], why: 'A set containing the zero vector is dependent: 1 · 0 + 0 · (1, 2, 3) = 0.' },
+    ], VYN, { multi: false }),
+  }], done) }],
+  ['param', 'A parameter', (m) => {
+    const p = panel(0);
+    ml(p, ['(k, 1, 0),   (1, k, 0),   (0, 0, 1)'], 1150, 150, m('set'), { size: 42 });
+    const D = mat(p, [['k', '1', '0'], ['1', 'k', '0'], ['0', '0', '1']], 1000, 330, m('det'), { size: 40, bars: true });
+    ml(p, ['= k', E(2), ' − 1'], D.x1 + 20, 344, m('det', 1), { size: 44, anchor: 'start', fill: COL.task });
+    const A = axes(p, { x0: 120, y0: 700, w: 560, h: 500, xs: [-3, 3, 1], ys: [-2, 8, 2], xl: 'k', yl: 'det', t0: m('graph') });
+    dashed(p, `M120 ${A.PY(0)}H680`, m('graph', .2), COL.dim);
+    draw(path(p, curveD(A, k => k * k - 1, -3, 3), { stroke: COL.task, 'stroke-width': 4 }, { d: 0 }), m('graph', .4), 1.2);
+    [-1, 1].forEach((k, i) => {
+      const d = G(p, { x: A.PX(k), y: A.PY(0), s: 0, o: 0 });
+      mk('circle', { r: 11, fill: COL.bad, stroke: COL.board, 'stroke-width': 2 }, d);
+      pop(d, m('roots', i * .5));
+    });
+    tx(p, 'det = 0 at k = ±1', 400, 150, m('roots', 1), { size: 30, fill: COL.bad, anchor: 'middle', weight: 600 });
+    const a = ml(p, ['independent for all k ≠ ±1'], 1150, 560, m('ans'), { size: 46, fill: COL.good });
+    boxMath(p, a, 1150, 560, 46, m('ans', .6));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['det = 0   →   dependent'], 800, 380, .2, { size: 60, fill: COL.task });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-param', prompt: ['For which k are ', $m('(k, 2)'), ' and ', $m('(2, k)'), ' dependent?'],
+    build: blanks([{ parts: ['k = ±', { box: '2' }], why: 'det = k² − 4 = 0 when k = 2 or k = −2.', hint: 'The 2 × 2 determinant is k · k − 2 · 2.' }]),
+  }], done) }],
+  ['wronsk', 'The Wronskian', (m) => {
+    const p = panel(0);
+    ml(p, ['1,    x,    e', E('x')], 800, 140, m('set'), { size: 48, fill: COL.task });
+    const D = mat(p, [['1', 'x', EX], ['0', '1', EX], ['0', '0', EX]], 640, 400, m('rows'), { size: 48, bars: true, cw: 110 });
+    ['f', 'f ′', 'f ″'].forEach((s, i) => tx(p, s, D.x0 - 60, D.rowY(i) - 8, m('rows', .4 + i * .8), { size: 30, fill: COL.dim, anchor: 'middle' }));
+    tx(p, 'W(x) =', D.x0 - 130, 414, m('rows'), { size: 34, anchor: 'end' });
+    const tri = path(p, `M${D.colX(0) - 30} ${D.rowY(1) - 40}L${D.colX(0) - 30} ${D.rowY(2) + 14}L${D.colX(1) + 30} ${D.rowY(2) + 14}Z`, { fill: COL.faint, 'fill-opacity': .35, stroke: 'none' }, { o: 0 });
+    show(tri, m('tri'));
+    const a = ml(p, ['= 1 · 1 · e', E('x'), ' = e', E('x')], D.x1 + 30, 414, m('ans'), { size: 46, anchor: 'start', fill: COL.good });
+    tx(p, 'W(x) ≠ 0 for some x  →  independent', 800, 680, m('rule'), { size: 34, fill: COL.task, anchor: 'middle', weight: 600 });
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    tx(p, 'rows: the functions, then their derivatives', 800, 380, .2, { size: 40, fill: COL.task, anchor: 'middle', weight: 600 });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-wronsk', prompt: ['The Wronskian of ', $m('sin x'), ' and ', $m('cos x'), ' is'],
+    build: choice([[$m('−1')], [$m('0')], [$m('sin x cos x')]], 0,
+      'det[[sin x, cos x], [cos x, −sin x]] = −sin²x − cos²x = −1 ≠ 0: independent.',
+      [null, 'Row 2 holds the derivatives cos x and −sin x; the determinant is −sin²x − cos²x.', 'Multiply diagonally: sin x · (−sin x) − cos x · cos x.']),
+  }], done) }],
+  ['two', 'Small sets and proofs', (m) => {
+    const p = panel(0);
+    tx(p, '{v₁, v₂} dependent  ⇔  at least one is a multiple of the other', 800, 120, m('two'), { size: 30, fill: COL.task, anchor: 'middle', weight: 600 });
+    ml(p, ['1 · 0 + 0 · v = 0'], 520, 210, m('zero'), { size: 40 });
+    tx(p, '{0, v} is dependent', 520, 260, m('zero', .5), { size: 26, fill: COL.bad, anchor: 'middle' });
+    ml(p, ['v ≠ k · 0'], 1100, 210, m('nm'), { size: 40, fill: COL.bad });
+    tx(p, 'but v is not a multiple of 0', 1100, 260, m('nm', .4), { size: 26, fill: COL.bad, anchor: 'middle' });
+    path(p, 'M140 310H1460', { stroke: COL.faint, 'stroke-width': 1.5 });
+    tx(p, 'proof pattern', 140, 370, m('proof'), { size: 28, fill: COL.dim });
+    ml(p, ['c₁v₁ + c₂v₂ = 0,   c₁, c₂ not both 0'], 800, 430, m('ex'), { size: 40 });
+    ml(p, ['want:   a(v₁ + v₂) + b(v₁ − v₂) = 0'], 800, 520, m('want'), { size: 40, fill: COL.task });
+    ml(p, ['(a + b)v₁ + (a − b)v₂ = 0'], 800, 610, m('match'), { size: 40 });
+    const a = ml(p, ['a + b = c₁,    a − b = c₂'], 800, 720, m('sol'), { size: 44, fill: COL.good });
+    boxMath(p, a, 800, 720, 44, m('sol', .6));
+  }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Independent: only the all-zero combination gives 0.', 'w1'], ['More than n vectors in ℝⁿ: dependent. Exactly n: det.', 'w2'],
+      ['With a parameter, find where det = 0.', 'w3'], ['Functions: Wronskian ≠ 0 somewhere → independent.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-hw20', prompt: [fromHW(20), 'Is the set linearly independent in ℝ³?'],
+    build: grid([
+      { parts: ['(a)  (1, 2, 6), (3, 4, 1), (4, 3, 1), (3, 3, 1)'], ans: ['N'], why: 'Count the vectors first.' },
+      { parts: ['(b)  (2, −1, 3), (4, 1, 2), (8, −1, 8)'], ans: ['N'], why: 'Compute the determinant (you met these vectors in problem 19(b)).' },
+    ], VYN, { multi: false }),
+  }, {
+    id: 'p-hw22', prompt: [fromHW(22), $m('(λ', E(2), ' − 5, 1, 0)'), ', ', $m('(2, −2, 3)'), ', ', $m('(2, 3, −3)'), '. Expand the determinant. The set is independent for'],
+    build: choice([[$m('every λ except λ = ±3')], [$m('λ = ±3 only')], [$m('every λ except λ = 9')]], 0,
+      '27 − 3λ² = 0 ⇔ λ² = 9 ⇔ λ = ±3. Show the cofactor expansion in your write-up.',
+      [null, 'At λ = ±3 the determinant is 0: that is where the set is dependent.', 'λ² = 9 gives λ = ±3, not λ = 9.']),
+  }, {
+    id: 'p-hw23', prompt: [fromHW(23), 'For ', $m('sin x'), ', ', $m('cos x'), ', ', $m('x cos x'), ', the Wronskian simplifies to'],
+    build: choice([[$m('2 sin x')], [$m('0')], [$m('−2 cos x')]], 0,
+      'It is not identically 0 (e.g. x = π/2 gives 2), so the functions are independent. Show the 3 × 3 determinant with the second derivatives.',
+      [null, 'Check a value: at x = π/2 the determinant is 2, not 0.', 'Recheck the expansion; the cos x terms cancel and 2 sin x remains.']),
+  }, {
+    id: 'p-hw29', prompt: [fromHW(29), '{v₁, v₂} is dependent. To prove {v₁ + 2v₂, 3v₁ − v₂} is dependent, you'],
+    build: choice([['start from c₁v₁ + c₂v₂ = 0 (not both 0) and find a, b, not both 0, with a(v₁ + 2v₂) + b(3v₁ − v₂) = 0.'], ['show that a determinant is 0.'], ['check it for v₁ = (1, 0) and v₂ = (2, 0).']], 0,
+      'Collect terms: (a + 3b)v₁ + (2a − b)v₂ = 0, then match the coefficients to c₁ and c₂ and solve for a, b.',
+      [null, 'v₁ and v₂ are not given as number vectors, so there is no matrix to take a determinant of.', 'An example does not prove it for every dependent pair.']),
+  }, {
+    id: 'p-hw30', prompt: [fromHW(30), 'Always true, or sometimes false? (Justify each in your write-up.)'],
+    build: grid([
+      { parts: ['(c)  every set of two vectors in ℝ³ is linearly independent'], ans: ['F'], why: 'Think of two parallel vectors.' },
+      { parts: ['(d)  if {v₁, v₂} is dependent, each vector is a scalar multiple of the other'], ans: ['F'], why: 'Think of a set containing the zero vector.' },
+      { parts: ['(e)  if {v₁, v₂, v₃} is independent, so is {kv₁, kv₂, kv₃} for any k ≠ 0'], ans: ['T'], why: 'A combination of the kvᵢ equal to 0 is a combination of the vᵢ with scalars kcᵢ.' },
+    ], VTF, { multi: false, text: true }),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

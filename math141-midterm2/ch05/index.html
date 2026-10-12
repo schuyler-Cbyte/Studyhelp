@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Holes and Asymptotes · Math 141 Midterm 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 2 Review, Chapter 5. Practice midterm questions 13 and 14. Storyboard: books/math141-midterm2/chapters/ch05.md.
+const CHAPTER = { number: 5, title: 'Holes and Asymptotes', minutes: 6, language: 'en', next: '../ch06/' };
+
+/* ---------- chapter data (checked in ch05.md) ---------- */
+// (x − 2)(x + 3)² / ((x − 2)³(x + 3)) = (x + 3)/(x − 2)², x ≠ −3: hole x = −3, VA x = 2, HA y = 0.
+const FA = ['(x − 2)'], FB = ['(x + 3)'];
+const TOPC = [[FA, COL.nat, 640], [FB, COL.whole, 800], [FB, COL.whole, 960]];
+const BOTC = [[FA, COL.nat, 560], [FA, COL.nat, 720], [FA, COL.nat, 880], [FB, COL.whole, 1040]];
+const CY = { top: 340, bar: 405, bot: 470 };
+const fHole = x => (x + 3) / (x - 2) ** 2;
+const fInt = x => (2 * x * x - 8) / (x * x - 9);     // x-intercepts ±2, y-intercept 8/9, VAs x = ±3, HA y = 2
+
+// Cross out a cancelled chip and dim it.
+function strike(p, c, t0) {
+  draw(path(p, `M${st(c).x - 70} ${st(c).y + 24}L${st(c).x + 70} ${st(c).y - 24}`, { stroke: COL.bad, 'stroke-width': 4 }, { d: 0 }), t0, .35);
+  tw(c, { o: .3 }, t0 + .3, .4);
+}
+// A row of the summary list: a grey label and a value in maths.
+function factRow(p, label, parts, y, t0, color) {
+  tx(p, label, 880, y, t0, { size: 28, fill: COL.dim });
+  return ml(p, parts, 1170, y, t0 + .2, { size: 40, fill: color, anchor: 'start' });
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Holes and asymptotes', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Rational Functions and Domains · Chapter 5', 'Holes and Asymptotes', 'what a rational graph does near trouble spots', 'Practice midterm questions 13 and 14 · no calculator');
+  }],
+  ['cancel', 'Cancel common factors', (m) => {
+    const p = panel(0);
+    fracEq(p, 'y =', ['(x − 2)(x + 3)', E(2)], ['(x − 2)', E(3), '(x + 3)'], 420, 150, .3, { size: 46 });
+    const top = TOPC.map(([pt, c, x], i) => { const e = chip(p, pt, c, { x, y: CY.top, o: 0, s: .6 }); pop(e, m('expand', i * .2)); return e; });
+    const bot = BOTC.map(([pt, c, x], i) => { const e = chip(p, pt, c, { x, y: CY.bot, o: 0, s: .6 }); pop(e, m('expand', .8 + i * .2)); return e; });
+    draw(path(p, `M470 ${CY.bar}H1130`, { stroke: COL.chalk, 'stroke-width': 3 }, { d: 0 }), m('expand', .4), .6);
+    strike(p, top[0], m('pair1')); strike(p, bot[0], m('pair1', .3));
+    strike(p, top[1], m('pair2')); strike(p, bot[3], m('pair2', .3));
+    [top[2], bot[1], bot[2]].forEach((c, i) => pulse(c, m('left', i * .25), 1.15));
+    fracEq(p, '=', ['x + 3'], ['(x − 2)', E(2)], 900, 150, m('left', .6), { size: 46, fill: COL.task });
+    ml(p, ['x ≠ −3'], 1240, 166, m('left', 1), { size: 36, fill: COL.dim, anchor: 'start' });
+    ml(p, ['hole:  x = −3'], 470, 620, m('hole'), { size: 46, fill: COL.whole });
+    tx(p, '(x + 3) is gone from the bottom', 470, 672, m('hole', .5), { size: 28, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['vertical asymptote:  x = 2'], 1130, 620, m('va'), { size: 46, fill: COL.nat });
+    tx(p, '(x − 2) is still on the bottom', 1130, 672, m('va', .5), { size: 28, fill: COL.dim, anchor: 'middle' });
+  }],
+  ['graph', 'The graph', (m) => {
+    const p = panel(0);
+    const P = plane(p, { cx: 560, cy: 420, u: 50, x0: -6, x1: 6, y0: -2, y1: 6, t0: .1 });
+    P.layer = p;
+    P.fn(fHole, -6, 1.9, COL.whole, .4, { dur: 1.2 });
+    P.fn(fHole, 2.1, 6, COL.whole, 1.4, { dur: .8 });
+    P.line(2, -2, 2, 6, COL.nat, m('va'), { dash: '10 8' });
+    ml(p, ['vertical asymptote:  x = 2'], 1230, 250, m('va', .5), { size: 38, fill: COL.nat });
+    P.dot(-3, 0, COL.whole, m('hole'), { open: true, r: 11 });
+    ml(p, ['hole:  x = −3'], 1230, 340, m('hole', .5), { size: 38, fill: COL.whole });
+    draw(path(p, `M${P.PX(-6)} ${P.PY(0)}H${P.PX(6)}`, { stroke: COL.task, 'stroke-width': 5 }, { d: 0 }), m('ha'), 1);
+    ml(p, ['horizontal asymptote:  y = 0'], 1230, 430, m('ha', .5), { size: 38, fill: COL.task });
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-hole', prompt: ['Where is the hole of ', $m('y = ', F('(x − 1)(x + 4)', '(x − 1)(x + 4)²')), '?'],
+    build: choice([[$m('x = 1')], [$m('x = −4')], ['NONE']], 0, '(x − 1) cancels completely from the bottom: a hole at x = 1. One (x + 4) stays on the bottom: a vertical asymptote at x = −4.',
+      [null, 'One (x + 4) stays on the bottom after cancelling, so x = −4 is a vertical asymptote, not a hole.', '(x − 1) cancels completely from the bottom, so there is a hole there.']),
+  }], done) }],
+  ['ha', 'Horizontal asymptotes', (m) => {
+    const p = panel(0);
+    ml(p, ['top degree < bottom degree   →   y = 0'], 800, 200, m('less'), { size: 44 });
+    ml(p, ['degrees equal   →   y = ', F('leading coefficient of top', 'leading coefficient of bottom')], 800, 340, m('equal'), { size: 44 });
+    ml(p, ['y = ', F('4x² − 1', '2x² + x'), '    →    y = ', F(4, 2), ' = 2'], 800, 470, m('ex'), { size: 44, fill: COL.task });
+    ml(p, ['top degree > bottom degree   →   no horizontal asymptote'], 800, 610, m('more'), { size: 44 });
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-ha', prompt: ['Find the horizontal asymptote of ', $m('y = ', F('5x³ + 1', '2x³ − x')), '.'],
+    build: blanks([{ parts: ['y = ', { box: '5/2' }], why: 'Both degrees are 3, so y = 5/2, the ratio of the leading coefficients.', hint: 'The degrees are equal. Divide the leading coefficients.' }]),
+  }], done) }],
+  ['inter', 'Intercepts and asymptotes', (m) => {
+    const p = panel(0);
+    ml(p, ['y = ', F('2x² − 8', 'x² − 9')], 1180, 150, .3, { size: 52 });
+    const P = plane(p, { cx: 430, cy: 400, u: 42, x0: -6, x1: 6, y0: -4, y1: 6, t0: .2 });
+    P.layer = p;
+    [[-6, -3.03], [-2.97, 2.97], [3.03, 6]].forEach(([a, b], i) => P.fn(fInt, a, b, COL.whole, .5 + i * .3, { dur: .7 }));
+    factRow(p, 'x-intercepts', ['(2, 0),  (−2, 0)'], 270, m('xint', 2), COL.irr);
+    P.dot(2, 0, COL.irr, m('xint', 2.2)); P.dot(-2, 0, COL.irr, m('xint', 2.4));
+    factRow(p, 'y-intercept', ['(0, ', F(8, 9), ')'], 370, m('yint', 1.5), COL.irr);
+    P.dot(0, 8 / 9, COL.irr, m('yint', 1.8));
+    factRow(p, 'vertical asymptotes', ['x = 3,  x = −3'], 470, m('va', 1.5), COL.nat);
+    P.line(3, -4, 3, 6, COL.nat, m('va', 1.8), { dash: '10 8' }); P.line(-3, -4, -3, 6, COL.nat, m('va', 2), { dash: '10 8' });
+    factRow(p, 'horizontal asymptote', ['y = 2'], 570, m('ha', 1), COL.task);
+    P.line(-6, 2, 6, 2, COL.task, m('ha', 1.3), { dash: '10 8' });
+  }],
+  ['q3', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-va', prompt: ['Find the vertical asymptotes of ', $m('y = ', F('x² + 4', 'x² − 25')), '.'],
+    build: choice([[$m('x = 5,  x = −5')], [$m('x = 2,  x = −2')], [$m('x = 25')]], 0, 'The bottom is 0 when x² = 25, so x = ±5; the top is not 0 there, so both are vertical asymptotes.',
+      [null, 'Vertical asymptotes come from the bottom, x² − 25 = 0, not the top.', 'x² = 25 means x = 5 or x = −5.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Factor, then cancel common factors.', 'w1'], ['Gone from the bottom: hole. Still on the bottom: vertical asymptote.', 'w2'],
+      ['Compare degrees for the horizontal asymptote.', 'w3'], ['x-intercepts: top = 0. y-intercept: x = 0.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q13a', prompt: [fromExam('13a'), $m('y = ', F('(x + 1)²(x + 2)', '(x + 1)(x + 2)⁴')), '. Where is the hole?'],
+    build: choice([[$m('x = −1')], [$m('x = −2')], ['NONE']], 0, 'Cancel: (x + 1)/(x + 2)³ with x ≠ −1. (x + 1) is gone from the bottom, so there is a hole at x = −1.',
+      [null, 'Three (x + 2) factors stay on the bottom: x = −2 is a vertical asymptote, not a hole.', '(x + 1) cancels from the bottom completely, so there is a hole.']),
+  }, {
+    id: 'p-q13b', prompt: ['Question 13b. Vertical asymptote(s)?'],
+    build: choice([[$m('x = −2')], [$m('x = −1,  x = −2')], ['NONE']], 0, 'After cancelling, only (x + 2)³ is on the bottom: x = −2.',
+      [null, 'x = −1 is the hole: (x + 1) left the bottom.', 'Three factors of (x + 2) remain on the bottom.']),
+  }, {
+    id: 'p-q13c', prompt: ['Question 13c. Horizontal asymptote?'],
+    build: choice([[$m('y = 0')], [$m('y = 1')], ['NONE']], 0, 'Top degree 3, bottom degree 5 (or 1 and 3 after cancelling): top < bottom, so y = 0.',
+      [null, 'y = 1 would need equal degrees; here 3 < 5.', 'A smaller top degree gives y = 0; NONE is for a bigger top degree.']),
+  }, {
+    id: 'p-q14a', prompt: [fromExam('14a'), $m('y = ', F('3x² + 1', '6x² − 6')), '. Its x-intercepts?'],
+    build: choice([['NONE'], [$m('x = 1,  x = −1')], [$m('(0, −', F(1, 6), ')')]], 0, '3x² + 1 = 0 has no real solution (3x² + 1 ≥ 1), so NONE.',
+      [null, 'Those make the bottom 0: they are vertical asymptotes.', 'That is the y-intercept (x = 0).']),
+  }, {
+    id: 'p-q14b', prompt: ['Question 14b. Its y-intercept?'],
+    build: blanks([{ parts: ['(0, ', { box: '-1/6' }, ')'], why: 'y = (0 + 1)/(0 − 6) = −1/6.', hint: 'Put x = 0: (3 · 0 + 1)/(6 · 0 − 6).' }]),
+  }, {
+    id: 'p-q14c', prompt: ['Question 14c. Vertical asymptote(s)?'],
+    build: choice([[$m('x = 1,  x = −1')], [$m('x = 1')], [$m('x = 6')]], 0, '6x² − 6 = 6(x − 1)(x + 1) = 0 at x = ±1, and the top is not 0 there.',
+      [null, 'x² = 1 has two solutions: 1 and −1.', 'Set the whole bottom to 0: 6x² − 6 = 0 gives x² = 1.']),
+  }, {
+    id: 'p-q14d', prompt: ['Question 14d. Horizontal asymptote?'],
+    build: blanks([{ parts: ['y = ', { box: '1/2' }], why: 'Equal degrees (2 and 2): y = 3/6 = 1/2.', hint: 'Divide the leading coefficients 3 and 6.' }]),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

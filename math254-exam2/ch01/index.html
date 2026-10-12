@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Linear Combinations of Vectors · Math 254 Exam 2 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m254.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 254 Exam 2 Review, Chapter 1. Study guide problems 1, 2. Storyboard: books/math254-exam2/chapters/ch01.md.
+const CHAPTER = { number: 1, title: 'Linear Combinations of Vectors', minutes: 6, language: 'en', next: '../ch02/' };
+
+/* ---------- chapter data: u = (2, 1), v = (−1, 2), 3u + 2v = (4, 7) (checked in ch01.md) ---------- */
+const CU = COL.whole, CV = COL.nat;
+const PL = { cx: 230, cy: 617, u: 62, x0: -2, x1: 7, y0: -1, y1: 8 };
+const RX = 1150;
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Linear combinations', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Vectors in ℝⁿ · Chapter 1', 'Linear Combinations of Vectors', 'scale, add, and find the scalars', 'Study guide problems 1 and 2');
+  }],
+  ['combo', 'Scale and add', (m) => {
+    const p = panel(0);
+    const P = plane(p, { ...PL, t0: .1 });
+    P.layer = p;
+    P.arrow(0, 0, 2, 1, CU, m('u'), { label: 'u' });
+    P.arrow(0, 0, -1, 2, CV, m('v'), { label: 'v' });
+    ml(p, ['u = (2, 1)'], RX - 160, 650, m('u', .3), { size: 40, fill: CU });
+    ml(p, ['v = (−1, 2)'], RX + 160, 650, m('v', .3), { size: 40, fill: CV });
+    ml(p, ['3u + 2v'], RX, 150, m('expr'), { size: 52, fill: COL.task });
+    [[0, 0], [2, 1], [4, 2]].forEach(([x, y], k) => P.arrow(x, y, x + 2, y + 1, CU, m('three', k * .6)));
+    [[6, 3], [5, 5]].forEach(([x, y], k) => P.arrow(x, y, x - 1, y + 2, CV, m('two', k * .6)));
+    P.arrow(0, 0, 4, 7, COL.good, m('sum'));
+    P.dot(4, 7, COL.good, m('sum', .5), { label: '(4, 7)', dx: 16, dy: -10 });
+    ml(p, ['= 3(2, 1) + 2(−1, 2)'], RX, 250, m('alg'), { size: 44 });
+    ml(p, ['= (6, 3) + (−2, 4)'], RX, 350, m('scale'), { size: 44 });
+    tx(p, 'scale each component', RX, 400, m('scale', .4), { size: 26, fill: COL.task, anchor: 'middle' });
+    tx(p, 'then add matching components', RX, 445, m('add'), { size: 26, fill: COL.task, anchor: 'middle' });
+    const a = ml(p, ['= (4, 7)'], RX, 530, m('ans'), { size: 50, fill: COL.good });
+    boxMath(p, a, RX, 530, 50, m('ans', .6));
+  }],
+  ['solve', 'Finding the scalars', (m) => {
+    const p = panel(0);
+    ml(p, ['a(2, 1) + b(−1, 2) = (4, 7)'], 800, 130, .3, { size: 48 });
+    const ce = colEq(p, ['a', { col: ['2', '1'], fill: CU }, '+ b', { col: ['−1', '2'], fill: CV }, '=', { col: ['4', '7'] }], 420, 340, m('cols'), { size: 48 });
+    rowBand(ce, 0, m('row1'), m('row2'), COL.task, 48);
+    rowBand(ce, 1, m('row2'), m('sub1'), COL.task, 48);
+    const L = 860;
+    ml(p, ['2a − b = 4'], L, 300, m('row1', .3), { size: 44, anchor: 'start' });
+    ml(p, ['a + 2b = 7'], L, 380, m('row2', .3), { size: 44, anchor: 'start' });
+    ml(p, ['b = 2a − 4'], L, 490, m('sub1'), { size: 44, anchor: 'start', fill: COL.task });
+    ml(p, ['a + 2(2a − 4) = 7   →   5a − 8 = 7'], L, 580, m('sub2'), { size: 44, anchor: 'start' });
+    const a = ml(p, ['a = 3'], 980, 700, m('a'), { size: 52, fill: COL.good });
+    boxMath(p, a, 980, 700, 52, m('a', .4));
+    const b = ml(p, ['b = 2'], 1260, 700, m('b'), { size: 52, fill: COL.good });
+    boxMath(p, b, 1260, 700, 52, m('b', .4));
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    colEq(p, ['a', { col: ['1', '1'], fill: CU }, '+ b', { col: ['1', '−1'], fill: CV }, '=', { col: ['5', '1'] }], 800, 380, .2, { size: 52 });
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-scalars', prompt: ['Find the scalars: ', $m('a(1, 1) + b(1, −1) = (5, 1)'), '.'],
+    build: blanks([{ parts: ['a = ', { box: '3' }, ',   b = ', { box: '2' }], why: 'a + b = 5 and a − b = 1. Adding gives 2a = 6, so a = 3 and b = 2.',
+      hint: 'Top row: a + b = 5. Bottom row: a − b = 1. Add the two equations.' }]),
+  }], done) }],
+  ['rn', 'In ℝ⁴', (m) => {
+    const p = panel(0), sz = 44;
+    ml(p, ['a(1, 2, 0, −1) + b(2, −1, 1, 3) = (1, 7, −1, −6)'], 800, 120, .3, { size: 42 });
+    const Y = 420, ce = colEq(p, ['a', { col: ['1', '2', '0', '−1'], fill: CU }, '+ b', { col: ['2', '−1', '1', '3'], fill: CV }, '=', { col: ['1', '7', '−1', '−6'] }], 360, Y, m('cols'), { size: sz });
+    const ry = i => Y + ce.rowY(i), EQ = ['a + 2b = 1', '2a − b = 7', 'b = −1', '−a + 3b = −6'];
+    EQ.forEach((s, i) => ml(p, [s], 700, ry(i), m('eqs', .3 + i * .35), { size: 38, anchor: 'start' }));
+    rowBand(ce, 2, m('easy'), m('first'), COL.task, sz);
+    ml(p, ['b = −1'], 1080, ry(2), m('easy', .5), { size: 38, anchor: 'start', fill: COL.task });
+    rowBand(ce, 0, m('first'), m('check'), COL.task, sz);
+    ml(p, ['a − 2 = 1,  a = 3'], 1080, ry(0), m('first', .5), { size: 38, anchor: 'start', fill: COL.task });
+    tx(p, 'the unused rows: check', 1080, ry(3) + 56, m('check'), { size: 24, fill: COL.dim });
+    ml(p, ['6 + 1 = 7  ✓'], 1080, ry(1), m('c2'), { size: 38, anchor: 'start', fill: COL.good });
+    ml(p, ['−3 − 3 = −6  ✓'], 1080, ry(3), m('c4'), { size: 38, anchor: 'start', fill: COL.good });
+    const a = ml(p, ['a = 3,   b = −1'], 800, 720, m('ok'), { size: 50, fill: COL.good });
+    boxMath(p, a, 800, 720, 50, m('ok', .5));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['solve with two equations,  check the rest'], 800, 380, .2, { size: 50, fill: COL.task });
+  }, { ask: done => quiz(LOW, [{
+    id: 'c-fails', prompt: ['You solve two of the four component equations for a and b, but one of the other equations is false for those values. What does that mean?'],
+    build: choice([['No scalars work: the target is not a linear combination of u and v.'], ['Use the values from the failing equation instead.'], ['Then a = b = 0.']], 0,
+      'Every component must match at once. If the only candidates fail one equation, nothing works.',
+      [null, 'The scalars must satisfy all four equations together; switching equations just breaks a different one.', 'a = b = 0 gives the zero vector, which is not the target here.']),
+  }], done) }],
+  ['homog', 'The zero target', (m) => {
+    const p = panel(0);
+    ml(p, ['a(1, 1, 0) + b(0, 1, 1) + c(1, 0, 1) = (0, 0, 0)'], 800, 120, .3, { size: 42 });
+    tx(p, 'a = b = c = 0 always works: the trivial solution', 800, 190, m('triv'), { size: 28, fill: COL.dim, anchor: 'middle' });
+    ['a + c = 0', 'a + b = 0', 'b + c = 0'].forEach((s, i) => ml(p, [s], 200, 320 + i * 90, m('eqs', i * .4), { size: 42, anchor: 'start' }));
+    ml(p, ['c = −a,   b = −a'], 600, 365, m('sub'), { size: 42, anchor: 'start', fill: COL.task });
+    ml(p, ['−a − a = −2a = 0'], 600, 500, m('third'), { size: 42, anchor: 'start', fill: COL.task });
+    const a = ml(p, ['a = b = c = 0  only'], 760, 650, m('only'), { size: 48, fill: COL.good });
+    boxMath(p, a, 760, 650, 48, m('only', .6));
+    const D = mat(p, [['1', '0', '1'], ['1', '1', '0'], ['0', '1', '1']], 1250, 380, m('det'), { size: 36, bars: true });
+    ml(p, ['= 2 ≠ 0'], D.x1 + 20, 392, m('det', 1.2), { size: 38, anchor: 'start', fill: COL.task });
+    tx(p, 'det ≠ 0: only the trivial solution', 1330, 510, m('det', 2.5), { size: 26, fill: COL.task, anchor: 'middle', weight: 600 });
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    ml(p, ['det ≠ 0   →   only a = b = c = 0'], 800, 380, .2, { size: 56, fill: COL.task });
+  }, { ask: done => quiz(LOW, [{
+    id: 'c-det0', prompt: ['For ', $m('av₁ + bv₂ + cv₃ = 0'), ' in ℝ³, the coefficient matrix has determinant 0. Then'],
+    build: choice([['there are nontrivial solutions too (infinitely many).'], ['a = b = c = 0 is the only solution.'], ['there is no solution at all.']], 0,
+      'det = 0 means the system has a free variable, so besides 0, 0, 0 there are infinitely many solutions.',
+      [null, 'That is what a nonzero determinant gives. A zero determinant leaves a free variable.', 'a = b = c = 0 always works, so there is at least one solution.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Scale every component, then add matching components.', 'w1'], ['Finding scalars: one equation per component.', 'w2'],
+      ['More equations than unknowns: solve with some, check the rest.', 'w3'], ['Zero target: det ≠ 0 means only the trivial solution.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-hw1', prompt: [fromHW(1), $m('u = (2, 1, 0, 1, −1)'), ' and ', $m('v = (−2, 3, 1, 0, 2)'), '. Find a and b so that ', $m('au + bv = (−8, 8, 3, −1, 7)'), '.'],
+    build: blanks([{ parts: ['a = ', { box: '-1' }, ',   b = ', { box: '3' }], why: 'Components 3 and 4 each contain only one unknown and give b and a at once; the other three components check.',
+      hint: 'Look for components where u or v has a 0: component 3 is 0a + 1b = 3, component 4 is 1a + 0b = −1.' }]),
+  }, {
+    id: 'p-hw2', prompt: [fromHW(2), 'Find all a, b, c such that ', $m('a(1, 2, 0) + b(2, 1, 1) + c(0, 3, 1) = (0, 0, 0)'), '.'],
+    build: choice([['Only a = b = c = 0.'], ['a = −2b and c = −b, for any b.'], ['There is no solution.']], 0,
+      'The coefficient matrix has a nonzero determinant, so the trivial solution is the only one. In your write-up, show the three equations and the elimination.',
+      [null, 'Test b = 1: a = −2, c = −1. The second component is 2(−2) + 1 + 3(−1) = −6, not 0.', 'a = b = c = 0 always works, so there is at least one solution.']),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Name a Chemical Formula · CHEM 152 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Review, Chapter 5. Storyboard: books/chem152-review/chapters/ch05.md.
+// Standard naming method, approved by the user in place of instructor slides; labelled on screen.
+const CHAPTER = { number: 5, title: 'Name a Chemical Formula', minutes: 5, language: 'en', next: '../ch06/' };
+
+/* ---------- chapter data ---------- */
+const EC5 = { Na: MCOL, Mg: MCOL, Fe: MCOL, Cl: NCOL, O: NCOL, C: NCOL, N: NCOL, S: PCOL };
+const IONS = [['sulfate', [['SO', '4']], '2−'], ['nitrate', [['NO', '3']], '−'], ['hydroxide', [['OH', '']], '−'],
+  ['carbonate', [['CO', '3']], '2−'], ['phosphate', [['PO', '4']], '3−'], ['ammonium', [['NH', '4']], '+']];
+const WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'From formula to name', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Nomenclature · Chapter 5', { x: 800, y: 320, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Name a Chemical Formula', { x: 800, y: 440, size: 92, weight: 600, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cT(p, 'turn a formula into its name', 800, 550, { size: 34, fill: COL.dim, anchor: 'middle' }), m('sub', .2));
+    srcBadge(p, 660, m('note'));
+  }],
+  ['type', 'Ionic or molecular?', (m) => {
+    const p = panel(0);
+    show(cT(p, 'First: what kind of compound?', 800, 150, { size: 34, weight: 600, anchor: 'middle' }), .3);
+    show(cT(p, 'metal + nonmetal → ionic', 450, 240, { size: 34, fill: MCOL, weight: 600, anchor: 'middle' }), m('ionic'));
+    show(cFormula(p, [['Na', ''], ['Cl', '']], 450, 350, { size: 72, colors: EC5 }), m('ionic', .8));
+    show(cFormula(p, [['Mg', ''], ['O', '']], 450, 450, { size: 72, colors: EC5 }), m('ionic', 1.6));
+    show(cT(p, 'nonmetals only → molecular', 1150, 240, { size: 34, fill: NCOL, weight: 600, anchor: 'middle' }), m('mol'));
+    show(cFormula(p, [['C', ''], ['O', '2']], 1150, 350, { size: 72, colors: EC5 }), m('mol', .8));
+    show(cFormula(p, [['N', '2'], ['O', '5']], 1150, 450, { size: 72, colors: EC5 }), m('mol', 1.6));
+    const key = G(p, { o: 0 });
+    mk('circle', { cx: 640, cy: 560, r: 10, fill: MCOL }, key); T(key, 'metal', { x: 660, y: 569, size: 26, fill: COL.dim });
+    mk('circle', { cx: 820, cy: 560, r: 10, fill: NCOL }, key); T(key, 'nonmetal', { x: 840, y: 569, size: 26, fill: COL.dim });
+    show(key, m('why'));
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'metal + nonmetal → ionic     ·     nonmetals only → molecular', 800, 200, { size: 34, weight: 600, anchor: 'middle' }), .2);
+  }, { ask: done => quiz(WIDE, [{
+    id: 'c-type', prompt: ['Ionic or molecular? Classify each formula.'],
+    build: grid([
+      { parts: [chemH(['K', ''], ['Br', ''])], ans: ['i'], why: 'K is a metal and Br a nonmetal: ionic.' },
+      { parts: [chemH(['S', ''], ['O', '3'])], ans: ['m'], why: 'S and O are both nonmetals: molecular.' },
+      { parts: [chemH(['Ca', ''], ['O', ''])], ans: ['i'], why: 'Ca is a metal: ionic.' },
+      { parts: [chemH(['N', '2'], ['O', '4'])], ans: ['m'], why: 'N and O are both nonmetals: molecular.' },
+    ], [['i', 'Ionic', MCOL, 'I'], ['m', 'Molecular', NCOL, 'M']], { multi: false, text: true }),
+  }], done) }],
+  ['ionic', 'Naming ionic compounds', (m) => {
+    const p = panel(0);
+    show(cT(p, 'metal name  +  nonmetal root + “ide”', 800, 140, { size: 34, weight: 600, anchor: 'middle' }), m('metal'));
+    [[450, [['Na', ''], ['Cl', '']], 'Na → sodium', 'chlorine → chloride', 'sodium chloride', 'nacl'],
+      [1150, [['Mg', ''], ['O', '']], 'Mg → magnesium', 'oxygen → oxide', 'magnesium oxide', 'mgo']].forEach(([x, f, a, b, name, mark], i) => {
+      show(cFormula(p, f, x, 270, { size: 84, colors: EC5 }), i ? m(mark) : .3);
+      show(cT(p, a, x, 360, { size: 30, fill: MCOL, anchor: 'middle', weight: 600 }), i ? m(mark, .5) : m('metal', .3));
+      show(cT(p, b, x, 410, { size: 30, fill: NCOL, anchor: 'middle', weight: 600 }), i ? m(mark, 1) : m('nonmetal', .3));
+      show(cT(p, name, x, 510, { size: 46, anchor: 'middle', weight: 600 }), i ? m(mark, 1.6) : m(mark));
+    });
+  }],
+  ['roman', 'Metals with more than one charge', (m) => {
+    const p = panel(0);
+    show(cT(p, 'one charge: group 1 and 2 metals, aluminum', 800, 150, { size: 30, fill: COL.dim, anchor: 'middle' }), .3);
+    show(cT(p, 'more than one: many transition metals (iron, copper, lead)', 800, 200, { size: 30, fill: COL.task, anchor: 'middle', weight: 600 }), m('more'));
+    const fe = cTerms(p, [['Fe', ''], ['Cl', '3']], 800, 350, { size: 96, sup: false, gap: .02 });
+    fe[0].setAttribute('fill', MCOL); fe[1].setAttribute('fill', NCOL);
+    fe.forEach(e => show(e, m('fe', -.6)));
+    show(cT(p, 'each Cl is 1−', 800, 435, { size: 30, fill: NCOL, anchor: 'middle', weight: 600 }), m('fe', 2.2));
+    show(cT(p, 'three Cl: 3 × (1−) = 3−', 800, 480, { size: 32, fill: NCOL, anchor: 'middle', font: CFONT }), m('total'));
+    show(cT(p, 'so Fe is 3+', 800, 525, { size: 32, fill: MCOL, anchor: 'middle', weight: 600 }), m('iii'));
+    show(cT(p, 'iron(III) chloride', 800, 615, { size: 56, anchor: 'middle', weight: 600 }), m('name'));
+    show(cT(p, 'Roman numeral = the metal’s charge', 800, 665, { size: 26, fill: COL.task, anchor: 'middle' }), m('name', .6));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'metal with more than one charge → find its charge → Roman numeral', 800, 200, { size: 32, weight: 600, anchor: 'middle' }), .2);
+  }, { ask: done => quiz(WIDE, [{
+    id: 'c-cuo', prompt: ['Name ', chemH(['Cu', ''], ['O', '']), '. (Copper can have more than one charge.)'],
+    build: choice([['copper(II) oxide'], ['copper oxide'], ['copper(I) oxide'], ['copper monoxide']], 0,
+      'Oxide is 2−, so copper is 2+: copper(II) oxide.',
+      [null, 'Copper can have more than one charge, so the name needs a Roman numeral.',
+        'Oxide is 2−, so one copper must be 2+, not 1+.', 'Prefixes like mono are only for molecular compounds; CuO is ionic.']),
+  }], done) }],
+  ['poly', 'Polyatomic ions', (m) => {
+    const p = panel(0);
+    show(cT(p, 'Polyatomic ions keep their own names', 800, 140, { size: 34, weight: 600, anchor: 'middle' }), .3);
+    IONS.forEach(([name, f, q], i) => {
+      const x = i % 2 ? 1150 : 450, y = 230 + Math.floor(i / 2) * 80, t = m('list', i * .5);
+      show(cT(p, name, x - 20, y, { size: 32, anchor: 'end', fill: PCOL, weight: 600 }), t);
+      show(ionF(p, f, q, x + 20, y, { size: 44, anchor: 'start' }), t);
+    });
+    const na = cTerms(p, [['Na', '2'], ['SO', '4']], 800, 530, { size: 84, sup: false, gap: .02 });
+    na[0].setAttribute('fill', MCOL); na[1].setAttribute('fill', PCOL);
+    na.forEach(e => show(e, m('na2so4')));
+    show(cT(p, 'sodium sulfate', 800, 620, { size: 46, anchor: 'middle', weight: 600 }), m('na2so4', 1.2));
+  }],
+  ['molecular', 'Prefixes for molecular compounds', (m) => {
+    const p = panel(0);
+    show(cT(p, 'Molecular compounds count atoms with prefixes', 800, 140, { size: 34, weight: 600, anchor: 'middle' }), .3);
+    show(cT(p, '1 mono   2 di   3 tri   4 tetra   5 penta   6 hexa', 800, 220, { size: 36, fill: COL.task, anchor: 'middle', font: CFONT }), m('prefixes'));
+    [[[['C', ''], ['O', '2']], 'carbon dioxide', 330, 'co2'], [[['C', ''], ['O', '']], 'carbon monoxide', 420, 'co'],
+      [[['N', '2'], ['O', '5']], 'dinitrogen pentoxide', 510, 'n2o5']].forEach(([f, name, y, mark]) => {
+      show(cFormula(p, f, 640, y, { size: 64, colors: EC5, anchor: 'end' }), m(mark));
+      show(cT(p, '→  ' + name, 680, y - 4, { size: 40, weight: 600 }), m(mark, .5));
+    });
+    show(cT(p, 'no “mono” on the first element  ·  penta + oxide → pentoxide', 800, 610, { size: 28, fill: COL.dim, anchor: 'middle' }), m('co', 1.6));
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, '1 mono   2 di   3 tri   4 tetra   5 penta   6 hexa', 800, 200, { size: 36, fill: COL.task, anchor: 'middle', font: CFONT }), .2);
+  }, { ask: done => quiz(WIDE, [{
+    id: 'c-p2o5', prompt: ['Name the molecular compound ', chemH(['P', '2'], ['O', '5']), '.'],
+    build: choice([['diphosphorus pentoxide'], ['phosphorus oxide'], ['pentaphosphorus dioxide']], 0,
+      'P₂ → di + phosphorus, O₅ → penta + oxide = pentoxide.',
+      [null, 'Molecular names need a prefix for each count: P₂ is di, O₅ is penta.', 'The prefixes follow the subscripts in order: P₂ is di, O₅ is penta.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [['Metal + nonmetal: ionic. Nonmetals only: molecular.', 'w1'], ['Ionic: metal name + nonmetal root + “ide”.', 'w2'],
+      ['Metal with more than one charge: add a Roman numeral.', 'w3'], ['Molecular: prefixes; no “mono” on the first element.', 'w4']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 230 + i * 120, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 36, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    srcBadge(p, 760, m('end'));
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-cacl2', prompt: ['Name ', chemH(['Ca', ''], ['Cl', '2']), '.'],
+    build: choice([['calcium chloride'], ['calcium dichloride'], ['calcium(II) chloride']], 0,
+      'Calcium (group 2) has one charge, 2+, so no Roman numeral, and ionic names use no prefixes.',
+      [null, 'Prefixes are for molecular compounds; CaCl₂ is ionic.', 'Calcium is a group 2 metal with only one charge, so it takes no Roman numeral.']),
+  }, {
+    id: 'p-pcl3', prompt: ['Name ', chemH(['P', ''], ['Cl', '3']), '.'],
+    build: choice([['phosphorus trichloride'], ['phosphorus chloride'], ['monophosphorus trichloride']], 0,
+      'Both are nonmetals: molecular. One P (no mono on the first element) and three Cl: trichloride.',
+      [null, 'P and Cl are both nonmetals, so the name needs prefixes: Cl₃ is trichloride.', 'The first element never takes mono.']),
+  }, {
+    id: 'p-kno3', prompt: ['Name ', chemH(['K', ''], ['NO', '3']), '.'],
+    build: choice([['potassium nitrate'], ['potassium nitride'], ['potassium nitrogen trioxide']], 0,
+      'NO₃⁻ is the polyatomic ion nitrate, which keeps its name: potassium nitrate.',
+      [null, 'Nitride would be N alone. NO₃ is the polyatomic ion nitrate.', 'NO₃ stays together as the polyatomic ion nitrate; KNO₃ is ionic, so no prefixes.']),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

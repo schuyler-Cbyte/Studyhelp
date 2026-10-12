@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Balance Chemical Equations · CHEM 152 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Review, Chapter 8. Storyboard: books/chem152-review/chapters/ch08.md.
+// Standard method, approved by the user in place of instructor slides; cross-checked against the two balancing handouts. Labelled on screen.
+const CHAPTER = { number: 8, title: 'Balance Chemical Equations', minutes: 6, language: 'en' };
+
+/* ---------- chapter data (all equations checked in ch08.md) ---------- */
+const sp = (f, atoms) => ({ f, atoms });
+const H2 = sp([['H', '2']], { H: 2 }), O2 = sp([['O', '2']], { O: 2 }), H2O = sp([['H', '2'], ['O', '']], { H: 2, O: 1 });
+const CH4 = sp([['C', ''], ['H', '4']], { C: 1, H: 4 }), CO2 = sp([['C', ''], ['O', '2']], { C: 1, O: 2 });
+const C2H6 = sp([['C', '2'], ['H', '6']], { C: 2, H: 6 });
+const N2 = sp([['N', '2']], { N: 2 }), NH3 = sp([['N', ''], ['H', '3']], { N: 1, H: 3 });
+const AL = sp([['Al', '']], { Al: 1 }), AL2O3 = sp([['Al', '2'], ['O', '3']], { Al: 2, O: 3 });
+const C3H8 = sp([['C', '3'], ['H', '8']], { C: 3, H: 8 });
+const TX = 630, WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };
+const SRC8 = 'Standard method · matches your balancing handouts · not yet confirmed by course slides';
+
+/* ---------- helpers ---------- */
+// Lay out an equation and its atom table; c is the current coefficient list (numbers).
+function setup(p, species, nLeft, els, y = 250, ty = 390) {
+  const row = eqRow(p, species, nLeft, y, { size: 72 });
+  show(row.g, .3);
+  const tb = countTable(p, els, TX, ty);
+  return { row, tb, species, nLeft };
+}
+const counts = (s, c, t0) => setCounts(s.tb, sideCount(s.species, c, 0, s.nLeft), sideCount(s.species, c, s.nLeft, s.species.length), t0);
+const okText = (p, str, t0, y = 680) => show(cT(p, str, 800, y, { size: 36, fill: COL.good, anchor: 'middle', weight: 600 }), t0);
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Atoms in, atoms out', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Reactions · Chapter 8', { x: 800, y: 320, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Balance Chemical Equations', { x: 800, y: 440, size: 88, weight: 600, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cT(p, 'the same atoms on both sides', 800, 550, { size: 34, fill: COL.dim, anchor: 'middle' }), m('sub', .2));
+    srcBadge(p, 660, m('note'), SRC8);
+  }],
+  ['rules', 'Coefficients only', (m) => {
+    const p = panel(0);
+    show(cT(p, 'Change only the coefficients', 800, 170, { size: 40, weight: 600, anchor: 'middle' }), m('coef'));
+    const ok = G(p, { o: 0 });
+    T(ok, '2', { x: 380, y: 360, size: 96, fill: COL.task, font: CFONT, anchor: 'end' });
+    cFormula(ok, [['H', '2'], ['O', '']], 400, 360, { size: 96, anchor: 'start', o: 1 });
+    T(ok, '✓ two water molecules', { x: 470, y: 450, size: 30, fill: COL.good, weight: 600, anchor: 'middle' });
+    show(ok, m('coef', .8));
+    const bad = G(p, { o: 0 });
+    cFormula(bad, [['H', '2'], ['O', '2']], 1130, 360, { size: 96, o: 1 });
+    T(bad, '✗ a different substance', { x: 1130, y: 450, size: 30, fill: COL.bad, weight: 600, anchor: 'middle' });
+    show(bad, m('h2o2'));
+    show(cT(p, 'never change a subscript', 1130, 230, { size: 32, fill: COL.bad, anchor: 'middle', weight: 600 }), m('sub2'));
+    draw(cCross(p, 1010, 270, 240, 120), m('h2o2', 1.2), .5);
+  }],
+  ['count', 'Count every atom', (m) => {
+    const p = panel(0);
+    S.s1 = setup(p, [H2, O2, H2O], 2, ['H', 'O']);
+    show(S.s1.tb.g, m('table'));
+    counts(S.s1, [1, 1, 1], m('h'));
+    S.s1.tb.vals.slice(2).forEach(v => pulse(v, m('o', .3), 1.4));
+  }],
+  ['fix', 'Fix one atom at a time', (m) => {
+    const s = S.s1, p = S.panel;
+    setCoef(s.row, 2, 2, m('water'));
+    counts(s, [1, 1, 2], m('recount'));
+    setCoef(s.row, 0, 2, m('h2'));
+    counts(s, [2, 1, 2], m('done'));
+    okText(p, 'balanced: 2 H₂ + O₂ → 2 H₂O', m('done', .6));
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-h-in-2h2o', prompt: ['How many hydrogen atoms are in ', chemH(['2 H', '2'], ['O', '']), '?'],
+    build: chemBlanks([{ parts: [{ box: '4' }, { t: ' hydrogen atoms', ui: true }], why: 'The coefficient multiplies the whole formula: 2 × 2 = 4 hydrogen atoms.',
+      hint: 'Each H₂O has 2 hydrogens, and there are 2 of them.' }]),
+  }], done) }],
+  ['methane', 'Most complex first, single elements last', (m) => {
+    const p = panel(0);
+    const s = S.s2 = setup(p, [CH4, O2, CO2, H2O], 2, ['C', 'H', 'O']);
+    show(s.tb.g, m('big'));
+    pulse(s.row.items[0].form, m('big', .4), 1.15);
+    counts(s, [1, 1, 1, 1], m('c'));
+    setCoef(s.row, 3, 2, m('h', 1)); counts(s, [1, 1, 1, 2], m('h', 1.6));
+    s.tb.vals.slice(4).forEach(v => pulse(v, m('o', .2), 1.4));
+    setCoef(s.row, 1, 2, m('o2', 1)); counts(s, [1, 2, 1, 2], m('done'));
+    okText(p, 'CH₄ + 2 O₂ → CO₂ + 2 H₂O', m('done', .4));
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-what-change', prompt: ['When balancing, which numbers may you change?'],
+    build: choice([['coefficients only'], ['subscripts only'], ['both']], 0, 'Coefficients only: subscripts define the substance.',
+      [null, 'Changing a subscript changes the substance (H₂O → H₂O₂). Change coefficients.', 'Subscripts must stay as written; only coefficients change.']),
+  }], done) }],
+  ['fraction', 'Clearing a fraction', (m) => {
+    const p = panel(0);
+    const s = setup(p, [C2H6, O2, CO2, H2O], 2, ['C', 'H', 'O']);
+    show(s.tb.g, m('start'));
+    setCoef(s.row, 2, 2, m('start', .8)); counts(s, [1, 1, 2, 1], m('start', 1.4));
+    setCoef(s.row, 3, 3, m('h', .8)); counts(s, [1, 1, 2, 3], m('h', 1.4));
+    setCoef(s.row, 1, '7/2', m('o', 1.8)); counts(s, [1, 3.5, 2, 3], m('o', 2.4));
+    show(cT(p, '× 2', 800, 640, { size: 40, fill: COL.task, anchor: 'middle', weight: 700 }), m('x2'));
+    [[0, 2], [1, 7], [2, 4], [3, 6]].forEach(([i, v], k) => setCoef(s.row, i, v, m('x2', .5 + k * .3)));
+    counts(s, [2, 7, 4, 6], m('done'));
+    okText(p, '2 C₂H₆ + 7 O₂ → 4 CO₂ + 6 H₂O', m('done', .6), 710);
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'count every atom on both sides', 800, 200, { size: 34, fill: COL.dim, anchor: 'middle' }), .2);
+  }, { ask: done => quiz(WIDE, [{
+    id: 'c-nh3', prompt: ['Balance the equation. Leave a box empty for a coefficient of 1.'],
+    build: coefBlanks([N2, H2, NH3], 2, [1, 3, 2], 'N: 2 = 2 × 1; H: 3 × 2 = 6 = 2 × 3. So N₂ + 3 H₂ → 2 NH₃.'),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [['Change coefficients only, never subscripts.', 'w1'], ['Count every atom on both sides.', 'w2'],
+      ['Start with the most complex substance; finish with single elements.', 'w3'], ['Clear a fraction by multiplying every coefficient.', 'w4']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 230 + i * 120, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 36, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    srcBadge(p, 760, m('end'), SRC8);
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-al2o3', prompt: ['Balance the equation.'],
+    build: coefBlanks([AL, O2, AL2O3], 2, [4, 3, 2], 'O: 3 × 2 = 6 = 2 × 3; Al: 4 = 2 × 2. So 4 Al + 3 O₂ → 2 Al₂O₃.'),
+  }, {
+    id: 'p-c3h8', prompt: ['Balance the equation.'],
+    build: coefBlanks([C3H8, O2, CO2, H2O], 2, [1, 5, 3, 4], 'C: 3 CO₂; H: 4 H₂O; O on the right: 6 + 4 = 10, so 5 O₂.'),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

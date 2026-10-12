@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electron Configuration · CHEM 152 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Review, Chapter 3. Storyboard: books/chem152-review/chapters/ch03.md. Neutral atoms only (ions are PRE-AP ONLY in the slides).
+const CHAPTER = { number: 3, title: 'Electron Configuration', minutes: 6, language: 'en', next: '../ch04/' };
+
+/* ---------- chapter data ---------- */
+// The energy ladder from the course slides' filling order (4s after 3p, before 3d); lowest at the bottom.
+const LAD = [['1s', 2, 770], ['2s', 2, 690], ['2p', 6, 610], ['3s', 2, 530], ['3p', 6, 450], ['4s', 2, 370], ['3d', 10, 290]];
+const SLOT0 = 330, SLOT_DX = 40;
+const CL = [['1s', 2, 's1'], ['2s', 2, 's2'], ['2p', 6, 'p2'], ['3s', 2, 's3'], ['3p', 5, 'p3']];   // chlorine, 17 electrons
+const CAP = [['s', 2, 300], ['p', 6, 400], ['d', 10, 500], ['f', 14, 600]];
+const ECOL = COL.task;   // electron colour
+
+/* ---------- helpers ---------- */
+// Draw the ladder; returns rows [{lab, slots: [{x, y}], g}] and keeps it on S.lad.
+function ladder(p, t0, step = .25) {
+  const rows = LAD.map(([lab, n, y], i) => {
+    const g = G(p, { o: 0 });
+    const l = T(g, lab, { x: 290, y: y + 12, size: 34, font: CFONT, anchor: 'end' });
+    const slots = [];
+    for (let k = 0; k < n; k++) {
+      const x = SLOT0 + k * SLOT_DX;
+      mk('circle', { cx: x, cy: y, r: 14, fill: 'none', stroke: COL.dim, 'stroke-width': 2.5 }, g);
+      slots.push({ x, y });
+    }
+    show(g, t0 + i * step, .4);
+    return { lab, y, g, l, slots };
+  });
+  const ax = G(p, { o: 0 });
+  path(ax, 'M120 800V250M110 266L120 250L130 266', { stroke: COL.faint, 'stroke-width': 3 });
+  T(ax, 'higher energy', { x: 120, y: 230, size: 24, fill: COL.dim, anchor: 'middle' });
+  show(ax, t0);
+  return (S.lad = rows);
+}
+function eDot(p, s) { const g = G(p, { x: s.x, y: s.y, s: 0, o: 0 }); mk('circle', { r: 11, fill: ECOL }, g); return g; }
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Arranging electrons', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Atomic Structure · Chapter 3', { x: 800, y: 320, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Electron Configuration', { x: 800, y: 440, size: 92, weight: 600, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cT(p, "how an atom's electrons are arranged", 800, 560, { size: 34, fill: COL.dim, anchor: 'middle' }), m('sub', .2));
+  }],
+  ['orbitals', 'Orbitals and capacity', (m) => {
+    const p = panel(0);
+    const cloud = G(p, { x: 400, y: 450, o: 0 });
+    [[180, .07], [130, .1], [85, .15]].forEach(([r, a]) => mk('circle', { r, fill: COL.whole, 'fill-opacity': a }, cloud));
+    mk('circle', { r: 10, fill: COL.chalk }, cloud);
+    show(cloud, .2, .8);
+    show(cT(p, 'orbital: a region where an electron is likely to be found', 400, 220, { size: 28, fill: COL.whole, anchor: 'middle', weight: 600 }), .6);
+    show(cT(p, 'Each subshell holds', 1150, 220, { size: 30, fill: COL.dim, anchor: 'middle', weight: 600 }), m('cap'));
+    CAP.forEach(([lab, n, y]) => {
+      const g = G(p, { o: 0 });
+      T(g, lab, { x: 900, y: y + 12, size: 38, font: CFONT, anchor: 'end' });
+      for (let k = 0; k < n; k++) mk('circle', { cx: 950 + k * 32, cy: y, r: 11, fill: ECOL }, g);
+      T(g, `${n}`, { x: 1440, y: y + 13, size: 38, font: CFONT, fill: ECOL, weight: 600 });
+      show(g, m(lab), .5);
+    });
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-pcap', prompt: ['How many electrons can a p subshell hold?'],
+    build: chemBlanks([{ parts: [{ t: 'p subshell: ', ui: true }, { box: '6' }, { t: ' electrons', ui: true }],
+      why: 's holds 2, p holds 6, d holds 10, f holds 14.', hint: 'Count the slots in the p row: s 2, p ?, d 10, f 14.' }]),
+  }], done) }],
+  ['aufbau', 'Lower energy first', (m) => {
+    const p = S.p3 = panel(0);
+    show(cT(p, 'Aufbau: fill lower energy before higher energy', 1150, 170, { size: 30, fill: COL.chalk, anchor: 'middle', weight: 600 }), .3);
+    const rows = ladder(p, m('ladder'));
+    const r4s = rows[5], r3d = rows[6];
+    tw(r4s.l, { c_fill: COL.task }, m('fours'), .4); tw(r3d.l, { c_fill: COL.task }, m('fours'), .4);
+    S.note4s = cT(p, '4s sits below 3d', 760, 335, { size: 30, fill: COL.task, weight: 600 });
+    show(S.note4s, m('fours', .3));
+    S.ord = G(p);
+    rows.forEach((r, i) => {
+      const g = G(S.ord, { x: 205, y: r.y, s: 0, o: 0 });
+      mk('circle', { r: 16, fill: 'none', stroke: COL.dim, 'stroke-width': 2 }, g);
+      T(g, String(i + 1), { y: 8, size: 20, fill: COL.dim, anchor: 'middle', weight: 600 });
+      pop(g, m('order', i * .35));
+    });
+    S.orderTxt = cT(p, 'fill order: 1s 2s 2p 3s 3p 4s 3d', 1150, 560, { size: 34, font: CFONT, anchor: 'middle' });
+    show(S.orderTxt, m('order', 2.6));
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-after3p', prompt: ['Which subshell fills right after 3p?'],
+    build: choice([['4s'], ['3d'], ['4p']], 0, '4s is the next step up the ladder: it fills after 3p and before 3d.',
+      [null, 'The slides note that 4s fills before 3d, because 4s is lower in energy.', 'Look at the ladder: the next step up from 3p is 4s.'],
+      () => pulseFx(S.lad[5].l, 1.4)),
+  }], done) }],
+  ['fill-cl', 'Filling chlorine', (m) => {
+    const p = S.p3;
+    hide(S.orderTxt, 0, .4); hide(S.note4s, 0, .4);
+    tw(S.lad[5].l, { c_fill: COL.chalk }, 0, .4); tw(S.lad[6].l, { c_fill: COL.chalk }, 0, .4);
+    show(cT(p, 'Chlorine · 17 electrons', 1150, 230, { size: 34, weight: 600, anchor: 'middle' }), .3);
+    S.cfg = cTerms(p, CL.map(([lab, n]) => [lab, String(n)]), 1150, 320, { size: 58 });
+    let total = 0;
+    S.counts = [];
+    CL.forEach(([lab, n, mark], i) => {
+      const row = S.lad.find(r => r.lab === lab), t = m(mark);
+      for (let k = 0; k < n; k++) pop(eDot(p, row.slots[k]), t + k * .12);
+      show(S.cfg[i], t + .2);
+      total += n;
+      const c = cT(p, `= ${total}`, 760, row.y + 11, { size: 28, fill: COL.dim, font: CFONT });
+      show(c, t + n * .12);
+      S.counts.push(c);
+    });
+    S.cfg.forEach((e, i) => { tw(e, { s: 1.15 }, m('full', i * .3), .2); tw(e, { s: 1 }, m('full', i * .3 + .2), .3); });
+  }],
+  ['shorthand', 'Noble-gas shorthand', (m) => {
+    const p = S.p3;
+    S.counts.forEach(c => hide(c, 0, .4));
+    const core = put(mk('rect', { x: 240, y: 585, width: 500, height: 210, rx: 18, fill: COL.whole, 'fill-opacity': .12, stroke: COL.whole, 'stroke-width': 2 }, p), { o: 0 });
+    show(core, m('core'));
+    show(cT(p, '10 electrons: neon', 760, 700, { size: 28, fill: COL.whole, weight: 600 }), m('core', .4));
+    const c = S.cfg, x1 = c[0]._cx - c[0]._w / 2, x2 = c[2]._cx + c[2]._w / 2;
+    draw(path(p, `M${x1} 345V357H${x2}V345`, { stroke: COL.whole, 'stroke-width': 3 }, { d: 0 }), m('core', .2), .5);
+    const sh = cTerms(p, [['[Ne]', ''], ['3s', '2'], ['3p', '5']], 1150, 440, { size: 58 });
+    show(cT(p, 'shorthand', 1150, 380, { size: 24, fill: COL.dim, anchor: 'middle' }), m('ne'));
+    tw(sh[0], { o: 1, c_fill: COL.whole }, m('ne'), .5);
+    show(sh[1], m('rest')); show(sh[2], m('rest', .5));
+    show(cT(p, 'Beryllium · 4 electrons', 1150, 540, { size: 30, weight: 600, anchor: 'middle' }), m('be'));
+    const full = cTerms(p, [['1s', '2'], ['2s', '2']], 1000, 620, { size: 50 });
+    full.forEach((e, i) => show(e, m('be', .4 + i * .3)));
+    show(cT(p, '→', 1150, 618, { size: 44, fill: COL.dim, anchor: 'middle' }), m('he'));
+    const be = cTerms(p, [['[He]', ''], ['2s', '2']], 1300, 620, { size: 50 });
+    tw(be[0], { o: 1, c_fill: COL.whole }, m('he', .2), .5); show(be[1], m('he', .6));
+  }],
+  ['q3', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-clshort', prompt: ["Finish chlorine's noble-gas shorthand."],
+    build: chemBlanks([{ parts: ['[Ne] 3s', { box: '2', sup: true }, ' 3p', { box: '5', sup: true }],
+      why: 'After neon’s 10 electrons come 3s² and 3p⁵: 10 + 2 + 5 = 17.', hint: 'Neon covers 10 electrons. Chlorine has 17, so 7 remain: 3s holds 2 of them.' }]),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [['Capacity: s 2, p 6, d 10, f 14.', 'w1'], ['Fill from lower to higher energy: 4s before 3d.', 'w2'],
+      ['Each superscript counts the electrons in that subshell.', 'w3'], ['Shorthand: [noble gas] + the rest.', 'w4']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 250 + i * 130, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 36, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    show(cFormula(p, [['[Ne] 3s', '2'], [' 3p', '5']], 800, 140, { size: 54, sup: true }), .3);
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-be', prompt: ['Beryllium has 4 electrons. Complete its full electron configuration.'],
+    build: chemBlanks([{ parts: ['1s', { box: '2', sup: true }, ' 2s', { box: '2', sup: true }],
+      why: '1s holds 2, and the other 2 go into 2s: 1s² 2s² (shorthand [He] 2s²).', hint: 'An s subshell holds at most 2. Fill 1s first, then 2s, until you reach 4.' }]),
+  }, {
+    id: 'p-cl', prompt: ['Chlorine has 17 electrons. Fill in the missing superscripts.'],
+    build: chemBlanks([{ parts: ['1s', { sup: '2' }, ' 2s', { sup: '2' }, ' 2p', { box: '6', sup: true }, ' 3s', { sup: '2' }, ' 3p', { box: '5', sup: true }],
+      why: '2p is full with 6; 2 + 2 + 6 + 2 = 12, so 3p holds the last 5.', hint: 'A p subshell holds 6. Fill 2p completely, then count how many of the 17 are left for 3p.' }]),
+  }, {
+    id: 'p-he', prompt: ['How many electrons does ', chemH(['[He] 2s', '2'], { sup: true }), ' describe?'],
+    build: chemBlanks([{ parts: [{ box: '4' }, { t: ' electrons', ui: true }],
+      why: '[He] stands for helium’s 2 electrons (1s²), plus 2s² gives 4: beryllium.', hint: '[He] stands for 1s², which is 2 electrons. Add the superscript of 2s.' }]),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>
