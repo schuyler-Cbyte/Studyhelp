@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Naming Formulas · CHEM 152 Exam 2</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Exam 2 Review, Chapter 6 (sheet "Name" a–d). Plan: books/chem152-exam2/chapters.md.
+// Standard naming method, as in CHEM 152 Review chapter 5; labelled on screen.
+const CHAPTER = { number: 6, title: 'Naming Formulas: FeN, Ag₂CO₃, Cu(NO₃)₂, NF₃', minutes: 6, language: 'en', next: '../ch07/' };
+
+/* ---------- chapter data ---------- */
+const U = 40, BX = 640, CAT_Y = 290, AN_Y = 410;   // charge blocks: unit size, left edge, row tops
+const WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };
+
+/* ---------- helpers ---------- */
+const formula = (p, parts, colors, t0) => show(cFormula(p, parts, 800, 180, { size: 96, colors }), t0);
+// The k-th ion of a row: q blocks after the k earlier ions, with a bracket below.
+function ionBlocks(p, k, q, sign, t0) {
+  const y = sign > 0 ? CAT_Y : AN_Y, x = BX + k * q * U;
+  const g = chargeBlocks(p, q, sign, x, y, { unit: U });
+  path(g, `M${x + 2} ${y + U + 4}V${y + U + 12}H${x + q * U - 6}V${y + U + 4}`, { stroke: COL.dim, 'stroke-width': 2 });
+  show(g, t0, .4);
+  return g;
+}
+// An ion label at the left end of its row.
+const ionLabel = (p, parts, charge, row, color, t0) => show(ionF(p, parts, charge, BX - 30, (row ? AN_Y : CAT_Y) + 30, { size: 44, fill: color, anchor: 'end' }), t0);
+// The two rows now have equal length: a dashed line and "total charge 0".
+function balanced(p, n, t0) {
+  const x = BX + n * U - 2;
+  draw(path(p, `M${x} ${CAT_Y - 16}V${AN_Y + U + 16}`, { stroke: COL.good, 'stroke-width': 3, 'stroke-dasharray': '8 8' }, { d: 0 }), t0, .5);
+  show(cT(p, `${n}+ and ${n}−: total 0`, x + 24, (CAT_Y + AN_Y + U) / 2 + 10, { size: 30, fill: COL.good, weight: 600 }), t0 + .3);
+}
+const nameText = (p, str, t0, y = 640) => show(cT(p, str, 800, y, { size: 60, weight: 700, fill: COL.good, anchor: 'middle' }), t0);
+const why = (p, str, t0, y = 720) => show(cT(p, str, 800, y, { size: 30, fill: COL.task, weight: 600, anchor: 'middle' }), t0);
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'From formula to name', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Exam 2 review · name a–d', { x: 800, y: 300, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Naming Formulas', { x: 800, y: 410, size: 92, weight: 600, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cT(p, 'FeN   ·   Ag₂CO₃   ·   Cu(NO₃)₂   ·   NF₃', 800, 510, { size: 44, font: CFONT, anchor: 'middle' }), m('sub'));
+    srcBadge(p, 640, m('note'));
+  }],
+  ['sort', 'Ionic or molecular?', (m) => {
+    const p = panel(0);
+    const items = [[[['Fe', ''], ['N', '']], 290, 1], [[['Ag', '2'], ['CO', '3']], 620, 1], [[['Cu', ''], ['(NO', '3'], [')', '2']], 970, 1], [[['N', ''], ['F', '3']], 1300, 0]];
+    items.forEach(([parts, x, ionic], i) => {
+      show(cFormula(p, parts, x, 250, { size: 72 }), m('four', i * .3));
+      const c = ionic ? MCOL : NCOL, t = ionic ? m('ionic', i * .3) : m('mol');
+      const b = G(p, { o: 0 });
+      mk('rect', { x: x - 130, y: 300, width: 260, height: 60, rx: 30, fill: 'none', stroke: c, 'stroke-width': 3 }, b);
+      T(b, ionic ? 'ionic' : 'molecular', { x, y: 341, size: 30, fill: c, weight: 700, anchor: 'middle' });
+      show(b, t);
+    });
+    show(cT(p, 'metal + nonmetal (or polyatomic ion) → ionic: name the ions', 800, 480, { size: 32, fill: MCOL, anchor: 'middle' }), m('ionic', 1));
+    show(cT(p, 'only nonmetals → molecular: use prefixes', 800, 560, { size: 32, fill: NCOL, anchor: 'middle' }), m('mol', .4));
+  }],
+  ['fen', 'FeN: iron(III) nitride', (m) => {
+    const p = panel(0);
+    formula(p, [['Fe', ''], ['N', '']], { Fe: MCOL, N: NCOL }, .2);
+    ionLabel(p, [['N', '']], '3−', 1, NCOL, m('n3')); ionBlocks(p, 0, 3, -1, m('n3', .3));
+    show(cT(p, 'nitride: N is 3−', 1200, AN_Y + 30, { size: 28, fill: NCOL }), m('n3', .6));
+    ionLabel(p, [['Fe', '']], '?', 0, MCOL, m('fe3'));
+    ionBlocks(p, 0, 3, 1, m('fe3', .8));
+    balanced(p, 3, m('fe3', 1.4));
+    show(cT(p, 'so Fe is 3+', BX + 3 * U + 24, CAT_Y + 30, { size: 30, fill: MCOL, weight: 700 }), m('fe3', 1.9));
+    why(p, 'iron can be 2+ or 3+, so write the charge as a Roman numeral', m('roman'), 560);
+    nameText(p, 'iron(III) nitride', m('name'), 660);
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    show(cFormula(p, [['Fe', ''], ['N', '']], 800, 240, { size: 96, colors: { Fe: MCOL, N: NCOL } }), .2);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-fen', prompt: ['Name FeN.'],
+    build: choice([['iron(III) nitride'], ['iron nitride'], ['iron(I) nitride'], ['iron mononitride']], 0,
+      'N is 3− (nitride), so one Fe must be 3+: iron(III) nitride.',
+      [null, 'Iron can have more than one charge, so the name needs a Roman numeral.', 'One N³⁻ needs 3+ to cancel it, not 1+.', 'Prefixes are for molecular compounds (nonmetals only). FeN is ionic.']),
+  }], done) }],
+  ['ag', 'Ag₂CO₃: silver carbonate', (m) => {
+    const p = panel(0);
+    formula(p, [['Ag', '2'], ['CO', '3']], { Ag: MCOL, CO: PCOL }, .2);
+    ionLabel(p, [['CO', '3']], '2−', 1, PCOL, m('co3')); ionBlocks(p, 0, 2, -1, m('co3', .3));
+    show(cT(p, 'carbonate: a polyatomic ion, keeps its name', 1000, AN_Y + 30, { size: 28, fill: PCOL }), m('co3', .6));
+    ionLabel(p, [['Ag', '']], '+', 0, MCOL, m('ag'));
+    ionBlocks(p, 0, 1, 1, m('ag', .4)); ionBlocks(p, 1, 1, 1, m('ag', .8));
+    balanced(p, 2, m('ag', 1.3));
+    why(p, 'silver is always 1+, so no Roman numeral', m('fixed'), 560);
+    nameText(p, 'silver carbonate', m('name'), 660);
+  }],
+  ['cu', 'Cu(NO₃)₂: copper(II) nitrate', (m) => {
+    const p = panel(0);
+    formula(p, [['Cu', ''], ['(NO', '3'], [')', '2']], { Cu: MCOL, '(NO': PCOL, ')': PCOL }, .2);
+    ionLabel(p, [['NO', '3']], '−', 1, PCOL, m('no3')); ionBlocks(p, 0, 1, -1, m('no3', .3)); ionBlocks(p, 1, 1, -1, m('no3', .8));
+    show(cT(p, 'two nitrates (the subscript 2): 2−', 900, AN_Y + 30, { size: 28, fill: PCOL }), m('no3', 1.1));
+    ionLabel(p, [['Cu', '']], '?', 0, MCOL, m('cu'));
+    ionBlocks(p, 0, 2, 1, m('cu', .6));
+    balanced(p, 2, m('cu', 1.1));
+    show(cT(p, 'so Cu is 2+', BX + 2 * U + 24, CAT_Y + 30, { size: 30, fill: MCOL, weight: 700 }), m('cu', 1.6));
+    why(p, 'copper can be 1+ or 2+: here it is 2+ → (II)', m('roman'), 560);
+    nameText(p, 'copper(II) nitrate', m('name'), 660);
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    show(cFormula(p, [['Cu', ''], ['(NO', '3'], [')', '2']], 800, 240, { size: 96, colors: { Cu: MCOL, '(NO': PCOL, ')': PCOL } }), .2);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-cu', prompt: ['Nitrate is NO₃⁻. What is copper’s charge in Cu(NO₃)₂?'],
+    build: chemBlanks([{ parts: [{ t: 'Cu is  +', ui: true }, { box: '2' }], why: 'Two nitrates give 2−, so Cu is 2+: copper(II).',
+      hint: 'The 2 outside the parentheses means two NO₃⁻ ions. What cancels 2−?' }]),
+  }], done) }],
+  ['nf3', 'NF₃: nitrogen trifluoride', (m) => {
+    const p = panel(0);
+    formula(p, [['N', ''], ['F', '3']], { N: NCOL, F: NCOL }, .2);
+    show(cT(p, 'two nonmetals → molecular → prefixes, no charges', 800, 300, { size: 32, fill: NCOL, weight: 600, anchor: 'middle' }), m('mol'));
+    const pre = G(p, { o: 0 });
+    [['1 mono', 380], ['2 di', 620], ['3 tri', 820], ['4 tetra', 1020], ['5 penta', 1240], ['6 hexa', 1460]].forEach(([s, x], i) =>
+      T(pre, s, { x: x - 120, y: 400, size: 30, fill: i === 2 ? COL.task : COL.dim, weight: i === 2 ? 700 : 500 }));
+    show(pre, m('pre'));
+    show(cT(p, 'one N: no "mono" on the first element', 800, 500, { size: 30, anchor: 'middle' }), m('first'));
+    show(cT(p, 'F₃ → tri + fluoride', 800, 560, { size: 30, anchor: 'middle', font: CFONT }), m('tri'));
+    nameText(p, 'nitrogen trifluoride', m('name'), 670);
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    show(cFormula(p, [['P', ''], ['Cl', '5']], 800, 240, { size: 96 }), .2);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-pcl5', prompt: ['Same pattern: name PCl₅.'],
+    build: choice([['phosphorus pentachloride'], ['monophosphorus pentachloride'], ['phosphorus(V) chloride']], 0,
+      'Two nonmetals: prefixes. One P (no mono), five Cl (penta): phosphorus pentachloride.',
+      [null, 'Leave off "mono" on the first element.', 'Roman numerals are for metals in ionic compounds. P and Cl are both nonmetals: use prefixes.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [['Ionic: name the metal, then the anion (-ide, or the polyatomic name).', 'w1'], ['Metals with more than one charge get a Roman numeral (Fe, Cu).', 'w2'],
+      ['Find that charge by making the total 0.', 'w3'], ['Molecular (nonmetals only): prefixes; no mono on the first.', 'w4']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 300 + i * 110, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 33, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    show(cT(p, 'iron(III) nitride · silver carbonate · copper(II) nitrate · nitrogen trifluoride', 800, 170, { size: 30, fill: COL.good, anchor: 'middle', weight: 600 }), .3);
+    srcBadge(p, 770, m('end'));
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-cuco3', prompt: ['Name ', chemH(['Cu', ''], ['CO', '3']), '. (Carbonate is CO₃²⁻.)'],
+    build: choice([['copper(II) carbonate'], ['copper(I) carbonate'], ['copper carbonate']], 0, 'One CO₃²⁻ (2−) needs Cu²⁺: copper(II) carbonate.',
+      [null, 'Cu¹⁺ would leave the total at 1−. One carbonate is 2−.', 'Copper can be 1+ or 2+, so include the Roman numeral.']),
+  }, {
+    id: 'p-agno3', prompt: ['Name ', chemH(['Ag', ''], ['NO', '3']), '.'],
+    build: choice([['silver nitrate'], ['silver(I) nitrate'], ['silver nitride']], 0, 'Silver is always 1+ (no numeral) and NO₃⁻ is nitrate: silver nitrate.',
+      [null, 'Silver only forms 1+, so it is written without a numeral.', 'Nitride is N³⁻ alone. NO₃⁻ is nitrate.']),
+  }, {
+    id: 'p-so2', prompt: ['Name ', chemH(['S', ''], ['O', '2']), '.'],
+    build: choice([['sulfur dioxide'], ['monosulfur dioxide'], ['sulfur(IV) oxide']], 0, 'Two nonmetals: prefixes, no mono on the first: sulfur dioxide.',
+      [null, 'Leave off "mono" on the first element.', 'Sulfur is a nonmetal: use prefixes, not Roman numerals.']),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

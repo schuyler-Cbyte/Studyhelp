@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Empirical Formula: Au and O · CHEM 152 Exam 2</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Exam 2 Review, Chapter 8 (sheet question 5). Plan: books/chem152-exam2/chapters.md.
+// Course sequence (empirical-formula presentation): percent to mass; mass to mole; divide by small; multiply 'til whole; subscripts in the given order.
+const CHAPTER = { number: 8, title: 'Empirical Formula: Au and O', minutes: 5, language: 'en' };
+
+/* ---------- chapter data (checked in chapters.md) ---------- */
+const EF = [
+  { sym: 'Au', pct: '89.14', am: '196.97', mol: '0.4526', ratio: '1.000', x2: '2.000', whole: 2, x: 500 },
+  { sym: 'O',  pct: '10.80', am: '16.00',  mol: '0.6750', ratio: '1.491', x2: '2.983', whole: 3, x: 920 },
+];
+const EC = { Au: COL.int, O: COL.whole };
+const ROW = { pct: 190, mass: 300, mol: 410, ratio: 520, x2: 630 };
+const STEPS = ['Percent → mass', 'Mass → mole', 'Divide by small', "Multiply 'til whole", 'Write subscripts'];
+const WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };
+
+/* ---------- helpers ---------- */
+// The five-step rail along the top of panel p; step(k, t) lights step k and dims the ones already done.
+function rail(p) {
+  const w = 268.8, gap = 16;
+  S.chips = STEPS.map((str, k) => {
+    const c = G(p, { x: 96 + k * (w + gap), y: 34, o: .4 });
+    c._r = mk('rect', { width: w, height: 44, rx: 22, fill: COL.board, stroke: COL.faint, 'stroke-width': 2 }, c);
+    T(c, `${k + 1}  ${str}`, { x: w / 2, y: 30, size: 21, fill: COL.chalk, weight: 600, anchor: 'middle' });
+    return c;
+  });
+}
+function step(k, t0) {
+  S.chips.forEach((c, i) => { tw(c, { o: i === k ? 1 : i < k ? .6 : .4 }, t0, .4); tw(c._r, { c_stroke: i === k ? COL.task : COL.faint }, t0, .4); });
+}
+const val = (p, e, str, y, t, o = {}) => { const b = cBox(p, str, EC[e.sym], e.x, y, { size: 32, minW: 300, ...o }); show(b, t); return b; };
+const arrowDown = (p, x, y1, y2, t) => draw(path(p, `M${x} ${y1}V${y2}M${x - 8} ${y2 - 10}L${x} ${y2}L${x + 8} ${y2 - 10}`, { stroke: COL.dim, 'stroke-width': 2.5 }, { d: 0 }), t, .3);
+const side = (p, str, y, t, fill = COL.dim) => show(cT(p, str, 1150, y + 10, { size: 26, fill, weight: 600 }), t);
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Percent to formula', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Exam 2 review · question 5', { x: 800, y: 300, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Empirical Formula', { x: 800, y: 410, size: 92, weight: 600, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cT(p, '89.14% Au  ·  10.80% O', 800, 500, { size: 48, font: CFONT, anchor: 'middle' }), .7);
+    show(cT(p, 'the simplest whole-number ratio of atoms', 800, 580, { size: 34, fill: COL.dim, anchor: 'middle' }), m('sub'));
+    show(cT(p, 'Percent to mass · Mass to mole · Divide by small · Multiply ’til whole', 800, 660, { size: 30, fill: COL.task, anchor: 'middle', weight: 600 }), m('steps'));
+  }],
+  ['to-mass', 'Assume 100 g', (m) => {
+    const p = S.p8 = panel(0);
+    rail(p); step(0, .2);
+    EF.forEach((e, i) => {
+      show(cT(p, `${e.pct}% ${e.sym}`, e.x, ROW.pct + 10, { size: 40, font: CFONT, fill: EC[e.sym], anchor: 'middle', weight: 600 }), .4 + i * .2);
+      arrowDown(p, e.x, ROW.pct + 26, ROW.mass - 30, m(i ? 'o' : 'au'));
+      val(p, e, `${e.pct} g ${e.sym}`, ROW.mass, m(i ? 'o' : 'au', .3));
+    });
+    side(p, 'in a 100 g sample', ROW.mass, m('hundred'), COL.task);
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-gO', prompt: ['The compound is 10.80% oxygen. How many grams of oxygen are in the 100 g sample?'],
+    build: chemBlanks([{ parts: [{ box: '10.80', tol: .005 }, { t: ' g O', ui: true }], why: 'In 100 g, a percent is the same number of grams: 10.80 g.',
+      hint: 'Assume 100 g. 10.80% of 100 g is…' }]),
+  }], done) }],
+  ['to-mole', 'Grams to moles', (m) => {
+    const p = S.p8;
+    step(1, m('start'));
+    EF.forEach((e, i) => {
+      const t = m(i ? 'o' : 'au');
+      arrowDown(p, e.x, ROW.mass + 30, ROW.mol - 30, t);
+      show(cT(p, `÷ ${e.am}`, e.x + 16, (ROW.mass + ROW.mol) / 2 + 10, { size: 26, fill: COL.dim, font: CFONT }), t);
+      val(p, e, `${e.mol} mol`, ROW.mol, t + .3);
+    });
+    side(p, 'divide by the atomic mass', ROW.mol - 25, m('start', .3));
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-molO', prompt: ['Convert 10.80 g of oxygen to moles (O = 16.00). Four decimal places.'],
+    build: chemBlanks([{ parts: ['10.80 ÷ 16.00 = ', { box: '0.6750', tol: .0006 }, { t: ' mol O', ui: true }], why: '10.80 ÷ 16.00 = 0.6750 mol of oxygen atoms.',
+      hint: 'Mass to mole: divide the grams by oxygen’s atomic mass, 16.00.' }]),
+  }], done) }],
+  ['divide', 'Divide by the smallest', (m) => {
+    const p = S.p8;
+    step(2, m('small'));
+    side(p, 'smallest: 0.4526 (Au)', ROW.mol + 25, m('small', .3), COL.task);
+    EF.forEach((e, i) => {
+      const t = m(i ? 'o' : 'au');
+      arrowDown(p, e.x, ROW.mol + 30, ROW.ratio - 30, t);
+      show(cT(p, '÷ 0.4526', e.x + 16, (ROW.mol + ROW.ratio) / 2 + 10, { size: 26, fill: COL.dim, font: CFONT }), t);
+      val(p, e, e.ratio, ROW.ratio, t + .3);
+    });
+    side(p, '1.491 ≈ 1.5: not whole!', ROW.ratio, m('half'), COL.bad);
+  }],
+  ['multiply', "Multiply 'til whole", (m) => {
+    const p = S.p8;
+    step(3, m('x2'));
+    EF.forEach((e, i) => {
+      const t = m('x2', .4 + i * .4);
+      arrowDown(p, e.x, ROW.ratio + 30, ROW.x2 - 30, t);
+      show(cT(p, '× 2', e.x + 16, (ROW.ratio + ROW.x2) / 2 + 10, { size: 26, fill: COL.task, font: CFONT, weight: 700 }), t);
+      val(p, e, `${e.x2} ≈ ${e.whole}`, ROW.x2, t + .3);
+    });
+    side(p, '1.5 × 2 = 3', ROW.x2, m('x2', .3), COL.task);
+    side(p, 'Au : O = 2 : 3', ROW.x2 + 50, m('done'), COL.good);
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'Au : O  =  1 : 1.491', 800, 230, { size: 56, font: CFONT, anchor: 'middle' }), .2);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-times2', prompt: ['The ratio is 1 : 1.49. What should you do?'],
+    build: choice([['multiply both by 2'], ['round 1.49 down to 1'], ['multiply both by 3']], 0,
+      '1.49 is about 1.5 = 3/2. Times 2 gives whole numbers: 2 : 3.',
+      [null, '1.49 is not close to 1. Only round when the number is within about 0.1 of a whole number.', '× 3 gives 3 : 4.47, still not whole. 1.5 needs × 2.']),
+  }], done) }],
+  ['write', 'Write the formula', (m) => {
+    const p = panel(0);
+    show(cT(p, 'whole-number ratio  Au : O = 2 : 3', 800, 200, { size: 36, font: CFONT, anchor: 'middle' }), .2);
+    show(cFormula(p, [['Au', '2'], ['O', '3']], 800, 400, { size: 140, colors: EC }), m('f'));
+    show(cT(p, 'subscripts in the order the problem gives: Au first, then O', 800, 500, { size: 30, fill: COL.dim, anchor: 'middle' }), m('f', .6));
+    show(cT(p, 'check: 2 Au³⁺ = 6+   and   3 O²⁻ = 6−   (gold(III) oxide)', 800, 620, { size: 32, font: CFONT, fill: COL.good, anchor: 'middle' }), m('check'));
+    show(cT(p, 'the percents add to 99.94%, not 100%: that is just rounding in the data', 800, 720, { size: 26, fill: COL.dim, anchor: 'middle' }), m('round'));
+  }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    STEPS.forEach((str, i) => {
+      const g = G(p, { x: -16, y: 230 + i * 100, o: 0 });
+      mk('circle', { cx: 300, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 300, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 360, size: 38, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m('w' + (i + 1)), .6);
+    });
+    show(cFormula(p, [['Au', '2'], ['O', '3']], 1250, 440, { size: 110, colors: EC }), .4);
+    show(cT(p, 'Now try the chapter practice.', 800, 760, { size: 30, fill: COL.dim, anchor: 'middle' }), m('end'));
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-fe-ratio', prompt: ['A compound is 69.94% Fe and 30.06% O. Fe: 69.94 ÷ 55.85 = 1.2523 mol; O: 30.06 ÷ 16.00 = 1.8788 mol. Divide by the smallest.'],
+    build: chemBlanks([{ parts: ['O ÷ Fe = 1.8788 ÷ 1.2523 = ', { box: '1.500', tol: .01 }],
+      why: '1.8788 ÷ 1.2523 ≈ 1.500, so Fe : O = 1 : 1.5.', hint: 'Divide the larger mole amount by the smallest one, 1.2523.' }]),
+  }, {
+    id: 'p-fe-formula', prompt: ['Now write the empirical formula (Fe first). Leave a box empty, or type 1, for no subscript.'],
+    build: chemBlanks([{ parts: ['Fe', { box: '2', sub: true, empty: 1, label: 'Subscript for Fe' }, 'O', { box: '3', sub: true, empty: 1, label: 'Subscript for O' }],
+      why: '1 : 1.5, times 2, is 2 : 3: Fe₂O₃, the same pattern as Au₂O₃.', hint: '1 : 1.5 is not whole yet. Multiply both by 2.' }]),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

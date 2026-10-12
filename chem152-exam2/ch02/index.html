@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Electron Configurations: Zn and U · CHEM 152 Exam 2</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Exam 2 Review, Chapter 2 (sheet 2b Zn, 2d U). Plan: books/chem152-exam2/chapters.md.
+// Course slides: fill order (4s before 3d, written in filling order), noble-gas shorthand. f-block order is standard; labelled.
+const CHAPTER = { number: 2, title: 'Electron Configurations: Zn and U', minutes: 5, language: 'en', next: '../ch03/' };
+
+/* ---------- chapter data ---------- */
+// Filling order with capacities, as two rows of chips.
+const ORDER = [['1s', 2], ['2s', 2], ['2p', 6], ['3s', 2], ['3p', 6], ['4s', 2], ['3d', 10], ['4p', 6],
+  ['5s', 2], ['4d', 10], ['5p', 6], ['6s', 2], ['4f', 14], ['5d', 10], ['6p', 6], ['7s', 2], ['5f', 14]];
+const CW = 140, CGAP = 16, CH = 84, ROWY = [150, 270];
+const WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };
+const SRC_F = 'f-block filling: standard order · not yet confirmed by course slides';
+
+/* ---------- helpers ---------- */
+// The fill-order chips; returns them in order, each with ._r (outline), ._lab, ._cap, ._cx, ._cy.
+function chips(p, t0, step = .08) {
+  return ORDER.map(([lab, cap], i) => {
+    const row = i < 8 ? 0 : 1, k = row ? i - 8 : i, n = row ? 9 : 8;
+    const x = 800 - (n * (CW + CGAP) - CGAP) / 2 + k * (CW + CGAP), y = ROWY[row];
+    const g = G(p, { o: 0 });
+    g._r = mk('rect', { x, y, width: CW, height: CH, rx: 14, fill: COL.board, stroke: COL.faint, 'stroke-width': 2.5 }, g);
+    g._lab = T(g, lab, { x: x + CW / 2, y: y + 40, size: 36, font: CFONT, anchor: 'middle' });
+    g._cap = T(g, `holds ${cap}`, { x: x + CW / 2, y: y + 70, size: 20, fill: COL.dim, anchor: 'middle' });
+    g._cx = x + CW / 2; g._cy = y; g._x = x;
+    show(g, t0 + i * step, .3);
+    // arrow to the next chip in the same row
+    if (k < n - 1) show(T(p, '›', { x: x + CW + CGAP / 2, y: y + 52, size: 30, fill: COL.faint, anchor: 'middle', o: 0 }), t0 + i * step);
+    return g;
+  });
+}
+// Light chip i (filled) at t, in colour c.
+function light(c, t, col = COL.task) { tw(c._r, { c_stroke: col, c_fill: '#2c3b2f' }, t, .3); tw(c._lab, { c_fill: col }, t, .3); }
+// A bracket under configuration terms a..b with a label.
+function underTerms(p, terms, a, b, label, t, col = COL.good) {
+  const x1 = terms[a]._cx - terms[a]._w / 2, x2 = terms[b]._cx + terms[b]._w / 2, y = 590, g = G(p, { o: 0 });
+  path(g, `M${x1} ${y}V${y + 12}H${x2}V${y}`, { stroke: col, 'stroke-width': 3 });
+  T(g, label, { x: (x1 + x2) / 2, y: y + 44, size: 28, fill: col, weight: 600, anchor: 'middle' });
+  show(g, t);
+  return g;
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Where the electrons go', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Exam 2 review · question 2 b and d', { x: 800, y: 300, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Electron Configurations', { x: 800, y: 410, size: 88, weight: 600, anchor: 'middle' });
+    T(g, 'zinc and uranium', { x: 800, y: 490, size: 48, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cT(p, 'full form or noble-gas shorthand: both are accepted', 800, 590, { size: 34, fill: COL.dim, anchor: 'middle' }), m('sub', .2));
+  }],
+  ['order', 'The filling order', (m) => {
+    const p = panel(0);
+    const cs = chips(p, m('chips'));
+    show(cT(p, 'fill lower energy first, in this order', 800, 100, { size: 32, weight: 600, anchor: 'middle' }), m('chips'));
+    [5, 6].forEach(i => light(cs[i], m('fours'), COL.task));
+    show(cT(p, '4s fills before 3d (course slides)', 800, 470, { size: 32, fill: COL.task, weight: 600, anchor: 'middle' }), m('fours', .3));
+    [11, 12, 13].forEach(i => light(cs[i], m('six'), COL.whole));
+    show(cT(p, 'same pattern later: 6s, then 4f, then 5d', 800, 530, { size: 32, fill: COL.whole, weight: 600, anchor: 'middle' }), m('six', .3));
+    [15, 16].forEach(i => light(cs[i], m('seven'), COL.real));
+    show(cT(p, 'and 7s before 5f', 800, 590, { size: 32, fill: COL.real, weight: 600, anchor: 'middle' }), m('seven', .3));
+    show(cT(p, 'capacities: s 2, p 6, d 10, f 14', 800, 680, { size: 30, fill: COL.dim, anchor: 'middle' }), m('cap'));
+  }],
+  ['zinc', 'Zinc, 30 electrons', (m) => {
+    const p = S.pz = panel(0);
+    const cs = S.zcs = chips(p, .1, .02);
+    show(cT(p, 'Zn · atomic number 30 → 30 electrons', 800, 100, { size: 34, weight: 600, anchor: 'middle' }), .3);
+    const terms = [['1s', '2'], ['2s', '2'], ['2p', '6'], ['3s', '2'], ['3p', '6'], ['4s', '2'], ['3d', '10']];
+    const cfg = S.zcfg = cTerms(p, terms, 800, 560, { size: 58 });
+    let run = 0;
+    terms.forEach(([lab, k], i) => {
+      run += +k;
+      const t = i < 5 ? m('fill', i * .5) : i === 5 ? m('fours') : m('d');
+      light(cs[i], t); show(cfg[i], t);
+      const c = cT(p, `${run}`, cs[i]._cx, cs[i]._cy - 14, { size: 24, fill: COL.task, weight: 700, anchor: 'middle' });
+      show(c, t + .1);
+    });
+    S.zsum = cT(p, '2 + 2 + 6 + 2 + 6 + 2 + 10 = 30', 800, 650, { size: 36, font: CFONT, fill: COL.good, anchor: 'middle' });
+    show(S.zsum, m('count'));
+  }],
+  ['zn-short', 'Shorthand: [Ar]', (m) => {
+    const p = S.pz;
+    hide(S.zsum, m('ar'), .3);
+    underTerms(p, S.zcfg, 0, 4, 'argon: 18 electrons', m('ar', .3));
+    S.zcfg.slice(0, 5).forEach(e => tw(e, { o: .3 }, m('ar', .6), .4));
+    const sh = cTerms(p, [['[Ar]', ''], ['4s', '2'], ['3d', '10']], 800, 740, { size: 64 });
+    sh.forEach((e, i) => show(e, m('short', i * .4)));
+    show(cT(p, 'Zn', 470, 740, { size: 40, font: CFONT, fill: COL.dim, anchor: 'end' }), m('short'));
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'Zn · 30 electrons', 800, 220, { size: 40, weight: 600, anchor: 'middle' }), .2);
+    show(cT(p, '[Ar] covers the first 18', 800, 300, { size: 32, fill: COL.dim, anchor: 'middle' }), .4);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-zn', prompt: ['Finish zinc’s shorthand configuration.'],
+    build: chemBlanks([{ parts: ['[Ar] 4s', { box: '2', sup: true, label: '4s superscript' }, ' 3d', { box: '10', sup: true, label: '3d superscript' }],
+      why: '[Ar] holds 18; 4s² brings it to 20; 3d¹⁰ fills the last 10. Zn = [Ar] 4s² 3d¹⁰.',
+      hint: 'Zinc has 30 electrons and [Ar] covers 18. 4s holds 2; the rest go into 3d.' }]),
+  }], done) }],
+  ['uranium', 'Uranium, 92 electrons', (m) => {
+    const p = panel(0);
+    const cs = chips(p, .1, .02);
+    show(cT(p, 'U · atomic number 92 → 92 electrons', 800, 100, { size: 34, weight: 600, anchor: 'middle' }), .3);
+    for (let i = 0; i < 15; i++) light(cs[i], m('rn', i * .06), COL.good);
+    show(cT(p, 'everything through 6p is radon’s 86 electrons: [Rn]', 800, 470, { size: 32, fill: COL.good, weight: 600, anchor: 'middle' }), m('rn', 1));
+    light(cs[15], m('s7'));
+    show(cT(p, '88', cs[15]._cx, cs[15]._cy - 14, { size: 24, fill: COL.task, weight: 700, anchor: 'middle' }), m('s7'));
+    light(cs[16], m('f5'));
+    show(cT(p, '92', cs[16]._cx, cs[16]._cy - 14, { size: 24, fill: COL.task, weight: 700, anchor: 'middle' }), m('f5'));
+    const sh = cTerms(p, [['[Rn]', ''], ['7s', '2'], ['5f', '4']], 800, 590, { size: 68 });
+    show(sh[0], m('rn', 1.4)); show(sh[1], m('s7', .2)); show(sh[2], m('f5', .2));
+    show(cT(p, '86 + 2 + 4 = 92', 800, 660, { size: 34, font: CFONT, fill: COL.good, anchor: 'middle' }), m('done'));
+    srcBadge(p, 760, m('done', .8), SRC_F);
+  }],
+  ['measured', 'What the periodic table may show', (m) => {
+    const p = panel(0);
+    show(cT(p, 'by the filling order', 800, 200, { size: 30, fill: COL.dim, anchor: 'middle' }), .2);
+    show(cFormula(p, [['[Rn] 7s', '2'], [' 5f', '4']], 800, 290, { size: 72, sup: true }), .3);
+    show(cT(p, 'measured for real uranium atoms', 800, 430, { size: 30, fill: COL.dim, anchor: 'middle' }), m('meas'));
+    show(cFormula(p, [['[Rn] 7s', '2'], [' 5f', '3'], [' 6d', '1']], 800, 520, { size: 72, sup: true, fill: COL.whole }), m('meas', .4));
+    show(cT(p, 'one electron sits in 6d instead of 5f', 800, 600, { size: 30, fill: COL.whole, anchor: 'middle' }), m('one'));
+    show(cT(p, 'Use the version your instructor teaches; ask if unsure.', 800, 720, { size: 34, fill: COL.task, weight: 600, anchor: 'middle' }), m('ask'));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'U · 92 electrons', 800, 220, { size: 40, weight: 600, anchor: 'middle' }), .2);
+    show(cFormula(p, [['[Rn]  ?', '']], 800, 380, { size: 80 }), .4);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-after-rn', prompt: ['After [Rn], which subshell fills first?'],
+    build: choice([['7s'], ['5f'], ['6d']], 0, 'After radon comes 7s, then 5f: [Rn] 7s² 5f⁴ for uranium.',
+      [null, '5f comes next, but only after 7s. Same pattern as 6s before 4f.', '6d comes after 5f in the filling order. 7s fills first.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [['Count the electrons: the atomic number (Zn 30, U 92).', 'w1'], ['Fill in order: … 4s 3d 4p … 6s 4f 5d 6p 7s 5f.', 'w2'],
+      ['Shorthand: the noble gas before the element, then the rest.', 'w3']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 330 + i * 130, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 36, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    show(cT(p, 'Zn = [Ar] 4s² 3d¹⁰     U = [Rn] 7s² 5f⁴', 800, 180, { size: 44, font: CFONT, fill: COL.good, anchor: 'middle' }), .3);
+    show(cT(p, '(measured U: [Rn] 7s² 5f³ 6d¹)', 800, 240, { size: 28, font: CFONT, fill: COL.dim, anchor: 'middle' }), .5);
+    show(cT(p, 'Now try the chapter practice.', 800, 760, { size: 30, fill: COL.dim, anchor: 'middle' }), m('end'));
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-fe', prompt: ['Iron has 26 electrons. Finish its shorthand configuration.'],
+    build: chemBlanks([{ parts: ['[Ar] 4s', { box: '2', sup: true, label: '4s superscript' }, ' 3d', { box: '6', sup: true, label: '3d superscript' }],
+      why: '26 − 18 = 8 electrons after [Ar]: 2 in 4s, then 6 in 3d. Fe = [Ar] 4s² 3d⁶.',
+      hint: '[Ar] covers 18 of the 26. Put 2 in 4s first, then the rest in 3d.' }]),
+  }, {
+    id: 'p-rn', prompt: ['How many electrons does [Rn] stand for? (It is everything through 6p.)'],
+    build: chemBlanks([{ parts: [{ box: '86' }, { t: ' electrons', ui: true }],
+      why: 'Radon is element 86, so [Rn] stands for 86 electrons. That is why uranium (92) has 6 more: 7s² 5f⁴.',
+      hint: 'A noble-gas symbol stands for all of that noble gas’s electrons: its atomic number.' }]),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

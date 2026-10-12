@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Percent Composition of H₂SO₄ · CHEM 152 Exam 2</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Exam 2 Review, Chapter 1 (sheet question 1). Plan: books/chem152-exam2/chapters.md.
+// Formula-to-percent is a standard method, not yet confirmed by instructor slides; the lesson says so.
+const CHAPTER = { number: 1, title: 'Percent Composition of H₂SO₄', minutes: 4, language: 'en', next: '../ch02/' };
+
+/* ---------- chapter data (checked in chapters.md) ---------- */
+const EC1 = { H: COL.real, S: COL.int, O: COL.whole };
+const GPX = 11;                                        // mass bar: 11 px per gram, to scale
+const BAR1 = { x: 800 - 98.09 * GPX / 2, y: 560, h: 64 };
+const PARTS = [
+  { sym: 'H', calc: '2 × 1.01 = 2.02 g',    g: 2.02,  pct: '2.06',  div: '2.02 ÷ 98.09 × 100 ≈ 2.06%',   y: 270 },
+  { sym: 'S', calc: '1 × 32.07 = 32.07 g',  g: 32.07, pct: '32.69', div: '32.07 ÷ 98.09 × 100 ≈ 32.69%', y: 340 },
+  { sym: 'O', calc: '4 × 16.00 = 64.00 g',  g: 64.00, pct: '65.25', div: '64.00 ÷ 98.09 × 100 ≈ 65.25%', y: 410 },
+];
+const WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };   // card for questions with long options
+const H2SO4 = [['H', '2'], ['S', ''], ['O', '4']];
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Mass shares', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Exam 2 review · question 1', { x: 800, y: 300, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Percent Composition', { x: 800, y: 410, size: 92, weight: 600, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cFormula(p, H2SO4, 800, 500, { size: 64, colors: EC1 }), .6);
+    show(cT(p, "how much of the compound's mass comes from each element", 800, 590, { size: 34, fill: COL.dim, anchor: 'middle' }), m('sub', .2));
+    srcBadge(p, 684, m('note'));
+  }],
+  ['molar-mass', 'Molar mass from the formula', (m) => {
+    const p = S.p1 = panel(0);
+    show(cFormula(p, H2SO4, 800, 160, { size: 84, colors: EC1 }), .2);
+    let x = BAR1.x;
+    S.parts = PARTS.map(e => {
+      const w = e.g * GPX, cx = x + w / 2, t = m(e.sym.toLowerCase());
+      show(cT(p, e.sym, 330, e.y, { size: 38, font: CFONT, fill: EC1[e.sym], weight: 700, anchor: 'middle' }), t);
+      show(cT(p, e.calc, 420, e.y, { size: 34, font: CFONT }), t + .3);
+      const r = put(mk('rect', { x, y: BAR1.y, width: w, height: BAR1.h, fill: EC1[e.sym] }, p), { o: 0 });
+      show(r, t + 1);
+      // H is too thin to label inside: its label sits above the bar with a short leader.
+      const inside = e.sym !== 'H';
+      const ly = inside ? BAR1.y + 43 : BAR1.y - 22, lf = inside ? COL.board : COL.chalk;
+      const lg = cT(p, `${e.sym}  ${e.g.toFixed(2)} g`, cx, ly, { size: 30, fill: lf, weight: 700, anchor: inside ? 'middle' : 'start' });
+      const lp = cT(p, `${e.sym}  ${e.pct}%`, cx, ly, { size: 30, fill: lf, weight: 700, anchor: inside ? 'middle' : 'start' });
+      if (!inside) { put(lg, { x: cx - 6 }); put(lp, { x: cx - 6 }); }
+      show(lg, t + 1.2);
+      x += w;
+      return { r, lg, lp, cx, e };
+    });
+    const br = G(p, { o: 0 });
+    path(br, `M${BAR1.x} ${BAR1.y + BAR1.h + 6}V${BAR1.y + BAR1.h + 18}H${BAR1.x + 98.09 * GPX}V${BAR1.y + BAR1.h + 6}`, { stroke: COL.task, 'stroke-width': 3 });
+    T(br, 'one mole: 2.02 + 32.07 + 64.00 = 98.09 g', { x: 800, y: BAR1.y + BAR1.h + 54, size: 30, fill: COL.task, weight: 600, anchor: 'middle' });
+    show(br, m('sum'));
+    S.bracket = br;
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-oxygen', prompt: ['In ', chemH(...H2SO4), ', how many grams of oxygen are in one mole? (O = 16.00)'],
+    build: chemBlanks([{ parts: ['4 × 16.00 = ', { box: '64.00', tol: .005 }, { t: ' g', ui: true }],
+      why: 'Four oxygen atoms, each 16.00 g/mol: 64.00 g in one mole.', hint: 'The subscript 4 means four oxygen atoms. Multiply 4 by 16.00.',
+      fx: () => pulseFx(S.parts[2].r, 1.05) }]),
+  }], done) }],
+  ['percent', 'Each part over the whole', (m) => {
+    hide(S.bracket, 0, .4);
+    S.parts.forEach(s => {
+      const t = m(s.e.sym.toLowerCase());
+      show(cT(S.p1, '→   ' + s.e.div, 760, s.e.y, { size: 34, font: CFONT }), t);
+      hide(s.lg, t + 2.2, .4); show(s.lp, t + 2.4, .4);
+    });
+  }],
+  ['check-sum', 'Check: they add to 100%', (m) => {
+    show(cT(S.p1, '2.06% + 32.69% + 65.25% = 100.00%', 780, 760, { size: 40, font: CFONT, anchor: 'middle' }), m('add'));
+    show(cT(S.p1, '✓', 1170, 760, { size: 44, fill: COL.good, weight: 700 }), m('ok'));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    show(cFormula(p, H2SO4, 800, 200, { size: 72, colors: EC1 }), .2);
+    show(cT(p, 'S part: 32.07 g     molar mass: 98.09 g/mol', 800, 300, { size: 34, font: CFONT, fill: COL.dim, anchor: 'middle' }), .4);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-sulfur', prompt: ['What percent of the mass of ', chemH(...H2SO4), ' is sulfur? Round to two decimal places.'],
+    build: chemBlanks([{ parts: ['32.07 ÷ 98.09 × 100 ≈ ', { box: '32.69', tol: .06 }, { t: ' %', ui: true }],
+      why: '32.07 ÷ 98.09 = 0.3269, and × 100 gives 32.69%.', hint: 'Divide sulfur’s part, 32.07, by the whole, 98.09, then multiply by 100.' }]),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [["Each element's mass in one mole: subscript × atomic mass.", 'w1'], ['Add the parts to get the molar mass: 98.09 g/mol.', 'w2'],
+      ['Percent = part ÷ molar mass × 100. The percents add to 100.', 'w3']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 300 + i * 140, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 36, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    show(cT(p, 'H 2.06%   ·   S 32.69%   ·   O 65.25%', 800, 160, { size: 40, font: CFONT, fill: COL.good, anchor: 'middle' }), .3);
+    srcBadge(p, 760, m('end'));
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-molar', prompt: ['Find the molar mass of nitric acid, ', chemH(['H', ''], ['N', ''], ['O', '3']), '. Use H 1.01, N 14.01, O 16.00.'],
+    build: chemBlanks([{ parts: [{ box: '63.02', tol: .03 }, { t: ' g/mol', ui: true }],
+      why: '1.01 + 14.01 + 3(16.00) = 1.01 + 14.01 + 48.00 = 63.02 g/mol.',
+      hint: 'Multiply each atomic mass by its subscript (no subscript means 1), then add the three parts.' }]),
+  }, {
+    id: 'p-nitrogen', prompt: ['What percent of the mass of ', chemH(['H', ''], ['N', ''], ['O', '3']), ' is nitrogen? Round to two decimal places.'],
+    build: chemBlanks([{ parts: [{ box: '22.23', tol: .06 }, { t: ' %', ui: true }],
+      why: 'Nitrogen’s part is 14.01 g; 14.01 ÷ 63.02 × 100 ≈ 22.23%.',
+      hint: 'Nitrogen’s part is 1 × 14.01 = 14.01 g. Divide it by the molar mass, 63.02, then multiply by 100.' }]),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

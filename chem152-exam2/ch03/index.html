@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Configurations of Ions: Au³⁺ and Br⁻ · CHEM 152 Exam 2</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Exam 2 Review, Chapter 3 (sheet 2a Au3+, 2c Br-). Plan: books/chem152-exam2/chapters.md.
+// The course slide on ions is marked PRE-AP ONLY and gives no method: the ion rule here is standard and labelled.
+const CHAPTER = { number: 3, title: 'Configurations of Ions: Au³⁺ and Br⁻', minutes: 5, language: 'en', next: '../ch04/' };
+
+/* ---------- chapter data ---------- */
+const WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };
+const SRC_ION = 'Ion rule: standard method · not yet confirmed by course slides';
+const ADD = COL.irr, TAKE = COL.bad;
+
+/* ---------- helpers ---------- */
+// A small label centred under a configuration term.
+const under = (p, term, str, t, fill = COL.dim, dy = 64) => show(cT(p, str, term._cx, term._y + dy, { size: 24, fill, weight: 600, anchor: 'middle' }), t);
+function terms(p, list, y, opt = {}) { const ts = cTerms(p, list, 800, y, { size: 64, ...opt }); ts.forEach(e => { e._y = y; }); return ts; }
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Charged atoms', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Exam 2 review · question 2 a and c', { x: 800, y: 300, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Configurations of Ions', { x: 800, y: 410, size: 88, weight: 600, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    const ions = G(p, { o: 0 });
+    ionF(ions, [['Au', '']], '3+', 700, 500, { size: 56, fill: COL.int, o: 1 });
+    ionF(ions, [['Br', '']], '−', 900, 500, { size: 56, fill: COL.whole, o: 1 });
+    show(ions, .7);
+    show(cT(p, 'start from the neutral atom, then add or remove electrons', 800, 590, { size: 34, fill: COL.dim, anchor: 'middle' }), m('sub'));
+    srcBadge(p, 690, m('note'), SRC_ION);
+  }],
+  ['rule', 'Add or remove', (m) => {
+    const p = panel(0);
+    const L = G(p, { o: 0 }), R = G(p, { o: 0 });
+    mk('rect', { x: 140, y: 170, width: 620, height: 470, rx: 24, fill: 'none', stroke: ADD, 'stroke-width': 3 }, L);
+    T(L, 'negative ion (anion)', { x: 450, y: 240, size: 38, fill: ADD, weight: 700, anchor: 'middle' });
+    T(L, 'gained electrons', { x: 450, y: 300, size: 30, anchor: 'middle' });
+    T(L, '−1 charge → add 1 electron', { x: 450, y: 400, size: 32, font: CFONT, anchor: 'middle' });
+    T(L, 'put it in the next open spot', { x: 450, y: 460, size: 28, fill: COL.dim, anchor: 'middle' });
+    show(L, m('neg'));
+    mk('rect', { x: 840, y: 170, width: 620, height: 470, rx: 24, fill: 'none', stroke: TAKE, 'stroke-width': 3 }, R);
+    T(R, 'positive ion (cation)', { x: 1150, y: 240, size: 38, fill: TAKE, weight: 700, anchor: 'middle' });
+    T(R, 'lost electrons', { x: 1150, y: 300, size: 30, anchor: 'middle' });
+    T(R, '+3 charge → remove 3 electrons', { x: 1150, y: 400, size: 32, font: CFONT, anchor: 'middle' });
+    show(R, m('pos'));
+    const o = G(p, { o: 0 });
+    T(o, 'remove from the highest shell number first', { x: 1150, y: 470, size: 28, fill: COL.task, weight: 700, anchor: 'middle' });
+    T(o, '(the outermost electrons, e.g. 6s before 5d)', { x: 1150, y: 515, size: 26, fill: COL.dim, anchor: 'middle' });
+    show(o, m('outer'));
+  }],
+  ['bromine', 'Br⁻: one more electron', (m) => {
+    const p = panel(0);
+    show(cT(p, 'Br · 35 electrons', 800, 150, { size: 36, weight: 600, anchor: 'middle' }), .2);
+    const a = terms(p, [['[Ar]', ''], ['4s', '2'], ['3d', '10'], ['4p', '5']], 260);
+    a.forEach((e, i) => show(e, m('br', i * .3)));
+    show(cT(p, 'Br⁻ · 35 + 1 = 36 electrons', 800, 400, { size: 36, weight: 600, fill: ADD, anchor: 'middle' }), m('add'));
+    const b = terms(p, [['[Ar]', ''], ['4s', '2'], ['3d', '10'], ['4p', '6']], 510, { fill: COL.good });
+    b.forEach((e, i) => show(e, m('add', .6 + i * .2)));
+    under(p, b[3], '4p is now full', m('add', 1.6), ADD);
+    show(cT(p, '= [Kr]: the same as krypton', 800, 680, { size: 40, font: CFONT, fill: COL.good, anchor: 'middle' }), m('kr'));
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'Br · [Ar] 4s² 3d¹⁰ 4p⁵', 800, 220, { size: 44, font: CFONT, anchor: 'middle' }), .2);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-br', prompt: ['Write bromide, ', chemH(['Br', '−'], { sup: true }), '. Fill in the last superscript.'],
+    build: chemBlanks([{ parts: ['[Ar] 4s', { sup: '2' }, ' 3d', { sup: '10' }, ' 4p', { box: '6', sup: true, label: '4p superscript' }],
+      why: 'Br has 4p⁵; the extra electron makes 4p⁶. 36 electrons, the same as krypton.',
+      hint: 'A −1 ion has one more electron than the atom. Add it to the last subshell, 4p⁵.' }]),
+  }], done) }],
+  ['gold-atom', 'The gold atom first', (m) => {
+    const p = S.pg = panel(0);
+    show(cT(p, 'Au · 79 electrons', 800, 150, { size: 36, weight: 600, anchor: 'middle' }), .2);
+    show(cT(p, 'xenon covers 54; 25 more in fill order: 6s, 4f, 5d', 800, 210, { size: 28, fill: COL.dim, anchor: 'middle' }), m('xe'));
+    const a = S.au = terms(p, [['[Xe]', ''], ['6s', '2'], ['4f', '14'], ['5d', '9']], 330);
+    a.forEach((e, i) => show(e, m('fill', i * .5)));
+    S.auSum = cT(p, '54 + 2 + 14 + 9 = 79', 800, 410, { size: 30, font: CFONT, fill: COL.good, anchor: 'middle' });
+    show(S.auSum, m('count'));
+  }],
+  ['gold-ion', 'Au³⁺: three electrons leave', (m) => {
+    const p = S.pg, a = S.au;
+    hide(S.auSum, m('out'), .3);
+    under(p, a[1], 'shell 6', m('out'), COL.task, 110); under(p, a[2], 'shell 4', m('out', .2), COL.dim, 110); under(p, a[3], 'shell 5', m('out', .4), COL.dim, 110);
+    // 6s² goes first: the highest shell number.
+    tw(a[1], { o: .25 }, m('s6'), .4);
+    draw(path(p, `M${a[1]._cx - a[1]._w / 2 - 8} 340L${a[1]._cx + a[1]._w / 2 + 8} 300`, { stroke: TAKE, 'stroke-width': 5 }, { d: 0 }), m('s6'), .4);
+    show(cT(p, '−2', a[1]._cx, 260, { size: 32, fill: TAKE, weight: 700, anchor: 'middle' }), m('s6', .3));
+    show(cT(p, '−1', a[3]._cx, 260, { size: 32, fill: TAKE, weight: 700, anchor: 'middle' }), m('d5'));
+    show(cT(p, '5d⁹ → 5d⁸', a[3]._cx, 480, { size: 30, font: CFONT, fill: TAKE, anchor: 'middle' }), m('d5', .3));
+    show(cT(p, 'Au³⁺ · 79 − 3 = 76 electrons', 800, 560, { size: 34, weight: 600, fill: TAKE, anchor: 'middle' }), m('result'));
+    const b = cTerms(p, [['[Xe]', ''], ['4f', '14'], ['5d', '8']], 800, 660, { size: 72, fill: COL.good });
+    b.forEach((e, i) => show(e, m('result', .4 + i * .25)));
+    show(cT(p, 'Gold’s measured atom, [Xe] 4f¹⁴ 5d¹⁰ 6s¹, gives the same ion.', 800, 760, { size: 28, fill: COL.dim, anchor: 'middle' }), m('same'));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'Au · [Xe] 6s² 4f¹⁴ 5d⁹', 800, 220, { size: 44, font: CFONT, anchor: 'middle' }), .2);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-first-out', prompt: ['Gold becomes ', chemH(['Au', '3+'], { sup: true }), '. Which electrons leave first?'],
+    build: choice([['6s'], ['5d'], ['4f']], 0, '6s: shell 6 is the outermost, so its two electrons go first; then one 5d electron.',
+      [null, '5d loses one electron, but only after 6s. Shell 6 is farther out than shell 5.', '4f is deep inside (shell 4). The outermost shell, 6, empties first.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [['Write the neutral atom first.', 'w1'], ['Negative ion: add electrons to the next open spot.', 'w2'],
+      ['Positive ion: remove from the highest shell number first.', 'w3']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 330 + i * 130, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 36, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    show(cT(p, 'Br⁻ = [Ar] 4s² 3d¹⁰ 4p⁶ = [Kr]     Au³⁺ = [Xe] 4f¹⁴ 5d⁸', 800, 190, { size: 40, font: CFONT, fill: COL.good, anchor: 'middle' }), .3);
+    srcBadge(p, 760, m('end'), SRC_ION);
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-zn2', prompt: ['Zinc is [Ar] 4s² 3d¹⁰. Write ', chemH(['Zn', '2+'], { sup: true }), '. (Type 0, or leave the box empty, if a subshell is now empty.)'],
+    build: chemBlanks([{ parts: ['[Ar] 4s', { box: '0', sup: true, empty: 0, label: '4s superscript' }, ' 3d', { box: '10', sup: true, label: '3d superscript' }],
+      why: 'Two electrons leave from shell 4 (4s) first, so 4s is empty: Zn²⁺ = [Ar] 3d¹⁰.',
+      hint: 'Remove 2 electrons from the highest shell number. 4s is shell 4; 3d is shell 3.' }]),
+  }, {
+    id: 'p-cl', prompt: ['Chlorine is [Ne] 3s² 3p⁵. Chloride, ', chemH(['Cl', '−'], { sup: true }), ', has the same configuration as which noble gas?'],
+    build: choice([['argon, [Ar]'], ['neon, [Ne]'], ['krypton, [Kr]']], 0,
+      'One more electron fills 3p: [Ne] 3s² 3p⁶, 18 electrons, the same as argon.',
+      [null, 'Neon has only 10 electrons. Chloride has 17 + 1 = 18.', 'Krypton has 36. Chloride has 17 + 1 = 18: argon.']),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

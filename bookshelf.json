@@ -21,6 +21,20 @@
       "hue": "#f4a48c"
     },
     {
+      "slug": "chem152-exam2",
+      "title": "CHEM 152 Exam 2",
+      "subtitle": "Every problem on the Exam 2 review sheet in 8 chapters: percent composition, electron configurations and boxes, balancing, naming and empirical formula",
+      "status": "Pilot / in review",
+      "href": "chem152-exam2/",
+      "chapters": {
+        "available": 8,
+        "planned": 8
+      },
+      "note": "All chapters awaiting your review; none approved yet. Ion configurations, naming, balancing and percent composition use standard methods not yet confirmed by course slides.",
+      "updated": "2026-10-12",
+      "hue": "#f3c95c"
+    },
+    {
       "slug": "math141-midterm2",
       "title": "Math 141 Midterm 2",
       "subtitle": "All 23 practice-midterm questions in 8 chapters: parabolas, polynomials, rational functions, exponentials and logs",

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Formulas from Names · CHEM 152 Exam 2</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/chem.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// CHEM 152 Exam 2 Review, Chapter 7 (sheet "Give correct formula" a–c). Plan: books/chem152-exam2/chapters.md.
+// Standard method, as in CHEM 152 Review chapter 7; labelled on screen.
+const CHAPTER = { number: 7, title: 'Formulas from Names: SF₆, PbO₂, Al(NO₃)₃', minutes: 5, language: 'en', next: '../ch08/' };
+
+/* ---------- chapter data ---------- */
+const U = 40, BX = 480, CAT_Y = 280, AN_Y = 410;   // charge blocks: unit size, left edge, row tops
+const WIDE = { x: 160, y: 300, w: 1280, cls: 'side', maxH: 560 };
+
+/* ---------- helpers ---------- */
+function ionBlocks(p, k, q, sign, t0) {
+  const y = sign > 0 ? CAT_Y : AN_Y, x = BX + k * q * U;
+  const g = chargeBlocks(p, q, sign, x, y, { unit: U });
+  path(g, `M${x + 2} ${y + U + 4}V${y + U + 12}H${x + q * U - 6}V${y + U + 4}`, { stroke: COL.dim, 'stroke-width': 2 });
+  show(g, t0, .4);
+  return g;
+}
+const ionLabel = (p, parts, charge, row, color, t0) => show(ionF(p, parts, charge, BX - 30, (row ? AN_Y : CAT_Y) + 30, { size: 44, fill: color, anchor: 'end' }), t0);
+function balanced(p, n, t0) {
+  const x = BX + n * U - 2;
+  draw(path(p, `M${x} ${CAT_Y - 16}V${AN_Y + U + 16}`, { stroke: COL.good, 'stroke-width': 3, 'stroke-dasharray': '8 8' }, { d: 0 }), t0, .5);
+  show(cT(p, `${n}+ and ${n}−: total 0`, x + 24, (CAT_Y + AN_Y + U) / 2 + 10, { size: 30, fill: COL.good, weight: 600 }), t0 + .3);
+}
+const nameT = (p, str) => show(cT(p, str, 800, 170, { size: 52, weight: 600, anchor: 'middle' }), .2);
+const result = (p, parts, t0, colors, x = 1240, y = 650) => show(cFormula(p, parts, x, y, { size: 104, colors }), t0);
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'From name to formula', (m) => {
+    const p = panel(0);
+    const g = G(p, { o: 0, y: 24 });
+    T(g, 'Exam 2 review · give the formula a–c', { x: 800, y: 300, size: 28, fill: COL.dim, anchor: 'middle' });
+    T(g, 'Formulas from Names', { x: 800, y: 410, size: 92, weight: 600, anchor: 'middle' });
+    tw(g, { o: 1, y: 0 }, .2, 1.1, out);
+    show(cT(p, 'sulfur hexafluoride  ·  lead(IV) oxide  ·  aluminum nitrate', 800, 510, { size: 38, anchor: 'middle' }), m('sub'));
+    srcBadge(p, 640, m('note'));
+  }],
+  ['sf6', 'Sulfur hexafluoride', (m) => {
+    const p = panel(0);
+    nameT(p, 'sulfur hexafluoride');
+    show(cT(p, '(your sheet spells it "hexa floride")', 800, 225, { size: 26, fill: COL.dim, anchor: 'middle' }), .5);
+    show(cT(p, 'two nonmetals → molecular: the prefixes are the subscripts', 800, 320, { size: 32, fill: NCOL, weight: 600, anchor: 'middle' }), m('mol'));
+    const g = G(p, { o: 0 });
+    T(g, 'sulfur', { x: 560, y: 430, size: 40, anchor: 'middle' });
+    T(g, 'no prefix → 1 S', { x: 560, y: 490, size: 30, fill: COL.task, anchor: 'middle', font: CFONT });
+    show(g, m('s'));
+    const h6 = G(p, { o: 0 });
+    T(h6, 'hexa + fluoride', { x: 1040, y: 430, size: 40, anchor: 'middle' });
+    T(h6, 'hexa = 6 → F₆', { x: 1040, y: 490, size: 30, fill: COL.task, anchor: 'middle', font: CFONT });
+    show(h6, m('hexa'));
+    result(p, [['S', ''], ['F', '6']], m('f'), null, 800, 660);
+  }],
+  ['q1', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'sulfur hexafluoride', 800, 230, { size: 52, weight: 600, anchor: 'middle' }), .2);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-sf6', prompt: ['Write sulfur hexafluoride. (Leave a box empty, or type 1, for no subscript.)'],
+    build: chemBlanks([{ parts: ['S', { box: '1', sub: true, empty: 1, label: 'Subscript for S' }, 'F', { box: '6', sub: true, empty: 1, label: 'Subscript for F' }],
+      why: 'No prefix on sulfur means one; hexa means six: SF₆.', hint: 'Molecular: read the prefixes. Hexa means 6; no prefix on the first element means 1.' }]),
+  }], done) }],
+  ['pb', 'Lead(IV) oxide', (m) => {
+    const p = panel(0);
+    nameT(p, 'lead(IV) oxide');
+    show(cT(p, '(IV) → lead is 4+', 800, 225, { size: 30, fill: COL.task, anchor: 'middle', weight: 600 }), m('iv'));
+    ionLabel(p, [['Pb', '']], '4+', 0, MCOL, m('iv', .6)); ionBlocks(p, 0, 4, 1, m('iv', .9));
+    ionLabel(p, [['O', '']], '2−', 1, NCOL, m('ox')); ionBlocks(p, 0, 2, -1, m('ox', .3));
+    ionBlocks(p, 1, 2, -1, m('two'));
+    balanced(p, 4, m('two', .6));
+    result(p, [['Pb', ''], ['O', '2']], m('formula'), { Pb: MCOL, O: NCOL });
+    show(cT(p, 'one Pb⁴⁺, two O²⁻', 1240, 730, { size: 28, fill: COL.dim, anchor: 'middle' }), m('formula', .5));
+  }],
+  ['q2', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'lead(IV) oxide', 800, 230, { size: 52, weight: 600, anchor: 'middle' }), .2);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-pbo2', prompt: ['Which formula is lead(IV) oxide?'],
+    build: choice([[chemH(['Pb', ''], ['O', '2'])], [chemH(['Pb', ''], ['O', ''])], [chemH(['Pb', '2'], ['O', '4'])], [chemH(['Pb', ''], ['O', '4'])]], 0,
+      'Pb⁴⁺ needs two O²⁻ (4+ and 4−): PbO₂.',
+      [null, 'PbO would be lead(II) oxide: one O²⁻ only cancels 2+.', 'Pb₂O₄ balances, but ionic formulas use the lowest ratio: PbO₂.', 'Four O²⁻ is 8−, too much for one Pb⁴⁺.']),
+  }], done) }],
+  ['al', 'Aluminum nitrate', (m) => {
+    const p = panel(0);
+    nameT(p, 'aluminum nitrate');
+    ionLabel(p, [['Al', '']], '3+', 0, MCOL, m('al')); ionBlocks(p, 0, 3, 1, m('al', .3));
+    show(cT(p, 'aluminum is always 3+ (no numeral needed)', 800, 225, { size: 28, fill: COL.task, anchor: 'middle', weight: 600 }), m('al', .2));
+    ionLabel(p, [['NO', '3']], '−', 1, PCOL, m('no3')); ionBlocks(p, 0, 1, -1, m('no3', .3));
+    ionBlocks(p, 1, 1, -1, m('three')); ionBlocks(p, 2, 1, -1, m('three', .5));
+    balanced(p, 3, m('three', 1));
+    result(p, [['Al', ''], ['(NO', '3'], [')', '3']], m('formula'), { Al: MCOL, '(NO': PCOL, ')': PCOL });
+    show(cT(p, 'three nitrates → parentheses, then 3', 1240, 730, { size: 28, fill: PCOL, anchor: 'middle', weight: 600 }), m('paren'));
+  }],
+  ['q3', 'Quick check', () => {
+    const p = panel(0);
+    show(cT(p, 'aluminum nitrate', 800, 230, { size: 52, weight: 600, anchor: 'middle' }), .2);
+  }, { ask: done => quiz(BAND, [{
+    id: 'c-alno33', prompt: ['Which formula is aluminum nitrate?'],
+    build: choice([[chemH(['Al', ''], ['(NO', '3'], [')', '3'])], [chemH(['Al', ''], ['NO', '3'])], [chemH(['Al', ''], ['NO', '9'])], [chemH(['Al', '3'], ['NO', '3'])]], 0,
+      'Al³⁺ needs three NO₃⁻. Keep the nitrate whole in parentheses: Al(NO₃)₃.',
+      [null, 'One NO₃⁻ only cancels 1+; Al is 3+. You need three nitrates.', 'Never change the 3 inside nitrate: NO₃ stays NO₃. Use parentheses: (NO₃)₃.', 'That is three aluminums (9+) with one nitrate (1−). It should be one Al and three NO₃.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    [['Molecular names: the prefixes give the subscripts.', 'w1'], ['Ionic names: find each charge (a Roman numeral gives the metal’s).', 'w2'],
+      ['Use the fewest ions that make the total charge 0.', 'w3'], ['More than one polyatomic ion: parentheses.', 'w4']].forEach(([str, mark], i) => {
+      const g = G(p, { x: -16, y: 300 + i * 110, o: 0 });
+      mk('circle', { cx: 200, cy: -12, r: 26, fill: COL.task }, g);
+      T(g, String(i + 1), { x: 200, y: -1, size: 30, fill: COL.board, weight: 700, anchor: 'middle' });
+      T(g, str, { x: 260, size: 34, weight: 600 });
+      tw(g, { o: 1, x: 0 }, m(mark), .6);
+    });
+    show(cT(p, 'SF₆   ·   PbO₂   ·   Al(NO₃)₃', 800, 170, { size: 52, font: CFONT, fill: COL.good, anchor: 'middle' }), .3);
+    srcBadge(p, 770, m('end'));
+  }],
+  ['final1', 'Chapter practice', () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-formulas', prompt: ['Write each formula. Leave a box empty, or type 1, for no subscript.'],
+    build: chemBlanks([
+      { parts: [{ t: 'carbon tetrachloride:  ', ui: true }, 'C', { box: '1', sub: true, empty: 1 }, 'Cl', { box: '4', sub: true, empty: 1 }],
+        why: 'tetra → Cl₄, and no prefix on carbon means one: CCl₄.', hint: 'Molecular: read the prefixes. tetra means 4.' },
+      { parts: [{ t: 'tin(IV) oxide:  ', ui: true }, 'Sn', { box: '1', sub: true, empty: 1 }, 'O', { box: '2', sub: true, empty: 1 }],
+        why: 'Sn⁴⁺ needs two O²⁻: SnO₂ (lowest ratio).', hint: 'IV means Sn is 4+; oxide is 2−. Use the lowest ratio.' },
+    ]),
+  }, {
+    id: 'p-cano32', prompt: ['Write calcium nitrate. (Calcium is always 2+; nitrate is NO₃⁻.)'],
+    build: choice([[chemH(['Ca', ''], ['(NO', '3'], [')', '2'])], [chemH(['Ca', ''], ['NO', '3'])], [chemH(['Ca', '2'], ['NO', '3'])]], 0,
+      'Ca²⁺ needs two NO₃⁻, in parentheses: Ca(NO₃)₂.',
+      [null, 'One NO₃⁻ (1−) cannot cancel Ca²⁺. You need two nitrates.', 'Two Ca²⁺ is 4+; one nitrate is only 1−. One Ca and two NO₃.']),
+  }], done, 'Chapter practice') }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>
