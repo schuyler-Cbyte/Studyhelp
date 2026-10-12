@@ -39,6 +39,8 @@ a:focus-visible { outline: 3px solid var(--task); outline-offset: 3px; }
 #cover > * { animation: rise .8s var(--ease) backwards; }
 #cover .mascot { animation: none; margin-bottom: 26px; view-transition-name: guide; }
 #cover .kicker { animation-delay: .9s; }
+.home { position: fixed; top: 14px; left: 16px; z-index: 5; padding: 6px 12px; border-radius: 99px; font-size: 14px; font-weight: 600; color: inherit; opacity: .75; text-decoration: none; }
+.home:hover, .home:focus-visible { opacity: 1; text-decoration: underline; }
 #cover h1 { animation-delay: 1s; }
 #cover .lede { animation-delay: 1.12s; }
 #cover .acts { animation-delay: 1.24s; }
@@ -194,6 +196,7 @@ main#contents { padding-bottom: 80px; }
     <span style="left:5%;bottom:20%;--d:2.2">Divide by small</span>
     <span style="right:6%;bottom:15%;--d:2.5">Multiply ’til whole</span>
   </div>
+  <a class="home" href="../">← All study guides</a>
   <svg class="mascot draw" id="guide" width="210" height="147"></svg>
   <p class="kicker">An animated review · In review</p>
   <h1>CHEM 152 <i>Review</i></h1>

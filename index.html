@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Local Bookshelf</title>
+<title>Study Guides</title>
 <style>
 :root {
   --board: #1d2b27; --board2: #23332e; --edge: #3a4d46;
@@ -38,13 +38,13 @@ footer { margin-top: 48px; font-size: 14px; color: var(--faint); }
 </head>
 <body>
 <main>
-  <p class="kicker">Papermorph · this PC only</p>
-  <h1>Local bookshelf</h1>
-  <p class="lede">Interactive books made for this project. Each book lives in its own folder under <code>site/</code>. Status shows how far along review is.</p>
+  <p class="kicker">Papermorph · animated reviews</p>
+  <h1>Study guides</h1>
+  <p class="lede">Animated, narrated study guides. Each one works through the material step by step on the board, with quick checks along the way. Pick a course to start.</p>
   <ul class="shelf" id="shelf" aria-live="polite"></ul>
-  <div class="empty" id="empty" hidden>No books on the shelf yet. A book is added here once its local preview works.</div>
+  <div class="empty" id="empty" hidden>No study guides yet.</div>
   <div class="error" id="error" hidden></div>
-  <footer>Catalog: <code>bookshelf.json</code>.</footer>
+  <footer>Methods are the standard ones; check them against your class notes.</footer>
 </main>
 <script>
 'use strict';
