@@ -1,252 +1,250 @@
-// Estimated timings for a silent preview; replaced by tts.py when narration audio is generated.
-window.TIMINGS_SILENT = true;
 window.TIMINGS = {
  "intro": {
-  "dur": 10.25,
+  "dur": 9.798,
   "marks": {
-   "sub": 5.1
+   "sub": 5.024
   },
   "cues": [
    [
-    0,
+    0.0,
     "Chapter four: the box structures for sodium and copper two plus."
    ],
    [
-    5.1,
+    5.024,
     "Every orbital is a box, and every electron is an arrow."
    ]
   ]
  },
  "rules": {
-  "dur": 18.55,
+  "dur": 18.165,
   "marks": {
-   "box": 2.75,
-   "pauli": 5.1,
-   "hund": 9.05,
-   "auf": 15.4
+   "box": 2.779,
+   "pauli": 5.103,
+   "hund": 9.562,
+   "auf": 15.126
   },
   "cues": [
    [
-    0,
+    0.0,
     "Three rules from your course slides."
    ],
    [
-    2.75,
+    2.779,
     "One box is one orbital."
    ],
    [
-    5.1,
+    5.103,
     "It holds at most two electrons, with opposite spins."
    ],
    [
-    9.05,
+    9.562,
     "In a set of equal boxes, put one electron in each box before pairing any."
    ],
    [
-    15.4,
+    15.126,
     "And fill the lowest energy first."
    ]
   ]
  },
  "sodium": {
-  "dur": 23.4,
+  "dur": 26.807,
   "marks": {
-   "s1": 1.95,
-   "s2": 4.25,
-   "p2": 6.55,
-   "s3": 12.0,
-   "count": 15.55,
-   "single": 19.45
+   "s1": 2.809,
+   "s2": 5.143,
+   "p2": 7.413,
+   "s3": 13.391,
+   "count": 16.975,
+   "single": 22.294
   },
   "cues": [
    [
-    0,
+    0.0,
     "Sodium has eleven electrons."
    ],
    [
-    1.95,
+    2.809,
     "One s: a pair."
    ],
    [
-    4.25,
+    5.143,
     "Two s: a pair."
    ],
    [
-    6.55,
+    7.413,
     "Two p: six electrons."
    ],
    [
-    8.85,
+    10.317,
     "One in each box, then the pairs."
    ],
    [
-    12.0,
+    13.391,
     "Three s gets the last one, by itself."
    ],
    [
-    15.55,
+    16.975,
     "Two, plus two, plus six, plus one: eleven."
    ],
    [
-    19.45,
+    22.294,
     "Sodium has one unpaired electron, in three s."
    ]
   ]
  },
  "q1": {
-  "dur": 3.5,
+  "dur": 4.269,
   "marks": {},
   "cues": [
    [
-    0,
+    0.0,
     "Quick check."
    ],
    [
-    1.15,
+    1.519,
     "Sodium's three s box."
    ]
   ]
  },
  "copper-ion": {
-  "dur": 28.05,
+  "dur": 26.963,
   "marks": {
-   "cu": 1.95,
-   "ion": 7.05,
-   "res": 14.55,
-   "same": 18.5
+   "cu": 2.174,
+   "ion": 8.438,
+   "res": 14.936,
+   "same": 18.995
   },
   "cues": [
    [
-    0,
+    0.0,
     "Now copper two plus."
    ],
    [
-    1.95,
+    2.174,
     "Copper has twenty-nine electrons: argon, four s two, three d nine."
    ],
    [
-    7.05,
+    8.438,
     "Two plus means two electrons are gone, and they leave from the highest shell first: four s."
    ],
    [
-    14.55,
+    14.936,
     "So copper two plus is argon, three d nine."
    ],
    [
-    18.5,
+    18.995,
     "If your periodic table shows copper as four s one, three d ten, you still get three d nine for the ion."
    ]
   ]
  },
  "copper-boxes": {
-  "dur": 23.25,
+  "dur": 21.299,
   "marks": {
-   "ar": 1.55,
-   "s4": 5.1,
-   "d": 8.25,
-   "count": 16.15,
-   "unp": 19.3
+   "ar": 1.599,
+   "s4": 5.263,
+   "d": 7.867,
+   "count": 14.391,
+   "unp": 17.3
   },
   "cues": [
    [
-    0,
+    0.0,
     "Now draw it."
    ],
    [
-    1.55,
+    1.599,
     "Argon's eighteen inner electrons are written as argon."
    ],
    [
-    5.1,
+    5.263,
     "The four s box is empty now."
    ],
    [
-    8.25,
+    7.867,
     "Three d gets nine electrons: one in each of the five boxes, then four more to pair up."
    ],
    [
-    16.15,
+    14.391,
     "Four pairs and one single make nine."
    ],
    [
-    19.3,
+    17.3,
     "So copper two plus has one unpaired electron."
    ]
   ]
  },
  "q2": {
-  "dur": 3.5,
+  "dur": 4.423,
   "marks": {},
   "cues": [
    [
-    0,
+    0.0,
     "Quick check."
    ],
    [
-    1.15,
+    1.519,
     "Count the unpaired electrons."
    ]
   ]
  },
  "wrap": {
-  "dur": 19.65,
+  "dur": 21.299,
   "marks": {
-   "w1": 1.55,
-   "w2": 6.65,
-   "w3": 12.15,
-   "end": 16.9
+   "w1": 1.514,
+   "w2": 7.677,
+   "w3": 13.336,
+   "end": 18.44
   },
   "cues": [
    [
-    0,
+    0.0,
     "To sum up."
    ],
    [
-    1.55,
+    1.514,
     "Write the configuration first."
    ],
    [
-    3.5,
+    4.108,
     "For an ion, add or remove electrons."
    ],
    [
-    6.65,
+    7.677,
     "Draw one box per orbital: s gets one, p three, d five."
    ],
    [
-    12.15,
+    13.336,
     "Put single electrons in first, then pair them with opposite spins."
    ],
    [
-    16.9,
+    18.44,
     "Now try the chapter practice."
    ]
   ]
  },
  "final1": {
-  "dur": 3.9,
+  "dur": 5.368,
   "marks": {},
   "cues": [
    [
-    0,
+    0.0,
     "Chapter practice."
    ],
    [
-    1.15,
+    1.899,
     "Iron three plus, and oxygen."
    ]
   ]
  },
  "finish": {
-  "dur": 4.3,
+  "dur": 4.228,
   "marks": {},
   "cues": [
    [
-    0,
+    0.0,
     "Well done."
    ],
    [
-    1.15,
+    1.474,
     "That's the end of chapter four."
    ]
   ]

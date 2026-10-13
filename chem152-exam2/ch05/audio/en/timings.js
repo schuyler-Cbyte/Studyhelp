@@ -1,288 +1,286 @@
-// Estimated timings for a silent preview; replaced by tts.py when narration audio is generated.
-window.TIMINGS_SILENT = true;
 window.TIMINGS = {
  "intro": {
-  "dur": 18.6,
+  "dur": 16.946,
   "marks": {
-   "sub": 4.3,
-   "note": 12.25
+   "sub": 4.269,
+   "note": 11.807
   },
   "cues": [
    [
-    0,
+    0.0,
     "Chapter five: balance the two equations on your sheet."
    ],
    [
-    4.3,
+    4.269,
     "You can only change the coefficients, the numbers in front, until every kind of atom matches on both sides."
    ],
    [
-    12.25,
+    11.807,
     "This is the standard method, the same one used in your other review book."
    ]
   ]
  },
  "start": {
-  "dur": 16.5,
+  "dur": 17.586,
   "marks": {
-   "table": 5.5,
-   "big": 10.6
+   "table": 5.889,
+   "big": 10.957
   },
   "cues": [
    [
-    0,
+    0.0,
     "Equation a: sulfuric acid plus boric acid makes boron sulfate and water."
    ],
    [
-    5.5,
+    5.889,
     "Count each kind of atom on both sides."
    ],
    [
-    9.05,
+    8.943,
     "Nothing matches yet."
    ],
    [
-    10.6,
+    10.957,
     "Start with the biggest formula: B two, S, O four, three times."
    ]
   ]
  },
  "q1": {
-  "dur": 3.1,
+  "dur": 3.679,
   "marks": {},
   "cues": [
    [
-    0,
+    0.0,
     "Quick check."
    ],
    [
-    1.15,
+    1.519,
     "Match the boron."
    ]
   ]
  },
  "fix-a": {
-  "dur": 26.4,
+  "dur": 27.409,
   "marks": {
    "b": 0.0,
-   "s": 6.75,
-   "h": 17.05,
-   "o": 21.35,
-   "done": 24.05
+   "s": 5.794,
+   "h": 15.567,
+   "o": 20.31,
+   "done": 23.505
   },
   "cues": [
    [
-    0,
+    0.0,
     "Two borons on the right, so put a two in front of B, O, H three."
    ],
    [
-    6.75,
+    5.794,
     "Three sulfate groups on the right, so three H two, S, O four on the left."
    ],
    [
-    13.5,
+    12.058,
     "The sulfate group stays together on both sides."
    ],
    [
-    17.05,
+    15.567,
     "Now hydrogen: twelve on the left, so six waters."
    ],
    [
-    21.35,
+    20.31,
     "Check oxygen: eighteen and eighteen."
    ],
    [
-    24.05,
+    23.505,
     "Three, two, one, six."
    ]
   ]
  },
  "start-b": {
-  "dur": 19.7,
+  "dur": 18.905,
   "marks": {
-   "c": 4.3,
-   "h": 7.45,
-   "half": 13.8
+   "c": 4.369,
+   "h": 8.163,
+   "half": 14.107
   },
   "cues": [
    [
-    0,
+    0.0,
     "Equation b: C three H seven burns in oxygen."
    ],
    [
-    4.3,
+    4.369,
     "Three carbons, so three C, O two."
    ],
    [
-    7.45,
+    8.163,
     "Seven hydrogens, but each water has two, so we need seven halves of a water."
    ],
    [
-    13.8,
+    14.107,
     "A fraction is fine for now."
    ],
    [
-    16.55,
+    16.466,
     "We'll clear it at the end."
    ]
   ]
  },
  "q2": {
-  "dur": 4.3,
+  "dur": 4.233,
   "marks": {},
   "cues": [
    [
-    0,
+    0.0,
     "Quick check."
    ],
    [
-    1.15,
+    1.519,
     "Count the oxygen on the right."
    ]
   ]
  },
  "fix-b": {
-  "dur": 16.9,
+  "dur": 19.22,
   "marks": {
    "o": 0.0,
-   "x4": 8.7,
-   "done": 13.0
+   "x4": 7.903,
+   "done": 12.591
   },
   "cues": [
    [
-    0,
+    0.0,
     "Nine and a half oxygen atoms, and each O two has two."
    ],
    [
-    5.15,
+    4.324,
     "So the O two coefficient is nineteen quarters."
    ],
    [
-    8.7,
+    7.903,
     "Now clear the fractions: multiply every coefficient by four."
    ],
    [
-    13.0,
+    12.591,
     "Four, nineteen, twelve, fourteen."
    ],
    [
-    14.95,
+    16.861,
     "Every atom matches."
    ]
   ]
  },
  "propane": {
-  "dur": 22.9,
+  "dur": 25.644,
   "marks": {
-   "typo": 2.35,
-   "prop": 10.25,
-   "test": 13.4
+   "typo": 2.024,
+   "prop": 9.617,
+   "test": 14.596
   },
   "cues": [
    [
-    0,
+    0.0,
     "A note about this one."
    ],
    [
-    2.35,
+    2.024,
     "C three H seven isn't a stable compound."
    ],
    [
-    5.9,
+    5.533,
     "Your teacher may have meant propane, C three H eight."
    ],
    [
-    10.25,
+    9.617,
     "Propane balances as one, five, three, four."
    ],
    [
-    13.4,
+    14.596,
     "On the test, balance exactly what's written."
    ],
    [
-    16.55,
+    18.305,
     "If it says C three H seven, the answer is four, nineteen, twelve, fourteen."
    ]
   ]
  },
  "q3": {
-  "dur": 3.1,
+  "dur": 3.769,
   "marks": {},
   "cues": [
    [
-    0,
+    0.0,
     "Quick check."
    ],
    [
-    1.15,
+    1.519,
     "Clear the fractions."
    ]
   ]
  },
  "wrap": {
-  "dur": 21.25,
+  "dur": 22.073,
   "marks": {
-   "w1": 1.55,
-   "w2": 4.7,
-   "w3": 9.45,
-   "w4": 12.6,
-   "end": 18.5
+   "w1": 1.514,
+   "w2": 5.668,
+   "w3": 10.537,
+   "w4": 13.781,
+   "end": 19.214
   },
   "cues": [
    [
-    0,
+    0.0,
     "To sum up."
    ],
    [
-    1.55,
+    1.514,
     "Change only the coefficients, never the subscripts."
    ],
    [
-    4.7,
+    5.668,
     "Start with the biggest formula, and keep groups like sulfate together."
    ],
    [
-    9.45,
+    10.537,
     "Balance single elements like O two last."
    ],
    [
-    12.6,
+    13.781,
     "A fraction is fine for a moment."
    ],
    [
-    15.75,
+    16.405,
     "Then multiply everything to clear it."
    ],
    [
-    18.5,
+    19.214,
     "Now try the chapter practice."
    ]
   ]
  },
  "final1": {
-  "dur": 3.1,
+  "dur": 4.224,
   "marks": {},
   "cues": [
    [
-    0,
+    0.0,
     "Chapter practice."
    ],
    [
-    1.15,
+    1.899,
     "Two more equations."
    ]
   ]
  },
  "finish": {
-  "dur": 4.3,
+  "dur": 4.283,
   "marks": {},
   "cues": [
    [
-    0,
+    0.0,
     "Well done."
    ],
    [
-    1.15,
+    1.474,
     "That's the end of chapter five."
    ]
   ]

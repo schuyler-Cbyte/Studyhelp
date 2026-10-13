@@ -253,7 +253,7 @@ document.querySelectorAll('.unit').forEach(u => seen.observe(u));
 const finished = [...done].filter(k => k <= total).length;
 document.getElementById('prog').innerHTML = finished ? `<b>${finished}</b> of ${total} finished` : `${total} chapter${total === 1 ? '' : 's'}`;
 const plural = (k, w) => `${k} ${w}${k === 1 ? '' : 's'}`;
-document.getElementById('meta').textContent = `${plural(total, 'chapter')} · ${plural(UNITS.length, 'unit')} · narration pending · in review`;   // back to "with sound" once tts.py has run
+document.getElementById('meta').textContent = `${plural(total, 'chapter')} · ${plural(UNITS.length, 'unit')} · with sound · in review`;
 const last = Number.isInteger(P.last) && document.getElementById(id(P.last));
 if (last) {
   const r = document.getElementById('resume');
