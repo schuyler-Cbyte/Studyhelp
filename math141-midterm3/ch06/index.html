@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Graphing Sine, Cosine and Tangent · Math 141 Midterm 3 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 3 Review, Chapter 6. Old midterm questions 12 and 13. Storyboard: books/math141-midterm3/chapters/ch06.md.
+const CHAPTER = { number: 6, title: 'Graphing with the Frame', minutes: 8, language: 'en', next: '../ch07/' };
+
+/* ---------- chapter data (checked in ch06.md) ---------- */
+// y = 2cos(3x − π) + 1 = 2cos[3(x − π/3)] + 1: P (π/3, 1), valley, amplitude 2, period 2π/3, increment π/6;
+//   x: π/3, π/2, 2π/3, 5π/6, π → y: 3, 1, −1, 1, 3.
+// y = 2tan(x/2): P (0, 0) at centre, rising snake, frame half-height 2, period 2π, increment π/2; VAs x = ±π.
+const FX0 = 200, FW = 560;              // frame left edge and width, pixels; 4 columns
+
+// The frame: a rectangle split into 4 columns, x labels under the grid lines, y labels on the left.
+function trigFrame(p, { y0, h, xl, yl, t0 }) {
+  const g = G(p, { o: 0 });
+  path(g, `M${FX0} ${y0}H${FX0 + FW}V${y0 + h}H${FX0}Z` + [1, 2, 3].map(i => `M${FX0 + FW * i / 4} ${y0}V${y0 + h}`).join('') + `M${FX0} ${y0 + h / 2}H${FX0 + FW}`,
+    { stroke: COL.chalk, 'stroke-opacity': .45, 'stroke-width': 2.5 });
+  show(g, t0);
+  return {
+    xLabels: (t) => xl.forEach((l, i) => ml(p, l, FX0 + FW * i / 4, y0 + h + 66, t + i * .15, { size: 32, fill: COL.whole })),
+    yLabels: (t) => yl.forEach(([l, py], i) => ml(p, l, FX0 - 22, py + 12, t + i * .15, { size: 32, fill: COL.whole, anchor: 'end' })),
+  };
+}
+const step = (p, parts, y, t0, fill = COL.chalk) => ml(p, parts, 900, y, t0, { size: 36, fill, anchor: 'start' });
+const keyDot = (p, x, y, t0, color = COL.nat) => { const d = G(p, { x, y, s: 0, o: 0 }); mk('circle', { r: 10, fill: color }, d); pop(d, t0); return d; };
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Graphing with the frame', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Trig Graphs · Chapter 6', 'Graphing with the Frame', 'one cycle, every key point labelled', 'Old midterm questions 12 and 13 · no calculator');
+  }],
+  ['steps', 'The checklist', (m) => {
+    const p = panel(0);
+    tx(p, 'For y = a·f(bx − c) + d:', 800, 140, .3, { size: 36, fill: COL.dim, anchor: 'middle' });
+    [['Observe', 'make sure b > 0', 'obs'], ['Pivot', 'P = (p, d); p is the phase shift', 'piv'], ['Cycle shape', 'from the sign of a', 'cyc'],
+      ['Amplitude', '|a|, the frame’s half-height', 'amp'], ['Period', '2π/b (sin, cos)   or   π/b (tan)', 'per'], ['Increment', '¼ of the period: the column width', 'inc'],
+      ['Axes', 'remember to draw them', 'axes']].forEach(([w, d, k], i) => {
+      tx(p, w, 300, 230 + i * 70, m(k), { size: 36, fill: COL.task, weight: 600 });
+      tx(p, d, 640, 230 + i * 70, m(k, .2), { size: 32 });
+    });
+  }],
+  ['cos', 'A cosine graph', (m) => {
+    const p = panel(0);
+    ml(p, ['y = 2 cos(3x − π) + 1'], 1180, 110, .2, { size: 44 });
+    step(p, ['b = 3 > 0  ✓'], 190, m('obs'));
+    step(p, ['3x − π = 3(x − ', F('π', 3), ')   →   p = ', F('π', 3)], 260, m('factor'));
+    step(p, ['Pivot (', F('π', 3), ', 1): left-center of the frame'], 340, m('pivot'), COL.task);
+    step(p, ['a = 2 > 0: starts at the top, "valley"'], 420, m('shape'));
+    step(p, ['Amplitude 2: from −1 up to 3'], 490, m('amp'));
+    step(p, ['Period ', F('2π', 3), ',  increment ', F('π', 6)], 570, m('per'));
+    const Y = v => 400 - 100 * v;                       // y = 1 at the frame's centre line, 100 px per unit
+    const f = trigFrame(p, { y0: Y(3), h: 400, t0: m('amp', .5),
+      xl: [[F('π', 3)], [F('π', 2)], [F('2π', 3)], [F('5π', 6)], ['π']], yl: [[['3'], Y(3)], [['1'], Y(1)], [['−1'], Y(-1)]] });
+    keyDot(p, FX0, Y(1), m('pivot', .3), COL.task);
+    tx(p, 'P', FX0 + 14, Y(1) - 16, m('pivot', .5), { size: 28, fill: COL.task });
+    f.yLabels(m('amp', .9));
+    f.xLabels(m('inc'));
+    const pts = [3, 1, -1, 1, 3];
+    const c = path(p, curveD({ PX: t => FX0 + FW * t / (2 * Math.PI), PY: Y }, t => 2 * Math.cos(t) + 1, 0, 2 * Math.PI), { stroke: COL.nat, 'stroke-width': 5 }, { d: 0 });
+    draw(c, m('curve'), 1.6);
+    pts.forEach((v, i) => keyDot(p, FX0 + FW * i / 4, Y(v), m('curve', i * .4)));
+    const ax = path(p, `M120 ${Y(0)}H${FX0 + FW + 60}M100 ${Y(3) - 30}V${Y(-1) + 30}`, { stroke: COL.chalk, 'stroke-width': 4 }, { o: 0 });
+    show(ax, m('axes'));
+    step(p, ['Axes: the x-axis is y = 0'], 650, m('axes'));
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-per', prompt: ['What is the period of y = 5 cos(4x)?'],
+    build: choice([[$m(F('π', 2))], [$m(F('π', 4))], [$m('8π')]], 0, 'For cosine the period is 2π/b = 2π/4 = π/2.',
+      [null, 'π/b is the period for tangent. Cosine uses 2π/b.', 'Divide 2π by b = 4; don’t multiply.']),
+  }], done) }],
+  ['tan', 'A tangent graph', (m) => {
+    const p = panel(0);
+    ml(p, ['y = 2 tan(', F('x', 2), ')'], 1180, 110, .2, { size: 44 });
+    step(p, ['b = ', F(1, 2), ' > 0  ✓   Pivot (0, 0): frame center'], 190, m('pivot'), COL.task);
+    step(p, ['a = 2 > 0: "rising snake"'], 270, m('shape'));
+    step(p, ['frame half-height |a| = 2'], 340, m('amp'));
+    step(p, ['Period ', F('π', 'b'), ' = ', F('π', '1/2'), ' = 2π'], 420, m('per'));
+    step(p, ['Increment ', F(1, 4), '(2π) = ', F('π', 2)], 500, m('inc'));
+    step(p, ['Asymptotes at the frame sides:  x = ±π'], 580, m('va'), COL.nat);
+    const Y = v => 400 - 70 * v, X = x => FX0 + FW / 2 + FW / 4 * x / (Math.PI / 2);
+    const f = trigFrame(p, { y0: Y(2), h: 280, t0: m('amp', .4),
+      xl: [['−π'], ['−', F('π', 2)], ['0'], [F('π', 2)], ['π']], yl: [[['2'], Y(2)], [['0'], Y(0)], [['−2'], Y(-2)]] });
+    keyDot(p, X(0), Y(0), m('pivot', .3), COL.task);
+    f.yLabels(m('amp', .8));
+    f.xLabels(m('inc'));
+    [-Math.PI, Math.PI].forEach(x => dashed(p, `M${X(x)} 140V${Y(-2) + 10}`, m('va', .3), COL.nat, 3));
+    const c = path(p, curveD({ PX: X, PY: Y }, x => 2 * Math.tan(x / 2), -1.75, 1.75), { stroke: COL.whole, 'stroke-width': 5 }, { d: 0 });
+    draw(c, m('curve'), 1.4);
+    [[-Math.PI / 2, -2], [0, 0], [Math.PI / 2, 2]].forEach(([x, y], i) => keyDot(p, X(x), Y(y), m('curve', .3 + i * .4)));
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-shift', prompt: ['What is the phase shift p of y = cos(2x − π/3)?'],
+    build: choice([[$m(F('π', 6))], [$m(F('π', 3))], [$m('−', F('π', 6))]], 0, 'Factor: 2x − π/3 = 2(x − π/6), so p = π/6. Or solve 2x − π/3 = 0.',
+      [null, 'Factor out the 2 first: 2(x − π/6).', 'x − π/6 means a shift to the right: p = +π/6.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Make b > 0, then factor out b to read the phase shift p.', 'w1'], ['Cosine pivot: frame’s left-center. Tangent pivot: frame center.', 'w2'],
+      ['Period 2π/b or π/b; the increment is a quarter of it.', 'w3'], ['Label every grid line, draw the asymptotes and the axes.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q12a', prompt: [fromExam(12), 'No calculator. Graph one cycle of y = 4 tan(x/3). First, the period.'],
+    build: blanks([{ parts: ['period = ', { box: '3' }, 'π'], why: 'For tangent, period = π/b = π/(1/3) = 3π.', hint: 'Tangent uses π/b, with b = 1/3.' }]),
+  }, {
+    id: 'p-q12b', prompt: ['Question 12. The increment (column width)?'],
+    build: blanks([{ parts: ['increment = ', { box: '3', lowest: true }, 'π / ', { box: '4', lowest: true }], why: '¼ of the period: ¼ · 3π = 3π/4. The key points are (−3π/4, −4), (0, 0) and (3π/4, 4).', hint: 'Take a quarter of 3π.' }]),
+  }, {
+    id: 'p-q12c', prompt: ['Question 12. Where are the vertical asymptotes of this cycle?'],
+    build: choice([[$m('x = ±', F('3π', 2))], [$m('x = ±', F('3π', 4))], [$m('x = ±3π')]], 0, 'The pivot (0, 0) is at the frame center, two increments from each side: ±2 · 3π/4 = ±3π/2.',
+      [null, '±3π/4 are where y = ±4, the frame’s corners on the curve.', 'One cycle is 3π wide, so it reaches only half of 3π each way.']),
+  }, {
+    id: 'p-q13a', prompt: [fromExam(13), 'Graph one cycle of y = −3 cos(5x − π/2) − 1. First, the phase shift p.'],
+    build: blanks([{ parts: ['p = π / ', { box: '10' }], why: '5x − π/2 = 5(x − π/10), so p = π/10. The pivot is (π/10, −1).', hint: 'Factor out the 5, or solve 5x − π/2 = 0.' }]),
+  }, {
+    id: 'p-q13b', prompt: ['Question 13. Period and increment?'],
+    build: blanks([{ parts: ['period = 2π / ', { box: '5' }, ',   increment = π / ', { box: '10' }], why: 'Period 2π/5; increment ¼ · 2π/5 = π/10. The x labels: π/10, π/5, 3π/10, 2π/5, π/2.', hint: 'Cosine: 2π/b with b = 5. Then a quarter of that.' }]),
+  }, {
+    id: 'p-q13c', prompt: ['Question 13. The cycle shape?'],
+    build: choice([['"hill": starts at the bottom'], ['"valley": starts at the top']], 0, 'a = −3 < 0 flips cosine: it starts at the bottom of the frame and rises to a peak, a hill.',
+      [null, 'a is negative here, so the cosine is flipped upside down.']),
+  }, {
+    id: 'p-q13d', prompt: ['Question 13. The frame’s top and bottom y-values?'],
+    build: blanks([{ parts: ['top y = ', { box: '2' }, ',   bottom y = ', { box: '-4' }], why: 'Midline d = −1, amplitude |−3| = 3: from −1 − 3 = −4 up to −1 + 3 = 2.', hint: 'Start at the midline y = −1 and go 3 up and 3 down.' }]),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

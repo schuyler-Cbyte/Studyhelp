@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Trig Identities · Math 141 Midterm 3 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 3 Review, Chapter 5. Old midterm questions 7, 8 and 9. Storyboard: books/math141-midterm3/chapters/ch05.md.
+const CHAPTER = { number: 5, title: 'Trig Identities', minutes: 6, language: 'en', next: '../ch06/' };
+
+/* ---------- chapter data (checked in ch05.md) ---------- */
+// sin θ = 2/7: csc(−θ) = −csc θ = −1/sin θ = −7/2.  cos θ = 1/3: sec(−θ) = 3.
+const S2 = ['sin', E(2), 'θ'], C2 = ['cos', E(2), 'θ'];
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Trig identities', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Trig Values · Chapter 5', 'Trig Identities', 'name the identity, then use it', 'Old midterm questions 7, 8 and 9 · no calculator');
+  }],
+  ['ids', 'Reciprocal, quotient, even and odd', (m) => {
+    const p = panel(0);
+    tx(p, 'Reciprocal IDs', 140, 150, m('recip'), { size: 32, fill: COL.task, weight: 600 });
+    ml(p, ['csc θ = ', F(1, 'sin θ'), '     sec θ = ', F(1, 'cos θ'), '     cot θ = ', F(1, 'tan θ')], 140, 240, m('recip', .3), { size: 44, anchor: 'start' });
+    tx(p, 'Quotient IDs', 140, 350, m('quot'), { size: 32, fill: COL.task, weight: 600 });
+    ml(p, ['tan θ = ', F('sin θ', 'cos θ'), '     cot θ = ', F('cos θ', 'sin θ')], 140, 440, m('quot', .3), { size: 44, anchor: 'start' });
+    tx(p, 'Even/Odd Properties', 140, 550, m('even'), { size: 32, fill: COL.task, weight: 600 });
+    ml(p, ['cos(−θ) = cos θ,   sec(−θ) = sec θ'], 140, 620, m('even', .3), { size: 42, fill: COL.whole, anchor: 'start' });
+    ml(p, ['sin(−θ) = −sin θ,  and the same for csc, tan, cot'], 140, 690, m('odd'), { size: 42, fill: COL.nat, anchor: 'start' });
+  }],
+  ['pyth', 'Pythagorean IDs', (m) => {
+    const p = panel(0);
+    ml(p, [...S2, ' + ', ...C2, ' = 1'], 800, 200, m('base'), { size: 56, fill: COL.task });
+    ml(p, ['÷ cos', E(2), 'θ'], 420, 320, m('cos2'), { size: 36, fill: COL.dim });
+    ml(p, ['÷ sin', E(2), 'θ'], 1180, 320, m('sin2'), { size: 36, fill: COL.dim });
+    ml(p, ['tan', E(2), 'θ + 1 = sec', E(2), 'θ'], 420, 460, m('cos2', .6), { size: 54, fill: COL.whole });
+    ml(p, ['1 + cot', E(2), 'θ = csc', E(2), 'θ'], 1180, 460, m('sin2', .6), { size: 54, fill: COL.whole });
+    tx(p, 'Cofunction IDs: the "co" swaps', 800, 590, m('co'), { size: 32, fill: COL.task, weight: 600, anchor: 'middle' });
+    ml(p, ['sin(', F('π', 2), ' − θ) = cos θ     tan(', F('π', 2), ' − θ) = cot θ     sec(', F('π', 2), ' − θ) = csc θ'], 800, 680, m('co', .4), { size: 40 });
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-pyth', prompt: ['Complete the Pythagorean ID:  1 + tan²θ = ?'],
+    build: choice([[$m('sec', E(2), 'θ')], [$m('csc', E(2), 'θ')], [$m('cos', E(2), 'θ')]], 0, 'Divide sin²θ + cos²θ = 1 by cos²θ: tan²θ + 1 = sec²θ.',
+      [null, 'csc²θ goes with cot²θ: 1 + cot²θ = csc²θ.', 'Divide sin²θ + cos²θ = 1 by cos²θ and see what 1/cos²θ is.']),
+  }], done) }],
+  ['example', 'Use them in a chain', (m) => {
+    const p = panel(0);
+    ml(p, ['Given  sin θ = ', F(2, 7), ',  find  csc(−θ).'], 800, 150, .3, { size: 46 });
+    ml(p, ['csc(−θ) = −csc θ'], 640, 290, m('odd'), { size: 50, anchor: 'end' });
+    tx(p, 'Odd Property', 700, 290, m('odd', .3), { size: 30, fill: COL.nat });
+    ml(p, ['= −', F(1, 'sin θ')], 640, 420, m('rec'), { size: 50, anchor: 'end' });
+    tx(p, 'Reciprocal ID', 700, 420, m('rec', .3), { size: 30, fill: COL.whole });
+    ml(p, ['= −', F(1, '2/7'), ' = −', F(7, 2)], 640, 560, m('val'), { size: 50, anchor: 'end' });
+    tx(p, 'flip the fraction', 700, 560, m('val', .3), { size: 30, fill: COL.dim });
+    const a = ml(p, ['csc(−θ) = −', F(7, 2)], 800, 680, m('box'), { size: 48, fill: COL.good });
+    boxMath(p, a, 800, 680, 48, m('box', .4));
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-sec', prompt: ['Given cos θ = 1/3, find sec(−θ).'],
+    build: blanks([{ parts: ['sec(−θ) = ', { box: '3' }], why: 'Secant is even: sec(−θ) = sec θ = 1/cos θ = 1/(1/3) = 3.', hint: 'Secant is even, like cosine, so the minus sign disappears. Then flip 1/3.' }]),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['cos and sec are even; the other four are odd.', 'w1'], ['Reciprocal and Quotient IDs turn one function into another.', 'w2'],
+      ['sin² + cos² = 1; divide by cos² or sin² for the other two.', 'w3'], ['Cofunctions: f(π/2 − θ) = co-f(θ).', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q7', prompt: [fromExam(7), 'No calculator. Assuming tan θ = 5, find cot(−θ).'],
+    build: blanks([{ parts: ['cot(−θ) = ', { box: '-1/5' }], why: 'cot(−θ) = −cot θ (Odd Property) = −1/tan θ (Reciprocal ID) = −1/5.', hint: 'Cotangent is odd, so pull out the minus sign. Then cot θ = 1/tan θ.' }]),
+  }, {
+    id: 'p-q8', prompt: [fromExam(8), 'Assuming cos θ = 4/5, find sec(−θ).'],
+    build: blanks([{ parts: ['sec(−θ) = ', { box: '5/4' }], why: 'sec(−θ) = sec θ (Even Property) = 1/cos θ (Reciprocal ID) = 1/(4/5) = 5/4.', hint: 'Secant is even. Then sec θ = 1/cos θ.' }]),
+  }, {
+    id: 'p-q9a', prompt: [fromExam(9), 'Quotient ID:  cot θ = ?'],
+    build: choice([[$m(F('cos θ', 'sin θ'))], [$m(F('sin θ', 'cos θ'))], [$m(F(1, 'sin θ'))]], 0, 'cot θ = cos θ / sin θ.',
+      [null, 'That is tan θ.', 'That is csc θ, a Reciprocal ID.']),
+  }, {
+    id: 'p-q9b', prompt: ['Question 9. Pythagorean ID:  tan²θ + 1 = ?'],
+    build: choice([[$m('sec', E(2), 'θ')], [$m('csc', E(2), 'θ')], [$m('1')]], 0, 'tan²θ + 1 = sec²θ.',
+      [null, 'csc² pairs with cot².', 'sin²θ + cos²θ is the one that equals 1.']),
+  }, {
+    id: 'p-q9c', prompt: ['Question 9. Pythagorean ID:  1 + cot²θ = ?'],
+    build: choice([[$m('csc', E(2), 'θ')], [$m('sec', E(2), 'θ')], [$m('tan', E(2), 'θ')]], 0, '1 + cot²θ = csc²θ.',
+      [null, 'sec² pairs with tan².', 'Divide sin²θ + cos²θ = 1 by sin²θ.']),
+  }, {
+    id: 'p-q9d', prompt: ['Question 9. Cofunction ID:  sec(π/2 − θ) = ?'],
+    build: choice([[$m('csc θ')], [$m('sec θ')], [$m('cos θ')]], 0, 'The "co" swaps: sec(π/2 − θ) = csc θ.',
+      [null, 'A cofunction ID changes the function to its cofunction.', 'The cofunction of secant is cosecant, not cosine.']),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

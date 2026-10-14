@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Right Triangles and Angles of Elevation · Math 141 Midterm 3 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 3 Review, Chapter 2. Old midterm question 4. Storyboard: books/math141-midterm3/chapters/ch02.md.
+const CHAPTER = { number: 2, title: 'Right Triangles and Angles of Elevation', minutes: 6, language: 'en', next: '../ch03/' };
+
+/* ---------- chapter data (checked in ch02.md) ---------- */
+// Balloon 500 ft up at 40°: d = 500 / sin 40° ≈ 777.86 → 778 ft.  800 ft away: θ = sin⁻¹(5/8) ≈ 38.682° → 38.7°.
+// Kite: 60 ft up on 100 ft of string: θ = sin⁻¹(0.6) ≈ 36.87° → 36.9°.
+const A = [200, 600], B = [760, 600], Cc = [760, 200];   // observer, ground under the balloon, balloon
+
+// Ground, height and line of sight, with the angle at the observer.
+function scene2(p, m, angle, hyp) {
+  path(p, `M120 ${A[1]}H880`, { stroke: COL.dim, 'stroke-width': 3 });
+  const h = path(p, `M${B[0]} ${B[1]}V${Cc[1]}`, { stroke: COL.irr, 'stroke-width': 5 }, { d: 0 }); draw(h, .3, .6);
+  path(p, `M${B[0] - 26} ${B[1]}V${B[1] - 26}H${B[0]}`, { stroke: COL.dim, 'stroke-width': 2.5 });
+  tx(p, '500 ft', B[0] + 22, 410, .5, { size: 30, fill: COL.irr });
+  const s = path(p, `M${A[0]} ${A[1]}L${Cc[0]} ${Cc[1]}`, { stroke: COL.whole, 'stroke-width': 5, 'stroke-dasharray': '14 10' }, { o: 0 }); show(s, .6);
+  tx(p, hyp, 440, 370, .9, { size: 34, fill: COL.whole, anchor: 'middle' });
+  const bal = G(p, { x: Cc[0], y: Cc[1] - 40, o: 0 });
+  mk('ellipse', { rx: 34, ry: 42, fill: 'none', stroke: COL.task, 'stroke-width': 4 }, bal);
+  path(bal, 'M-10 40L-8 56H8L10 40', { stroke: COL.task, 'stroke-width': 3 });
+  show(bal, .2);
+  const fig = G(p, { x: A[0] - 40, y: A[1] });   // the observer, standing at the end of the ground line
+  mk('circle', { cx: 0, cy: -66, r: 11, fill: 'none', stroke: COL.chalk, 'stroke-width': 3 }, fig);
+  path(fig, 'M0 -55V-22M0 -22L-12 0M0 -22L12 0M-14 -44H14', { stroke: COL.chalk, 'stroke-width': 3 });
+  const arcE = path(p, `M${A[0] + 90} ${A[1]}A90 90 0 0 0 ${A[0] + 90 * Math.cos(.62)} ${A[1] - 90 * Math.sin(.62)}`, { stroke: COL.task, 'stroke-width': 4 }, { d: 0 });
+  draw(arcE, .9, .5);
+  tx(p, angle, A[0] + 110, A[1] - 22, 1.1, { size: 32, fill: COL.task });
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Right triangles', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Angles and Right Triangles · Chapter 2', ['Right Triangles', 'and Angles of Elevation'], 'SOH-CAH-TOA, forwards and backwards', 'Old midterm question 4 · calculator');
+  }],
+  ['soh', 'SOH-CAH-TOA', (m) => {
+    const p = panel(0);
+    const t = path(p, 'M200 620H760V220Z', { stroke: COL.chalk, 'stroke-width': 4 }, { d: 0 }); draw(t, .2, 1.2);
+    path(p, 'M734 620V594H760', { stroke: COL.dim, 'stroke-width': 2.5 });
+    const ang = path(p, `M290 620A90 90 0 0 0 ${200 + 90 * Math.cos(.62)} ${620 - 90 * Math.sin(.62)}`, { stroke: COL.task, 'stroke-width': 4 }, { d: 0 }); draw(ang, .8, .5);
+    ml(p, ['θ'], 320, 600, 1, { size: 40, fill: COL.task });
+    tx(p, 'hypotenuse', 430, 390, m('hyp'), { size: 32, fill: COL.whole, anchor: 'middle' });
+    tx(p, 'opposite', 790, 430, m('opp'), { size: 32, fill: COL.irr });
+    tx(p, 'adjacent', 480, 670, m('adj'), { size: 32, fill: COL.nat, anchor: 'middle' });
+    [['SOH', 'sin θ = ', F('opp', 'hyp'), 260, 'sin'], ['CAH', 'cos θ = ', F('adj', 'hyp'), 420, 'cos'], ['TOA', 'tan θ = ', F('opp', 'adj'), 580, 'tan']].forEach(([w, l, r, y, k]) => {
+      tx(p, w, 960, y, m(k), { size: 40, fill: COL.task, weight: 700 });
+      ml(p, [l, r], 1100, y, m(k, .2), { size: 48, anchor: 'start' });
+    });
+  }],
+  ['elev', 'Find a side', (m) => {
+    const p = panel(0);
+    scene2(p, m, '40°', 'd = ?');
+    tx(p, 'opposite and hypotenuse → sine', 1220, 150, m('which'), { size: 30, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['sin 40° = ', F('500', 'd')], 1220, 270, m('sin'), { size: 50 });
+    ml(p, ['d · sin 40° = 500'], 1220, 380, m('mult'), { size: 50 });
+    ml(p, ['d = ', F('500', 'sin 40°')], 1220, 500, m('div'), { size: 50 });
+    const a = ml(p, ['d ≈ 778 feet'], 1220, 630, m('calc'), { size: 50, fill: COL.good });
+    boxMath(p, a, 1220, 630, 50, m('calc', .6));
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-ratio', prompt: ['You know the side opposite θ and the hypotenuse. Which ratio connects them?'],
+    build: choice([[$m('sin θ')], [$m('cos θ')], [$m('tan θ')]], 0, 'SOH: sine is opposite over hypotenuse.',
+      [null, 'Cosine uses the adjacent side: CAH.', 'Tangent uses opposite over adjacent: TOA. There is no hypotenuse in it.']),
+  }], done) }],
+  ['back', 'Find an angle', (m) => {
+    const p = panel(0);
+    scene2(p, m, 'θ = ?', '800 ft');
+    ml(p, ['sin θ = ', F('500', '800'), ' = ', F(5, 8)], 1220, 230, m('sin'), { size: 50 });
+    ml(p, ['θ = sin', E('−1'), '(', F(5, 8), ')'], 1220, 370, m('inv'), { size: 50 });
+    const a = ml(p, ['θ ≈ 38.7°'], 1220, 500, m('calc'), { size: 54, fill: COL.good });
+    boxMath(p, a, 1220, 500, 54, m('calc', .6));
+    tx(p, 'calculator in DEGREE mode', 1220, 610, m('mode'), { size: 30, fill: COL.task, anchor: 'middle' });
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-kite', prompt: ['A kite is 60 ft above the ground on 100 ft of straight string. Find the angle of elevation of the string, to the nearest tenth of a degree.'],
+    build: blanks([{ parts: ['θ ≈ ', { box: '36.9' }, '°'], why: 'sin θ = 60/100 = 0.6, so θ = sin⁻¹(0.6) ≈ 36.87°, about 36.9°.', hint: 'Height is opposite, string is hypotenuse: sin θ = 60/100. Then use sin⁻¹ in degree mode.' }]),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Label opposite, adjacent and hypotenuse from θ.', 'w1'], ['Pick the ratio with the side you know and the one you want.', 'w2'],
+      ['Unknown side: solve for it, then use the calculator.', 'w3'], ['Unknown angle: use sin⁻¹, cos⁻¹ or tan⁻¹ in degree mode.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q4a', prompt: [fromExam('4a'), 'Calculator allowed. A plane flies 10,000 feet above flat ground. The angle of elevation from the observer to the plane is 53°. How far is the observer from the plane? Round to the nearest foot, and type it without a comma.'],
+    build: blanks([{ parts: ['d ≈ ', { box: '12521' }, '  feet'], why: 'sin 53° = 10,000/d, so d = 10,000/sin 53° ≈ 12,521 feet.', hint: 'Height is opposite the 53° angle; the distance d is the hypotenuse. Use sin 53° = 10,000/d.' }]),
+  }, {
+    id: 'p-q4b', prompt: [fromExam('4b'), 'Later, the plane is 12,000 feet from the observer, still 10,000 feet up. Find the new angle of elevation, to the nearest tenth of a degree.'],
+    build: blanks([{ parts: ['θ ≈ ', { box: '56.4' }, '°'], why: 'sin θ = 10,000/12,000 = 5/6, so θ = sin⁻¹(5/6) ≈ 56.4°.', hint: 'sin θ = opposite/hypotenuse = 10,000/12,000. Then use sin⁻¹ in degree mode.' }]),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

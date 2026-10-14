@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inverse Trig Functions · Math 141 Midterm 3 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 3 Review, Chapter 8. Old midterm questions 15–18 and 10 (the sin⁻¹, cos⁻¹ rows). Storyboard: books/math141-midterm3/chapters/ch08.md.
+const CHAPTER = { number: 8, title: 'Inverse Trig Functions', minutes: 8, language: 'en' };
+
+/* ---------- chapter data (checked in ch08.md) ---------- */
+// arccos(−√3/2) = 5π/6.  arcsin(sin(5π/4)) = arcsin(−√2/2) = −π/4.  arcsin(1/2) = π/6.
+// cos(tan⁻¹(x/2)): opp x, adj 2, hyp √(x² + 4) → 2/√(x² + 4).
+const U = { x: 380, y: 400, r: 200 };
+const UX = v => U.x + U.r * v, UY = v => U.y - U.r * v;
+const PI = Math.PI;
+
+function unit(p, t0) {
+  path(p, `M${U.x - U.r - 50} ${U.y}H${U.x + U.r + 50}M${U.x} ${U.y - U.r - 50}V${U.y + U.r + 50}`, { stroke: COL.dim, 'stroke-width': 2.5 });
+  draw(path(p, `M${U.x + U.r} ${U.y}A${U.r} ${U.r} 0 1 0 ${U.x - U.r} ${U.y}A${U.r} ${U.r} 0 1 0 ${U.x + U.r} ${U.y}`, { stroke: COL.chalk, 'stroke-opacity': .5, 'stroke-width': 3 }, { d: 0 }), t0, 1);
+}
+// A thick arc of the unit circle from angle a to b (counterclockwise), the function's range.
+const rangeArc = (p, a, b, color, t0) => draw(path(p, `M${UX(Math.cos(a))} ${UY(Math.sin(a))}A${U.r} ${U.r} 0 0 0 ${UX(Math.cos(b))} ${UY(Math.sin(b))}`, { stroke: color, 'stroke-width': 10 }, { d: 0 }), t0, .9);
+function spoke(p, a, color, t0) {
+  draw(path(p, `M${U.x} ${U.y}L${UX(Math.cos(a))} ${UY(Math.sin(a))}`, { stroke: color, 'stroke-width': 5 }, { d: 0 }), t0, .5);
+  const d = G(p, { x: UX(Math.cos(a)), y: UY(Math.sin(a)), s: 0, o: 0 }); mk('circle', { r: 11, fill: color }, d); pop(d, t0 + .4);
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Inverse trig functions', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Inverse Trig · Chapter 8', 'Inverse Trig Functions', 'the answer must land in the right range', 'Old midterm questions 15–18 and 10 · no calculator');
+  }],
+  ['ranges', 'The three ranges', (m) => {
+    const p = panel(0);
+    unit(p, .1);
+    rangeArc(p, -PI / 2, PI / 2, COL.whole, m('sin'));
+    ml(p, ['arcsin = sin', E('−1'), ':  range  [−', F('π', 2), ', ', F('π', 2), ']'], 1110, 200, m('sin'), { size: 40, fill: COL.whole });
+    tx(p, 'right half of the circle', 1110, 250, m('sin', .4), { size: 26, fill: COL.dim, anchor: 'middle' });
+    tx(p, 'domain [−1, 1]', 1110, 290, m('sin', .7), { size: 26, fill: COL.dim, anchor: 'middle' });
+    rangeArc(p, 0, PI, COL.task, m('cos'));
+    ml(p, ['arccos = cos', E('−1'), ':  range  [0, π]'], 1110, 400, m('cos'), { size: 40, fill: COL.task });
+    tx(p, 'top half of the circle', 1110, 450, m('cos', .4), { size: 26, fill: COL.dim, anchor: 'middle' });
+    tx(p, 'domain [−1, 1]', 1110, 490, m('cos', .7), { size: 26, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['arctan = tan', E('−1'), ':  range  (−', F('π', 2), ', ', F('π', 2), ')'], 1110, 600, m('tan'), { size: 40, fill: COL.irr });
+    tx(p, 'right half, without the top and bottom; domain (−∞, ∞)', 1110, 650, m('tan', .4), { size: 26, fill: COL.dim, anchor: 'middle' });
+  }],
+  ['eval', 'Evaluate arccos', (m) => {
+    const p = panel(0);
+    unit(p, .1);
+    rangeArc(p, 0, PI, COL.task, .4);
+    ml(p, ['arccos(−', F('√3', 2), ') = ?'], 1110, 170, .3, { size: 48 });
+    tx(p, 'which angle in [0, π] has cos = −√3/2?', 1110, 260, m('ask'), { size: 30, fill: COL.dim, anchor: 'middle' });
+    spoke(p, 5 * PI / 6, COL.whole, m('find'));
+    dashed(p, `M${UX(-Math.sqrt(3) / 2)} ${UY(.5)}V${U.y}`, m('find', .6), COL.whole);
+    ml(p, ['cos(', F('5π', 6), ') = −', F('√3', 2), '   ✓'], 1110, 380, m('find', .4), { size: 44, fill: COL.whole });
+    const a = ml(p, ['arccos(−', F('√3', 2), ') = ', F('5π', 6)], 1110, 520, m('ans'), { size: 48, fill: COL.good });
+    boxMath(p, a, 1110, 520, 48, m('ans', .5));
+    tx(p, 'not 7π/6: that is outside [0, π]', 1110, 640, m('not'), { size: 30, fill: COL.bad, anchor: 'middle' });
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-asin', prompt: ['Evaluate arcsin(1/2).'],
+    build: choice([[$m(F('π', 6))], [$m(F('5π', 6))], [$m(F('π', 3))]], 0, 'sin(π/6) = 1/2, and π/6 is in arcsin’s range [−π/2, π/2].',
+      [null, 'sin(5π/6) = 1/2 too, but 5π/6 is outside [−π/2, π/2].', 'sin(π/3) = √3/2, not 1/2.']),
+  }], done) }],
+  ['comp', 'arcsin(sin θ)', (m) => {
+    const p = panel(0);
+    unit(p, .1);
+    rangeArc(p, -PI / 2, PI / 2, COL.whole, .4);
+    ml(p, ['arcsin(sin ', F('5π', 4), ')'], 1110, 160, .3, { size: 48 });
+    spoke(p, 5 * PI / 4, COL.nat, m('inner'));
+    ml(p, ['sin ', F('5π', 4), ' = −', F('√2', 2)], 1110, 290, m('inner', .4), { size: 44, fill: COL.nat });
+    const hz = path(p, `M${UX(-Math.SQRT1_2)} ${UY(-Math.SQRT1_2)}H${UX(Math.SQRT1_2)}`, { stroke: COL.dim, 'stroke-width': 2.5, 'stroke-dasharray': '8 8' }, { o: 0 });
+    show(hz, m('brother'));
+    spoke(p, -PI / 4, COL.whole, m('brother', .3));
+    tx(p, 'same height, inside the range: the brother', 1110, 390, m('brother'), { size: 28, fill: COL.dim, anchor: 'middle' });
+    const a = ml(p, ['arcsin(−', F('√2', 2), ') = −', F('π', 4)], 1110, 520, m('ans'), { size: 48, fill: COL.good });
+    boxMath(p, a, 1110, 520, 48, m('ans', .5));
+    tx(p, 'not 5π/4: arcsin never gives that', 1110, 640, m('not'), { size: 30, fill: COL.bad, anchor: 'middle' });
+  }],
+  ['graph', 'y = arctan x', (m) => {
+    const p = panel(0);
+    const P = { PX: x => 800 + x * 100, PY: y => 400 - y * 150 };
+    path(p, `M${P.PX(-6.5)} ${P.PY(0)}H${P.PX(6.5)}M${P.PX(0)} ${P.PY(2)}V${P.PY(-2)}`, { stroke: COL.chalk, 'stroke-width': 3 });
+    [-1, 1].forEach(v => { path(p, `M${P.PX(v)} ${P.PY(0) - 8}V${P.PY(0) + 8}`, { stroke: COL.chalk, 'stroke-width': 3 }); M(p, [v > 0 ? '1' : '−1'], { x: P.PX(v), y: P.PY(0) + 40, size: 28, fill: COL.dim }); });
+    [1, -1].forEach(s => { dashed(p, `M${P.PX(-6.5)} ${P.PY(s * PI / 2)}H${P.PX(6.5)}`, m('ha'), COL.nat, 4);
+      ml(p, [s > 0 ? '' : '−', F('π', 2)], P.PX(0) - 20, P.PY(s * PI / 2) + (s > 0 ? -16 : 52), m('ha', .3), { size: 34, fill: COL.nat, anchor: 'end' }); });
+    draw(path(p, curveD(P, Math.atan, -6.5, 6.5, 120), { stroke: COL.whole, 'stroke-width': 5 }, { d: 0 }), m('curve'), 1.4);
+    const d = G(p, { x: P.PX(0), y: P.PY(0), s: 0, o: 0 }); mk('circle', { r: 11, fill: COL.whole }, d); pop(d, m('origin'));
+    tx(p, 'horizontal asymptotes  y = ±π/2', 1180, 110, m('ha', .6), { size: 30, fill: COL.nat, anchor: 'middle' });
+  }],
+  ['tri', 'The triangle model', (m) => {
+    const p = panel(0);
+    ml(p, ['cos(tan', E('−1'), '(', F('x', 2), '))'], 1110, 120, .3, { size: 46 });
+    ml(p, ['θ = tan', E('−1'), '(', F('x', 2), '),  so  tan θ = ', F('x', 2), ' = ', F('opp', 'adj')], 1110, 220, m('let'), { size: 38 });
+    const t = path(p, 'M120 560H620V260Z', { stroke: COL.chalk, 'stroke-width': 4 }, { d: 0 }); draw(t, m('draw'), 1);
+    path(p, 'M594 560V534H620', { stroke: COL.dim, 'stroke-width': 2.5 });
+    ml(p, ['θ'], 210, 540, m('draw', .5), { size: 38, fill: COL.task });
+    ml(p, ['x'], 650, 420, m('draw', .7), { size: 40, fill: COL.irr, anchor: 'start' });
+    ml(p, ['2'], 370, 610, m('draw', .9), { size: 40, fill: COL.nat });
+    ml(p, ['x', E(2), ' + 2', E(2), ' = hyp', E(2)], 1110, 330, m('pyth'), { size: 40 });
+    ml(p, ['hyp = ', R('x² + 4')], 1110, 420, m('pyth', 1), { size: 40, fill: COL.whole });
+    ml(p, [R('x² + 4')], 300, 380, m('pyth', 1.3), { size: 36, fill: COL.whole, anchor: 'end' });
+    ml(p, ['cos θ = ', F('adj', 'hyp'), ' = ', F('2', '√(x² + 4)')], 1110, 540, m('cah'), { size: 42 });
+    const a = ml(p, ['= ', F('2', '√(x² + 4)')], 1110, 660, m('ans'), { size: 42, fill: COL.good });
+    boxMath(p, a, 1110, 660, 42, m('ans', .4));
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-tri', prompt: ['If θ = sin⁻¹(x/3), which side of the right triangle is x?'],
+    build: choice([['the side opposite θ'], ['the side adjacent to θ'], ['the hypotenuse']], 0, 'sin θ = x/3 = opp/hyp, so x is opposite θ and 3 is the hypotenuse.',
+      [null, 'Sine is opposite over hypotenuse, so x is opposite.', 'The hypotenuse is the denominator, 3.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['arcsin: [−π/2, π/2]. arccos: [0, π]. arctan: (−π/2, π/2).', 'w1'], ['The answer must be in the range: use the brother if needed.', 'w2'],
+      ['arctan x has asymptotes y = ±π/2 and passes through (0, 0).', 'w3'], ['Compositions: let θ = the inside, draw the triangle, Pythagoras.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q15', prompt: [fromExam(15), 'No calculator. Evaluate arccos(−1/2).'],
+    build: choice([[$m(F('2π', 3))], [$m(F('4π', 3))], [$m('−', F('π', 3))]], 0, 'cos(2π/3) = −1/2, and 2π/3 is in arccos’s range [0, π].',
+      [null, 'cos(4π/3) = −1/2 too, but 4π/3 is outside [0, π].', 'Negative angles are outside arccos’s range [0, π].']),
+  }, {
+    id: 'p-q16', prompt: [fromExam(16), 'Evaluate arcsin(sin(4π/3)).'],
+    build: choice([[$m('−', F('π', 3))], [$m(F('4π', 3))], [$m(F('π', 3))]], 0, 'sin(4π/3) = −√3/2, and arcsin(−√3/2) = −π/3, the brother in [−π/2, π/2].',
+      [null, '4π/3 is outside arcsin’s range [−π/2, π/2], so arcsin cannot return it.', 'sin(4π/3) is negative, so the answer is negative.']),
+  }, {
+    id: 'p-q17', prompt: [fromExam(17), 'Graph y = arctan x. What are its asymptotes?'],
+    build: choice([[$m('y = ±', F('π', 2), ' (horizontal)')], [$m('x = ±', F('π', 2), ' (vertical)')], ['none']], 0, 'arctan x levels off toward π/2 on the right and −π/2 on the left, through (0, 0).',
+      [null, 'Vertical asymptotes x = ±π/2 belong to tan x. Flipping the graph turns them horizontal.', 'Its outputs stay strictly between −π/2 and π/2.']),
+  }, {
+    id: 'p-q18', prompt: [fromExam(18), 'Write sec(sin⁻¹(x/3)) as an algebraic expression.'],
+    build: choice([[$m(F(3, '√(9 − x²)'))], [$m(F('√(9 − x²)', 3))], [$m(F(3, '3 − x'))]], 0, 'θ = sin⁻¹(x/3): opp x, hyp 3, adj √(9 − x²). sec θ = hyp/adj = 3/√(9 − x²).',
+      [null, 'That is cos θ = adj/hyp. Secant is its reciprocal.', '√(9 − x²) is not 3 − x.']),
+  }, {
+    id: 'p-q10e', prompt: [fromExam(10), 'The sin⁻¹ x row: domain and range?'],
+    build: choice([[$m('[−1, 1];  [−', F('π', 2), ', ', F('π', 2), ']')], [$m('[−1, 1];  [0, π]')], [$m('(−∞, ∞);  [−1, 1]')]], 0, 'sin⁻¹ takes sine values, [−1, 1], and returns angles in [−π/2, π/2].',
+      [null, '[0, π] is the range of cos⁻¹.', 'That is sin x. The inverse swaps domain and range (restricted).']),
+  }, {
+    id: 'p-q10f', prompt: ['Question 10. The cos⁻¹ x row: domain and range?'],
+    build: choice([[$m('[−1, 1];  [0, π]')], [$m('[−1, 1];  [−', F('π', 2), ', ', F('π', 2), ']')], [$m('[0, π];  [−1, 1]')]], 0, 'cos⁻¹ takes [−1, 1] and returns angles in [0, π].',
+      [null, 'That range belongs to sin⁻¹.', 'Domain and range are swapped.']),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

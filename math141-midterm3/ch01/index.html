@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Radians and Arc Length · Math 141 Midterm 3 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 3 Review, Chapter 1. Old midterm questions 1 and 6. Storyboard: books/math141-midterm3/chapters/ch01.md.
+const CHAPTER = { number: 1, title: 'Radians and Arc Length', minutes: 5, language: 'en', next: '../ch02/' };
+
+/* ---------- chapter data (checked in ch01.md) ---------- */
+// r = 5 cm, s = 12 cm: θ = 12/5 = 2.4 radians.  150° = 5π/6;  2π/3 = 120°.
+const C = { x: 430, y: 420, r: 200 }, TH = 2.4;
+const pt = a => [C.x + C.r * Math.cos(a), C.y - C.r * Math.sin(a)];
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Radians and arc length', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Angles and Right Triangles · Chapter 1', 'Radians and Arc Length', 'measure an angle by the arc it cuts off', 'Old midterm questions 1 (calculator) and 6 (no calculator)');
+  }],
+  ['arc', 'Arc length: s = rθ', (m) => {
+    const p = panel(0);
+    const ring = path(p, `M${C.x + C.r} ${C.y}A${C.r} ${C.r} 0 1 0 ${C.x - C.r} ${C.y}A${C.r} ${C.r} 0 1 0 ${C.x + C.r} ${C.y}`, { stroke: COL.dim, 'stroke-width': 3 }, { d: 0 });
+    draw(ring, .2, 1);
+    const [ex, ey] = pt(TH);
+    const r1 = path(p, `M${C.x} ${C.y}H${C.x + C.r}`, { stroke: COL.chalk, 'stroke-width': 4 }, { d: 0 }); draw(r1, m('r'), .5);
+    tx(p, 'r = 5 cm', C.x + 100, C.y + 44, m('r', .3), { size: 32, anchor: 'middle' });
+    const r2 = path(p, `M${C.x} ${C.y}L${ex} ${ey}`, { stroke: COL.chalk, 'stroke-width': 4 }, { d: 0 }); draw(r2, m('angle'), .5);
+    const wedge = path(p, `M${C.x + 60} ${C.y}A60 60 0 0 0 ${C.x + 60 * Math.cos(TH)} ${C.y - 60 * Math.sin(TH)}`, { stroke: COL.task, 'stroke-width': 4 }, { d: 0 });
+    draw(wedge, m('angle', .3), .6);
+    ml(p, ['θ'], C.x + 40, C.y - 70, m('angle', .6), { size: 40, fill: COL.task });
+    const s = path(p, `M${C.x + C.r} ${C.y}A${C.r} ${C.r} 0 0 0 ${ex} ${ey}`, { stroke: COL.whole, 'stroke-width': 9 }, { d: 0 });
+    draw(s, m('s'), 1.2);
+    tx(p, 's = 12 cm', C.x + 150, C.y - 215, m('s', .8), { size: 32, fill: COL.whole });
+    ml(p, ['s = rθ'], 1150, 220, m('formula'), { size: 64, fill: COL.task });
+    ml(p, ['12 = 5θ'], 1150, 340, m('plug'), { size: 54 });
+    ml(p, ['θ = ', F(12, 5), ' = 2.4'], 1150, 470, m('solve'), { size: 54 });
+    const a = ml(p, ['θ = 2.4 radians'], 1150, 600, m('units'), { size: 50, fill: COL.good });
+    boxMath(p, a, 1150, 600, 50, m('units', .5));
+    tx(p, 'cm ÷ cm: the units cancel', 1150, 680, m('units', 1), { size: 28, fill: COL.dim, anchor: 'middle' });
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-arc', prompt: ['A circle has radius 3 m. A central angle cuts off an arc of 10.5 m. Find θ in radians.'],
+    build: blanks([{ parts: ['θ = ', { box: '3.5' }, '  radians'], why: 's = rθ: 10.5 = 3θ, so θ = 10.5/3 = 3.5 radians.', hint: 'Divide the arc length by the radius: θ = s/r.' }]),
+  }], done) }],
+  ['convert', 'Degrees and radians', (m) => {
+    const p = panel(0);
+    const half = path(p, `M650 250A150 150 0 0 1 950 250`, { stroke: COL.whole, 'stroke-width': 7 }, { d: 0 });
+    path(p, 'M610 250H990', { stroke: COL.dim, 'stroke-width': 3 }); draw(half, m('half'), 1);
+    ml(p, ['180° = π radians'], 800, 330, m('half', .6), { size: 54, fill: COL.whole });
+    tx(p, 'degrees → radians', 140, 500, m('deg'), { size: 30, fill: COL.dim });
+    ml(p, ['× ', F('π', '180°')], 560, 500, m('deg', .3), { size: 54, fill: COL.task });
+    ml(p, ['150° · ', F('π', '180°'), ' = ', F('150π', 180), ' = ', F('5π', 6)], 1110, 500, m('ex'), { size: 50 });
+    tx(p, 'radians → degrees', 140, 660, m('back'), { size: 30, fill: COL.dim });
+    ml(p, ['× ', F('180°', 'π')], 560, 660, m('back', .3), { size: 54, fill: COL.task });
+    ml(p, [F('2π', 3), ' · ', F('180°', 'π'), ' = 120°'], 1110, 660, m('back', 1), { size: 50 });
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-deg', prompt: ['Convert 135° into radians. Simplify the fraction.'],
+    build: blanks([{ parts: ['135° = ', { box: '3', lowest: true }, 'π / ', { box: '4', lowest: true }], why: '135 · π/180 = 135π/180 = 3π/4 (divide top and bottom by 45).', hint: 'Multiply by π/180°, then reduce 135/180.' }]),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Arc length: s = rθ, with θ in radians.', 'w1'], ['θ = s ÷ r. The length units cancel.', 'w2'],
+      ['Degrees → radians: multiply by π/180°.', 'w3'], ['Radians → degrees: multiply by 180°/π.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q1', prompt: [fromExam(1), 'Calculator allowed. A circle has radius 4 feet. A central angle intercepts an arc of 7 feet. Find the radian measure of the angle.'],
+    build: blanks([{ parts: ['θ = ', { box: '1.75' }, '  radians'], why: 's = rθ: 7 = 4θ, so θ = 7/4 = 1.75 radians.', hint: 'Use s = rθ with s = 7 and r = 4.' }]),
+  }, {
+    id: 'p-q6', prompt: [fromExam(6), 'No calculator. Convert 80° into radians.'],
+    build: blanks([{ parts: ['80° = ', { box: '4', lowest: true }, 'π / ', { box: '9', lowest: true }], why: '80 · π/180 = 80π/180 = 4π/9 (divide by 20).', hint: 'Multiply by π/180°, then reduce 80/180.' }]),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

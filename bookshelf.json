@@ -35,6 +35,20 @@
       "hue": "#f3c95c"
     },
     {
+      "slug": "math141-midterm3",
+      "title": "Math 141 Midterm 3",
+      "subtitle": "All 18 questions from the Spring 2026 Midterm 3 in 8 chapters: radians, right triangles, the unit circle, identities, trig graphs and inverse trig",
+      "status": "Pilot / in review",
+      "href": "math141-midterm3/",
+      "chapters": {
+        "available": 8,
+        "planned": 8
+      },
+      "note": "All chapters awaiting your review; none approved yet. Methods follow the Spring 2026 worked solutions.",
+      "updated": "2026-10-13",
+      "hue": "#8fd6b0"
+    },
+    {
       "slug": "math141-midterm2",
       "title": "Math 141 Midterm 2",
       "subtitle": "All 23 practice-midterm questions in 8 chapters: parabolas, polynomials, rational functions, exponentials and logs",

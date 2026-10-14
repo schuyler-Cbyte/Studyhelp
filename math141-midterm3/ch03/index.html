@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Solving Trig Equations with a Calculator · Math 141 Midterm 3 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 3 Review, Chapter 3. Old midterm questions 2 and 3. Storyboard: books/math141-midterm3/chapters/ch03.md.
+const CHAPTER = { number: 3, title: 'Solving Trig Equations with a Calculator', minutes: 6, language: 'en', next: '../ch04/' };
+
+/* ---------- chapter data (checked in ch03.md) ---------- */
+// tan θ = 2 on [0, 2π): 1.107, 1.107 + π ≈ 4.249.  cos θ = −0.6 on [0°, 360°): 126.9°, 233.1°.
+// Checks: tan θ = 3 → 1.249, 4.391.  sin θ = 0.3 → 17.5°, 162.5°.
+const U = { x: 420, y: 400, r: 220 };
+const UX = v => U.x + U.r * v, UY = v => U.y - U.r * v;
+
+// The unit circle with axes; quadrant letters when asked.
+function circle(p, t0, letters = false) {
+  path(p, `M${U.x - U.r - 50} ${U.y}H${U.x + U.r + 50}M${U.x} ${U.y - U.r - 50}V${U.y + U.r + 50}`, { stroke: COL.dim, 'stroke-width': 2.5 });
+  const c = path(p, `M${U.x + U.r} ${U.y}A${U.r} ${U.r} 0 1 0 ${U.x - U.r} ${U.y}A${U.r} ${U.r} 0 1 0 ${U.x + U.r} ${U.y}`, { stroke: COL.chalk, 'stroke-width': 3.5 }, { d: 0 });
+  draw(c, t0, 1);
+  if (letters) return [['S', -1, 1, 'sin, csc'], ['A', 1, 1, 'all six'], ['T', -1, -1, 'tan, cot'], ['C', 1, -1, 'cos, sec']].map(([L, sx, sy, sub]) => {
+    const g = G(p, { o: 0 });
+    T(g, L, { x: U.x + sx * 110, y: U.y - sy * 100 + 14, size: 64, weight: 700, fill: COL.task, anchor: 'middle' });
+    T(g, sub, { x: U.x + sx * 110, y: U.y - sy * 100 + 52, size: 22, fill: COL.dim, anchor: 'middle' });
+    return g;
+  });
+}
+const dotAt = (p, a, color, t0) => { const d = G(p, { x: UX(Math.cos(a)), y: UY(Math.sin(a)), s: 0, o: 0 }); mk('circle', { r: 11, fill: color }, d); pop(d, t0); return d; };
+const rayTo = (p, a, color, t0) => { const l = path(p, `M${U.x} ${U.y}L${UX(Math.cos(a))} ${UY(Math.sin(a))}`, { stroke: color, 'stroke-width': 5 }, { d: 0 }); draw(l, t0, .6); return l; };
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Trig equations', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Trig Values · Chapter 3', ['Solving Trig Equations', 'with a Calculator'], 'the calculator gives one answer; find its brother', 'Old midterm questions 2 and 3 · calculator');
+  }],
+  ['astc', 'ASTC', (m) => {
+    const p = panel(0);
+    const L = circle(p, .2, true);
+    [1, 0, 2, 3].forEach((k, i) => show(L[k], m(['a', 's', 't', 'c'][i])));
+    tx(p, 'Which functions are positive?', 1000, 200, .4, { size: 34, fill: COL.dim });
+    tx(p, 'Quadrant I: All', 1000, 300, m('a'), { size: 38 });
+    tx(p, 'Quadrant II: Sine', 1000, 390, m('s'), { size: 38 });
+    tx(p, 'Quadrant III: Tangent', 1000, 480, m('t'), { size: 38 });
+    tx(p, 'Quadrant IV: Cosine', 1000, 570, m('c'), { size: 38 });
+    tx(p, 'Usually two solutions in one turn.', 1000, 670, m('two'), { size: 32, fill: COL.task });
+  }],
+  ['tan', 'tan θ = 2', (m) => {
+    const p = panel(0);
+    circle(p, .1);
+    const a = Math.atan(2);
+    const line = path(p, `M${UX(-Math.cos(a) * 1.25)} ${UY(-Math.sin(a) * 1.25)}L${UX(Math.cos(a) * 1.25)} ${UY(Math.sin(a) * 1.25)}`, { stroke: COL.dim, 'stroke-width': 2, 'stroke-dasharray': '8 8' }, { o: 0 });
+    rayTo(p, a, COL.whole, m('calc', .3)); dotAt(p, a, COL.whole, m('calc', .8));
+    ml(p, ['tan θ = 2,   0 ≤ θ < 2π'], 1140, 150, .3, { size: 44 });
+    ml(p, ['θ = tan', E('−1'), '(2) ≈ 1.107'], 1140, 260, m('calc'), { size: 44, fill: COL.whole });
+    tx(p, 'Quadrant I, from the calculator', 1140, 305, m('calc', .5), { size: 26, fill: COL.dim, anchor: 'middle' });
+    rayTo(p, a + Math.PI, COL.task, m('brother', .3)); dotAt(p, a + Math.PI, COL.task, m('brother', .8));
+    tx(p, 'tangent is also positive in Quadrant III', 1140, 390, m('q3'), { size: 28, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['brother:  1.107 + π ≈ 4.249'], 1140, 470, m('brother'), { size: 44, fill: COL.task });
+    show(line, m('slope'));
+    tx(p, 'same line, same slope 2', 1140, 540, m('slope'), { size: 28, fill: COL.dim, anchor: 'middle' });
+    const s = ml(p, ['{1.107, 4.249}'], 1140, 650, m('set'), { size: 50, fill: COL.good });
+    boxMath(p, s, 1140, 650, 50, m('set', .5));
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-tan', prompt: ['Solve tan θ = 3 for 0 ≤ θ < 2π. tan⁻¹(3) ≈ 1.249. Give the other solution to three decimal places.'],
+    build: blanks([{ parts: ['{1.249, ', { box: '4.391' }, '}'], why: 'Tangent is positive in Quadrant III too: 1.249 + π ≈ 4.391.', hint: 'For tangent, the brother is θ + π. Use the unrounded tan⁻¹(3) if you can.' }]),
+  }], done) }],
+  ['cos', 'cos θ = −0.6', (m) => {
+    const p = panel(0);
+    circle(p, .1);
+    const a = Math.acos(-.6);
+    const v = path(p, `M${UX(-.6)} ${UY(1.1)}V${UY(-1.1)}`, { stroke: COL.dim, 'stroke-width': 2, 'stroke-dasharray': '8 8' }, { o: 0 });
+    rayTo(p, a, COL.whole, m('calc', .3)); dotAt(p, a, COL.whole, m('calc', .8));
+    ml(p, ['cos θ = −0.6,   0° ≤ θ < 360°'], 1140, 150, .3, { size: 44 });
+    ml(p, ['θ = cos', E('−1'), '(−0.6) ≈ 126.9°'], 1140, 260, m('calc'), { size: 44, fill: COL.whole });
+    tx(p, 'Quadrant II, from the calculator', 1140, 305, m('calc', .5), { size: 26, fill: COL.dim, anchor: 'middle' });
+    rayTo(p, -a, COL.task, m('brother', .3)); dotAt(p, -a, COL.task, m('brother', .8));
+    tx(p, 'cosine is also negative in Quadrant III', 1140, 390, m('q3'), { size: 28, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['brother:  360° − 126.9° ≈ 233.1°'], 1140, 470, m('brother'), { size: 44, fill: COL.task });
+    show(v, m('same'));
+    tx(p, 'same x-coordinate, −0.6', 1140, 540, m('same'), { size: 28, fill: COL.dim, anchor: 'middle' });
+    const s = ml(p, ['{126.9°, 233.1°}'], 1140, 650, m('set'), { size: 50, fill: COL.good });
+    boxMath(p, s, 1140, 650, 50, m('set', .5));
+  }],
+  ['rules', 'Finding the brother', (m) => {
+    const p = panel(0);
+    tx(p, 'The brother angle, from the calculator angle θ', 800, 180, .3, { size: 34, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['tangent:   θ + π     (θ + 180°)'], 800, 320, m('tan'), { size: 48 });
+    tx(p, 'same line through the centre', 800, 370, m('tan', .4), { size: 26, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['cosine:   2π − θ     (360° − θ)'], 800, 470, m('cos'), { size: 48 });
+    tx(p, 'same x-coordinate', 800, 520, m('cos', .4), { size: 26, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['sine:   π − θ     (180° − θ)'], 800, 620, m('sin'), { size: 48 });
+    tx(p, 'same y-coordinate', 800, 670, m('sin', .4), { size: 26, fill: COL.dim, anchor: 'middle' });
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-sin', prompt: ['Solve sin θ = 0.3 for 0° ≤ θ < 360°, to the nearest tenth of a degree.'],
+    build: blanks([{ parts: ['{', { box: '17.5' }, '°, ', { box: '162.5' }, '°}'], why: 'sin⁻¹(0.3) ≈ 17.5° in Quadrant I. Sine is also positive in Quadrant II: 180° − 17.5° = 162.5°.', hint: 'Start with sin⁻¹(0.3) in degree mode. The sine brother is 180° − θ.' }]),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Use the inverse key for the first solution.', 'w1'], ['ASTC tells you the other quadrant.', 'w2'],
+      ['Find the brother angle in that quadrant.', 'w3'], ['Check the mode and the interval; round; use set braces.', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q2', prompt: [fromExam(2), 'Calculator allowed. Solve tan θ = 3.92 for 0 ≤ θ < 2π, in radians, to the nearest thousandth.'],
+    build: blanks([{ parts: ['{', { box: '1.321' }, ', ', { box: '4.463' }, '}'], why: 'tan⁻¹(3.92) ≈ 1.321 in Quadrant I. Tangent is also positive in Quadrant III: 1.321 + π ≈ 4.463.', hint: 'Radian mode: tan⁻¹(3.92). The tangent brother is θ + π.' }]),
+  }, {
+    id: 'p-q3', prompt: [fromExam(3), 'Solve cos θ = −0.8 for 0° ≤ θ < 360°, in degrees, to the nearest tenth.'],
+    build: blanks([{ parts: ['{', { box: '143.1' }, '°, ', { box: '216.9' }, '°}'], why: 'cos⁻¹(−0.8) ≈ 143.1° in Quadrant II. Cosine is also negative in Quadrant III: 360° − 143.1° ≈ 216.9°.', hint: 'Degree mode: cos⁻¹(−0.8). The cosine brother is 360° − θ.' }]),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

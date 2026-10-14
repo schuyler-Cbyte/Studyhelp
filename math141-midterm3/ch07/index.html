@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reciprocal Graphs, Domains and Ranges · Math 141 Midterm 3 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 3 Review, Chapter 7. Old midterm questions 14 and 10 (the cos, tan, cot, sec rows). Storyboard: books/math141-midterm3/chapters/ch07.md.
+const CHAPTER = { number: 7, title: 'Reciprocal Graphs, Domains and Ranges', minutes: 6, language: 'en', next: '../ch08/' };
+
+/* ---------- chapter data (checked in ch07.md) ---------- */
+// sec x = 1/cos x: VAs where cos x = 0 (x = π/2 + πn); touches cos at x = πn (cos = ±1); range (−∞, −1] ∪ [1, ∞).
+const PI = Math.PI, AX = { PX: x => 800 + x * 1240 / (4 * PI), PY: y => 400 - 80 * y };
+const SETNE = (a) => ['{x | x ≠ ', ...a, '  (n ∈ ℤ)}'];
+const ROWS = [
+  ['sin x', ['(−∞, ∞)'], ['[−1, 1]'], 'sc'], ['cos x', ['(−∞, ∞)'], ['[−1, 1]'], 'sc'],
+  ['tan x', SETNE([F('π', 2), ' + πn']), ['(−∞, ∞)'], 'tan'], ['cot x', SETNE(['πn']), ['(−∞, ∞)'], 'cot'],
+  ['sec x', SETNE([F('π', 2), ' + πn']), ['(−∞, −1] ∪ [1, ∞)'], 'sec'], ['csc x', SETNE(['πn']), ['(−∞, −1] ∪ [1, ∞)'], 'sec'],
+];
+
+function axesPi(p, t0) {
+  const g = G(p, { o: 0 });
+  path(g, `M${AX.PX(-2 * PI) - 40} ${AX.PY(0)}H${AX.PX(2 * PI) + 40}M${AX.PX(0)} ${AX.PY(3.6)}V${AX.PY(-3.6)}`, { stroke: COL.chalk, 'stroke-width': 3 });
+  [[-2, '−2π'], [-1, '−π'], [1, 'π'], [2, '2π']].forEach(([k, s]) => {
+    path(g, `M${AX.PX(k * PI)} ${AX.PY(0) - 8}V${AX.PY(0) + 8}`, { stroke: COL.chalk, 'stroke-width': 3 });
+    M(g, [s], { x: AX.PX(k * PI), y: AX.PY(0) + 40, size: 28, fill: COL.dim });
+  });
+  [1, -1].forEach(v => M(g, [v > 0 ? '1' : '−1'], { x: AX.PX(0) - 22, y: AX.PY(v) + (v > 0 ? -12 : 30), size: 26, fill: COL.dim, anchor: 'end' }));
+  show(g, t0);
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Reciprocal graphs', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Trig Graphs · Chapter 7', ['Reciprocal Graphs,', 'Domains and Ranges'], 'graph sec and csc from cos and sin', 'Old midterm questions 14 and 10 · no calculator');
+  }],
+  ['sec', 'sec x from cos x', (m) => {
+    const p = panel(0);
+    axesPi(p, .1);
+    draw(path(p, curveD(AX, Math.cos, -2 * PI, 2 * PI, 160), { stroke: COL.dim, 'stroke-width': 4 }, { d: 0 }), .3, 1.4);
+    tx(p, 'y = cos x', 1000, 70, .8, { size: 30, fill: COL.dim });
+    [-1.5, -.5, .5, 1.5].forEach((k, i) => dashed(p, `M${AX.PX(k * PI)} ${AX.PY(3.4)}V${AX.PY(-3.4)}`, m('zeros', i * .2), COL.nat, 3));
+    tx(p, 'cos x = 0  →  sec x = 1/0: asymptote', 800, 750, m('zeros', .4), { size: 30, fill: COL.nat, anchor: 'middle' });
+    [-2, -1, 0, 1, 2].forEach((k, i) => { const d = G(p, { x: AX.PX(k * PI), y: AX.PY(Math.cos(k * PI)), s: 0, o: 0 }); mk('circle', { r: 10, fill: COL.task }, d); pop(d, m('touch', i * .2)); });
+    const sec = x => 1 / Math.cos(x), cut = 1.27;    // stop each branch where |sec x| reaches about 3.4
+    [[-2 * PI, -1.5 * PI], [-1.5 * PI, -.5 * PI], [-.5 * PI, .5 * PI], [.5 * PI, 1.5 * PI], [1.5 * PI, 2 * PI]].forEach(([a, b], i) => {
+      const lo = a === -2 * PI ? a : a + (PI / 2 - cut), hi = b === 2 * PI ? b : b - (PI / 2 - cut);
+      draw(path(p, curveD(AX, sec, lo, hi, 80), { stroke: COL.whole, 'stroke-width': 5 }, { d: 0 }), m('u', i * .35), .8);
+    });
+    tx(p, 'y = sec x', 1220, 70, m('u', 1.6), { size: 30, fill: COL.whole });
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-csc', prompt: ['Where does y = csc x have vertical asymptotes?'],
+    build: choice([['where sin x = 0:  x = πn'], ['where sin x = ±1'], ['where cos x = 0']], 0, 'csc x = 1/sin x, so it blows up where sin x = 0: x = 0, ±π, ±2π, …',
+      [null, 'Where sin x = ±1, csc x = ±1: that is where the U shapes touch the sine curve.', 'That is for sec x = 1/cos x.']),
+  }], done) }],
+  ['table', 'Domains and ranges', (m) => {
+    const p = panel(0);
+    [['f(x)', 180], ['Domain', 610], ['Range', 1230]].forEach(([h, x]) => tx(p, h, x, 130, .2, { size: 32, fill: COL.dim, anchor: 'middle', weight: 600 }));
+    path(p, 'M100 155H1500', { stroke: COL.dim, 'stroke-width': 2 });
+    ROWS.forEach(([f, d, r, k], i) => {
+      const y = 220 + i * 84, t = m(k, (i % 2) * .6);
+      ml(p, [f], 180, y, t, { size: 40 });
+      ml(p, d, 610, y, t + .3, { size: 38, fill: COL.whole });
+      ml(p, r, 1230, y, t + .6, { size: 38, fill: COL.task });
+    });
+    tx(p, 'set-builder form for the domains with holes', 610, 730, m('tan', 1.5), { size: 26, fill: COL.dim, anchor: 'middle' });
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-range', prompt: ['What is the range of y = csc x?'],
+    build: choice([[$m('(−∞, −1] ∪ [1, ∞)')], [$m('[−1, 1]')], [$m('(−∞, ∞)')]], 0, 'sin x is between −1 and 1, so 1/sin x is never between −1 and 1: (−∞, −1] ∪ [1, ∞).',
+      [null, 'That is the range of sin x. Its reciprocal is the outside of that interval.', 'csc x never takes values strictly between −1 and 1.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['Sketch sin or cos first, lightly.', 'w1'], ['Its zeros become dashed vertical asymptotes.', 'w2'],
+      ['At its peaks and valleys, draw U shapes touching it.', 'w3'], ['Domains skip the asymptotes; ranges skip (−1, 1).', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q14a', prompt: [fromExam(14), 'No calculator. Graph two cycles of y = csc x using y = sin x. Where are the vertical asymptotes on [−2π, 2π]?'],
+    build: choice([[$m('x = −2π, −π, 0, π, 2π')], [$m('x = ±', F('π', 2), ', ±', F('3π', 2))], [$m('x = −π, π')]], 0, 'csc x = 1/sin x is undefined where sin x = 0: every multiple of π.',
+      [null, 'Those are the peaks and valleys of sin x, where csc x touches it.', 'sin 0 = 0 and sin(±2π) = 0 too.']),
+  }, {
+    id: 'p-q14b', prompt: ['Question 14. Where do the U shapes of csc x touch the sine curve?'],
+    build: choice([['where sin x = 1 or −1'], ['where sin x = 0'], ['nowhere']], 0, 'There 1/sin x = sin x = ±1. Between asymptotes, csc opens up above a sine hill and down below a sine valley.',
+      [null, 'Those are the asymptotes.', 'They touch at sin x = ±1, since 1/1 = 1 and 1/(−1) = −1.']),
+  }, {
+    id: 'p-q10a', prompt: [fromExam(10), 'The cos x row: domain and range?'],
+    build: choice([[$m('(−∞, ∞);  [−1, 1]')], [$m('[−1, 1];  (−∞, ∞)')], [$m('(−∞, ∞);  (−∞, ∞)')]], 0, 'Cosine takes any real input; its outputs stay between −1 and 1.',
+      [null, 'Domain is the inputs: cos x accepts every real x.', 'Cosine never goes above 1 or below −1.']),
+  }, {
+    id: 'p-q10b', prompt: ['Question 10. The domain of tan x (set-builder form)?'],
+    build: choice([[$m('{x | x ≠ ', F('π', 2), ' + πn  (n ∈ ℤ)}')], [$m('{x | x ≠ πn  (n ∈ ℤ)}')], [$m('(−∞, ∞)')]], 0, 'tan x = sin x/cos x is undefined where cos x = 0: x = π/2 + πn.',
+      [null, 'That is the domain of cot x (where sin x = 0).', 'tan x has vertical asymptotes, so some x are left out.']),
+  }, {
+    id: 'p-q10c', prompt: ['Question 10. The domain of cot x?'],
+    build: choice([[$m('{x | x ≠ πn  (n ∈ ℤ)}')], [$m('{x | x ≠ ', F('π', 2), ' + πn  (n ∈ ℤ)}')], [$m('[−1, 1]')]], 0, 'cot x = cos x/sin x is undefined where sin x = 0: x = πn. Its range is (−∞, ∞).',
+      [null, 'That is for tan x and sec x (where cos x = 0).', '[−1, 1] is a range, of sine and cosine.']),
+  }, {
+    id: 'p-q10d', prompt: ['Question 10. The range of sec x?'],
+    build: choice([[$m('(−∞, −1] ∪ [1, ∞)')], [$m('(−∞, ∞)')], [$m('[−1, 1]')]], 0, 'sec x = 1/cos x is never strictly between −1 and 1. Its domain is {x | x ≠ π/2 + πn (n ∈ ℤ)}.',
+      [null, 'The U shapes never come between −1 and 1.', 'That is the range of cos x itself.']),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>

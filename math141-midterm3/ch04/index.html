@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Special Angles and the Unit Circle · Math 141 Midterm 3 Review</title>
+<link rel="stylesheet" href="../lib/engine.css">
+<link rel="expect" href="#bar" blocking="render"><!-- hold the first frame until the player exists, so the page transition can run -->
+</head>
+<body>
+<script src="../lib/engine.js"></script>
+<script src="../lib/m141.js"></script>
+<script src="audio/en/timings.js"></script>
+<script>
+'use strict';
+// Math 141 Midterm 3 Review, Chapter 4. Old midterm questions 5 and 11. Storyboard: books/math141-midterm3/chapters/ch04.md.
+const CHAPTER = { number: 4, title: 'Special Angles and the Unit Circle', minutes: 7, language: 'en', next: '../ch05/' };
+
+/* ---------- chapter data (checked in ch04.md) ---------- */
+// 0..π/2 table (sin = √n/2, cos reversed, tan = sin/cos, sec = 1/cos).  7π/6: ref π/6, QIII: (−√3/2, −1/2).
+// 11π/4 − 2π = 3π/4: tan = −1.  π: (−1, 0), tan 0, cot und.  sec(5π/4) = −√2.
+const COLS = [200, 470, 770, 1070, 1360], ROWS = [220, 320, 420, 520, 620];
+const ANG = [['0'], [F('π', 6)], [F('π', 4)], [F('π', 3)], [F('π', 2)]];
+const RAW = [[F('√0', 2)], [F('√1', 2)], [F('√2', 2)], [F('√3', 2)], [F('√4', 2)]];
+const SIN = [['0'], [F(1, 2)], [F('√2', 2)], [F('√3', 2)], ['1']];
+const TAN = [['0'], [F('√3', 3)], ['1'], ['√3'], ['und.']];
+const SEC = [['1'], [F('2√3', 3)], ['√2'], ['2'], ['und.']];
+const U = { x: 400, y: 410, r: 220 };
+const UX = v => U.x + U.r * v, UY = v => U.y - U.r * v;
+
+function unit(p, t0) {
+  path(p, `M${U.x - U.r - 50} ${U.y}H${U.x + U.r + 50}M${U.x} ${U.y - U.r - 50}V${U.y + U.r + 50}`, { stroke: COL.dim, 'stroke-width': 2.5 });
+  draw(path(p, `M${U.x + U.r} ${U.y}A${U.r} ${U.r} 0 1 0 ${U.x - U.r} ${U.y}A${U.r} ${U.r} 0 1 0 ${U.x + U.r} ${U.y}`, { stroke: COL.chalk, 'stroke-width': 3.5 }, { d: 0 }), t0, 1);
+}
+function spoke(p, a, color, t0, label, lx, ly) {
+  draw(path(p, `M${U.x} ${U.y}L${UX(Math.cos(a))} ${UY(Math.sin(a))}`, { stroke: color, 'stroke-width': 5 }, { d: 0 }), t0, .6);
+  const d = G(p, { x: UX(Math.cos(a)), y: UY(Math.sin(a)), s: 0, o: 0 }); mk('circle', { r: 11, fill: color }, d); pop(d, t0 + .5);
+  if (label) ml(p, label, lx, ly, t0 + .7, { size: 34, fill: color });
+}
+
+/* ---------- beats ---------- */
+const BEATS = [
+  ['intro', 'Special angles', (m) => {
+    const p = panel(0);
+    introCard(p, m, 'Trig Values · Chapter 4', ['Special Angles', 'and the Unit Circle'], 'exact values without a calculator', 'Old midterm questions 5 and 11 · no calculator');
+  }],
+  ['table', 'Build the table', (m) => {
+    const p = panel(0);
+    ['θ', 'sin θ', 'cos θ', 'tan θ', 'sec θ'].forEach((h, i) => ml(p, [h], COLS[i], 130, .2, { size: 38, fill: COL.dim }));
+    path(p, 'M100 160H1480', { stroke: COL.dim, 'stroke-width': 2 });
+    ANG.forEach((a, r) => ml(p, a, COLS[0], ROWS[r] + 14, .3 + r * .1, { size: 40 }));
+    const raw = RAW.map((a, r) => ml(p, a, COLS[1], ROWS[r] + 14, m('sin', r * .35), { size: 40, fill: COL.task }));
+    raw.forEach((e, r) => hide(e, m('simp', r * .15), .3));
+    SIN.forEach((a, r) => ml(p, a, COLS[1], ROWS[r] + 14, m('simp', .3 + r * .15), { size: 40 }));
+    SIN.forEach((a, r) => ml(p, a, COLS[2], ROWS[4 - r] + 14, m('cos', r * .3), { size: 40, fill: COL.whole }));
+    TAN.forEach((a, r) => ml(p, a, COLS[3], ROWS[r] + 14, m('tan', r * .3), { size: 40 }));
+    SEC.forEach((a, r) => ml(p, a, COLS[4], ROWS[r] + 14, m('sec', r * .3), { size: 40 }));
+    tx(p, 'reverse the sine column', COLS[2], 700, m('cos'), { size: 26, fill: COL.whole, anchor: 'middle' });
+    tx(p, 'sin ÷ cos', COLS[3], 700, m('tan'), { size: 26, fill: COL.dim, anchor: 'middle' });
+    tx(p, '1 ÷ cos, rationalized', COLS[4], 700, m('sec'), { size: 26, fill: COL.dim, anchor: 'middle' });
+  }],
+  ['q1', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-cos', prompt: ['Find cos(π/3) exactly.'],
+    build: blanks([{ parts: ['cos(', F('π', 3), ') = ', { box: '1/2' }], why: 'Reversing the sine column: cos(π/3) = sin(π/6) = 1/2.', hint: 'Read the cosine column: it is the sine column upside down.' }]),
+  }], done) }],
+  ['circle', 'Beyond π/2', (m) => {
+    const p = panel(0);
+    unit(p, .1);
+    const a = 7 * Math.PI / 6;
+    const ref = path(p, `M${UX(-.32)} ${U.y}A70 70 0 0 0 ${U.x + 70 * Math.cos(a)} ${U.y - 70 * Math.sin(a)}`, { stroke: COL.task, 'stroke-width': 4 }, { d: 0 });
+    spoke(p, a, COL.nat, .5, [F('7π', 6)], UX(-1.15), UY(-.62));
+    ml(p, ['θ = ', F('7π', 6)], 1130, 150, .3, { size: 48 });
+    draw(ref, m('ref'), .5);
+    ml(p, ['reference angle  ', F('π', 6)], 1130, 250, m('ref'), { size: 40, fill: COL.task });
+    tx(p, 'Quadrant III', 1130, 320, m('quad'), { size: 32, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['(cos, sin) = (−', F('√3', 2), ', −', F(1, 2), ')'], 1130, 410, m('coords'), { size: 42, fill: COL.nat });
+    tx(p, 'ASTC: only tan and cot are positive here', 1130, 480, m('astc'), { size: 28, fill: COL.dim, anchor: 'middle' });
+    ml(p, ['sin = −', F(1, 2), '    cos = −', F('√3', 2)], 1130, 570, m('vals'), { size: 40 });
+    ml(p, ['tan = ', F('√3', 3), '    sec = −', F('2√3', 3)], 1130, 670, m('vals', 1.5), { size: 40 });
+  }],
+  ['coterm', 'Coterminal and quadrantal angles', (m) => {
+    const p = panel(0);
+    unit(p, .1);
+    spoke(p, 3 * Math.PI / 4, COL.whole, m('pt'), ['(−', F('√2', 2), ', ', F('√2', 2), ')'], UX(-.95), UY(.95));
+    spoke(p, Math.PI, COL.task, m('quadr'), ['(−1, 0)'], UX(-1.38), UY(.1));
+    ml(p, ['tan(', F('11π', 4), ')'], 1130, 150, .3, { size: 46 });
+    ml(p, [F('11π', 4), ' − 2π = ', F('11π', 4), ' − ', F('8π', 4), ' = ', F('3π', 4)], 1130, 250, m('cot1'), { size: 40 });
+    tx(p, 'coterminal: same terminal side', 1130, 310, m('cot1', .8), { size: 26, fill: COL.dim, anchor: 'middle' });
+    const v = ml(p, ['tan = ', F('y', 'x'), ' = −1'], 1130, 400, m('val'), { size: 44, fill: COL.whole });
+    ml(p, ['θ = π:   tan π = ', F(0, '−1'), ' = 0'], 1130, 540, m('quadr', .6), { size: 40, fill: COL.task });
+    ml(p, ['cot π = ', F('−1', 0), ' :  und.'], 1130, 650, m('und'), { size: 40, fill: COL.task });
+  }],
+  ['q2', 'Quick check', () => {}, { ask: done => quiz(BAND, [{
+    id: 'c-sec', prompt: ['Find sec(5π/4) exactly.'],
+    build: choice([[$m('−√2')], [$m('√2')], [$m('−', F('√2', 2))]], 0, '5π/4 is in Quadrant III with reference angle π/4, so cos = −√2/2 and sec = 1/cos = −2/√2 = −√2.',
+      [null, 'Secant follows cosine, which is negative in Quadrant III.', 'That is cos(5π/4). Secant is its reciprocal.']),
+  }], done) }],
+  ['wrap', 'Summary', (m) => {
+    const p = panel(0);
+    wrapList(p, m, [['sin: √0/2 … √4/2. Reverse it for cos.', 'w1'], ['tan = sin/cos, sec = 1/cos; rationalize.', 'w2'],
+      ['Other angles: reference angle, then ASTC signs.', 'w3'], ['Subtract 2π for a nicer coterminal angle; x/0 is "und."', 'w4']]);
+  }],
+  ['final1', PRACT, () => { panel(0); }, { ask: done => quiz(SCREEN, [{
+    id: 'p-q5a', prompt: [fromExam(5), 'No calculator. The table row for 7π/6. First, sin(7π/6).'],
+    build: blanks([{ parts: ['sin(', F('7π', 6), ') = ', { box: '-1/2' }], why: 'Reference angle π/6, Quadrant III: sine is negative, so −1/2.', hint: 'Reference angle π/6 gives 1/2. Is sine positive in Quadrant III?' }]),
+  }, {
+    id: 'p-q5b', prompt: ['Question 5. cos(7π/6)?'],
+    build: choice([[$m('−', F('√3', 2))], [$m(F('√3', 2))], [$m('−', F(1, 2))]], 0, 'Reference π/6 gives √3/2; cosine is negative in Quadrant III.',
+      [null, 'Cosine is negative in Quadrant III (only tan and cot are positive).', 'That is sin(7π/6).']),
+  }, {
+    id: 'p-q5c', prompt: ['Question 5. tan(7π/6)?'],
+    build: choice([[$m(F('√3', 3))], [$m('−', F('√3', 3))], [$m('√3')]], 0, 'tan = (−1/2)/(−√3/2) = 1/√3 = √3/3, positive in Quadrant III.',
+      [null, 'By ASTC, tangent is positive in Quadrant III.', '√3 is tan(π/3). The reference angle here is π/6.']),
+  }, {
+    id: 'p-q5d', prompt: ['Question 5. sec(7π/6)?'],
+    build: choice([[$m('−', F('2√3', 3))], [$m(F('2√3', 3))], [$m('−2')]], 0, 'sec = 1/cos = 1/(−√3/2) = −2/√3 = −2√3/3.',
+      [null, 'Secant has the same sign as cosine: negative in Quadrant III.', '−2 would be sec(4π/3), where cos = −1/2.']),
+  }, {
+    id: 'p-q5e', prompt: ['Question 5. tan(3π/2)?'],
+    build: choice([['und.'], ['0'], ['−1']], 0, '3π/2 is the point (0, −1): tan = −1/0, undefined. Write "und."',
+      [null, '0 is cot(3π/2) and cos(3π/2). Tangent divides by x = 0.', '−1 is sin(3π/2).']),
+  }, {
+    id: 'p-q5f', prompt: ['Question 5. sec(π/6)?'],
+    build: choice([[$m(F('2√3', 3))], [$m(F('√3', 2))], [$m('2')]], 0, 'sec = 1/(√3/2) = 2/√3 = 2√3/3 after rationalizing.',
+      [null, 'That is cos(π/6). Secant is its reciprocal.', '2 is sec(π/3).']),
+  }, {
+    id: 'p-q11', prompt: [fromExam(11), 'Evaluate cot(7π/2).'],
+    build: blanks([{ parts: ['cot(', F('7π', 2), ') = ', { box: '0' }], why: '7π/2 − 2π = 3π/2, the point (0, −1). cot = x/y = 0/(−1) = 0.', hint: 'Subtract 2π to get a coterminal angle, then use cot = x/y.' }]),
+  }], done, PRACT) }],
+  ['finish', 'Finished', () => { panel(0); }, { ask: finishCard }],
+].map(([id, title, run, extra]) => ({ id, title, run, ...extra }));
+
+boot();
+</script>
+</body>
+</html>
