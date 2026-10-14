@@ -149,13 +149,19 @@ main#contents { padding-bottom: 80px; }
 @keyframes breathe { from { transform: scaleY(1); } to { transform: scaleY(.35); } }
 .unit h2 span { font: 600 14px var(--ui); letter-spacing: .14em; text-transform: uppercase; color: var(--c); white-space: nowrap; }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 290px), 1fr)); gap: 12px; }
-.ch { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr auto; column-gap: 16px; row-gap: 8px; min-height: 112px;
+.ch { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 1fr auto auto; column-gap: 16px; row-gap: 8px; min-height: 112px;
   padding: 16px 18px 14px 16px; border-radius: 16px; background: var(--panel); border: 1.5px solid var(--edge); border-left: 6px solid var(--c);
   text-decoration: none; transition: transform .3s var(--ease), border-color .3s, box-shadow .3s; }
 .ch:hover { transform: translateY(-3px); border-color: var(--c); box-shadow: 0 14px 34px rgba(0, 0, 0, .3); }
-.ch b { grid-row: span 2; min-width: 1.15em; font: 500 42px/1 var(--book); color: var(--c); font-variant-numeric: lining-nums tabular-nums; }
+.ch b { grid-row: span 3; min-width: 1.15em; font: 500 42px/1 var(--book); color: var(--c); font-variant-numeric: lining-nums tabular-nums; }
 .ch span { font-size: 18px; line-height: 1.3; }
 .ch small { color: var(--dim); font-size: 14px; }
+.ch .tags { grid-column: 2; display: flex; flex-wrap: wrap; gap: 6px; }
+.ch .tag { font: 600 13px/1 var(--ui); font-style: normal; padding: 5px 9px; border-radius: 99px; border: 1.5px solid; white-space: nowrap; }
+.ch .tag.calc { color: #86c9e8; border-color: rgba(134, 201, 232, .55); }
+.ch .tag.nocalc { color: #f0b45a; border-color: rgba(240, 180, 90, .55); }
+.calc-key { max-width: 1212px; margin: 0 auto; padding: 20px 16px 0; color: var(--dim); font-size: 15px; }
+.calc-key b { font-weight: 600; }
 .ch.done small::before { content: "✓ Finished · "; color: var(--good); font-weight: 600; }
 .ch.last small::after { content: " · Last opened"; color: var(--quiz); }
 .ch.here:focus-visible { outline-color: var(--c); }
@@ -213,18 +219,22 @@ main#contents { padding-bottom: 80px; }
     <a class="home" href="#book" aria-label="Back to the cover"><svg class="mascot" id="guideSmall" width="52" height="36"></svg><strong>Math 141 <i>Midterm 2</i></strong></a>
     <span class="prog" id="prog"></span>
   </header>
+  <p class="calc-key">Practice midterm: <b style="color:#86c9e8">Part 1, questions 1–5: scientific calculator</b> · <b style="color:#f0b45a">Part 2, questions 6–23: no calculator</b></p>
   <div id="units"></div>
 </main>
 
 <script>
 'use strict';
 // Chapters are numbered in order through the units. Add a chapter here when its lesson is ready.
-const UNITS = [   // [unit title, [[chapter title, minutes], ...]]; chapters are numbered in order. Add a chapter when its lesson is ready.
-  ['Quadratic Functions', [['Parabolas: Vertex Form and Maximum Height', 7]]],
-  ['Polynomial Functions', [['Long Division of Polynomials', 5], ['Complex Zeros and Linear Factors', 7], ['Zero Tests and Graph Shapes', 7]]],
-  ['Rational Functions and Domains', [['Holes and Asymptotes', 6], ['Domains and Ranges', 5]]],
-  ['Exponentials and Logarithms', [['Logarithm Rules and Change of Base', 6], ['Exponential and Log Equations', 7]]],
+const UNITS = [   // [unit title, [[chapter title, minutes, [calculator questions], [no-calculator questions]], ...]]; chapters are numbered in order.
+  ['Quadratic Functions', [['Parabolas: Vertex Form and Maximum Height', 7, [1, 2], []]]],
+  ['Polynomial Functions', [['Long Division of Polynomials', 5, [], [6]], ['Complex Zeros and Linear Factors', 7, [3], [8, 9, 11]], ['Zero Tests and Graph Shapes', 7, [], [7, 10, 12]]]],
+  ['Rational Functions and Domains', [['Holes and Asymptotes', 6, [], [13, 14]], ['Domains and Ranges', 5, [], [15, 16, 17, 18, 19]]]],
+  ['Exponentials and Logarithms', [['Logarithm Rules and Change of Base', 6, [5], [20, 21]], ['Exponential and Log Equations', 7, [4], [22, 23]]]],
 ];
+// Practice midterm: Part 1 (questions 1–5) uses a scientific calculator; Part 2 (questions 6–23) is no calculator.
+const qs = a => (a.length > 2 && a[a.length - 1] - a[0] === a.length - 1 ? `Q${a[0]}–${a[a.length - 1]}` : 'Q' + a.join(', '));
+const calcTags = (c, nc) => (c.length ? `<i class="tag calc">Calculator ${qs(c)}</i>` : '') + (nc.length ? `<i class="tag nocalc">No calculator ${qs(nc)}</i>` : '');
 const HUES = ['#86c9e8', '#f3c95c', '#e8a0c8', '#8fd6b0'];
 const id = n => 'ch' + String(n).padStart(2, '0');
 let P = {};
@@ -240,9 +250,9 @@ let n = 0, total = 0, i = 0;   // i staggers the entrance, in reading order
 const esc = s => s.replace(/&/g, '&amp;').replace(/</g, '&lt;');
 document.getElementById('units').innerHTML = UNITS.map(([name, chs], u) => {
   return `<section class="unit" style="--c:${HUES[u % HUES.length]};--i:${i++}"><svg class="unit-art" viewBox="0 0 600 180" aria-hidden="true">${UNIT_ART[u] || ''}</svg><h2><span>Unit ${u + 1}</span>${esc(name)}</h2><div class="grid">` +
-    chs.map(([t, min]) => { n++;
+    chs.map(([t, min, calc = [], nocalc = []]) => { n++;
       const cls = 'ch' + (done.has(n) ? ' done' : '') + (P.last === n ? ' last' : '');
-      return `<a class="${cls}" id="${id(n)}" href="${id(n)}/" style="--i:${i++}"><b>${n}</b><span>${esc(t)}</span><small>${min} min</small></a>`;
+      return `<a class="${cls}" id="${id(n)}" href="${id(n)}/" style="--i:${i++}"><b>${n}</b><span>${esc(t)}</span><small>${min} min</small><span class="tags">${calcTags(calc, nocalc)}</span></a>`;
     }).join('') + '</div></section>';
 }).join('');
 total = n;
